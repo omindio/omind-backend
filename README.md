@@ -10,9 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 Docker dependency. Install it from:
 
-```
 [https://docs.docker.com/install/](https://docs.docker.com/install/)
-```
 
 ### Installing
 
@@ -21,19 +19,20 @@ Docker dependency. Install it from:
 ```
 docker-compose build
 ```
-3. Run containrs:
+3. Run containers:
 ```
 docker-compose up -d
 ```
-
-- App: [0.0.0.0:5000](0.0.0.0:5000)
-- Mongo Admin: [0.0.0.0:8081](0.0.0.0:8081)
-- MongoDB: [0.0.0.0:27017](0.0.0.0:27017)
 
 List all containers:
 ```
 docker ps
 ```
+
+- App: [http://0.0.0.0:5000](http://0.0.0.0:5000)
+- Mongo Admin: [http://0.0.0.0:8081](http://0.0.0.0:8081)
+- MongoDB: [http://0.0.0.0:27017](http://0.0.0.0:27017)
+
 
 ## Running the tests
 
