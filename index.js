@@ -1,40 +1,15 @@
-require('dotenv').config();
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const cors = require('cors');
-const passport = require("passport");
+import { app } from './src/app';
 
-const users = require("./routes/api/users");
+import https from 'https';
+import fs from 'fs';
 
-const app = express();
-console.log();
-// Bodyparser middleware
-app.use(
-  bodyParser.urlencoded({
-    extended: false
-  })
-);
-app.use(bodyParser.json());
-console.log(process.env.DB_URI);
-// Connect to MongoDB
-mongoose
-  .connect(
-    process.env.DB_URI,
-    { useNewUrlParser: true }
-  )
-  .then(() => console.log("MongoDB successfully connected"))
-  .catch(err => console.log(err));
-
-// Passport middleware
-app.use(passport.initialize());
-
-// Passport config
-require("./config/passport")(passport);
-
-// Routes
-app.use("/api/users", users);
+const options = {
+  //key: fs.readFileSync('/srv/www/keys/my-site-key.pem'),
+  //cert: fs.readFileSync('/srv/www/keys/chain.pem')
+};
 
 const port = process.env.APP_PORT;
 
-app.listen(port, () => console.log(`Server up and running on port ${port} !`));
+app.listen(port);
+
+//https.createServer(options, app).listen(port);

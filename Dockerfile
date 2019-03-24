@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE ${APP_PORT}
 
-CMD nodemon -L --watch . index.js
+CMD npm start

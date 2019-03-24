@@ -33,7 +33,6 @@ docker ps
 - Mongo Admin: [http://0.0.0.0:8081](http://0.0.0.0:8081)
 - MongoDB: [http://0.0.0.0:27017](http://0.0.0.0:27017)
 
-
 ## Running the tests
 
 *TODO*
@@ -48,10 +47,20 @@ docker ps
 - **express**: sits on top of Node to make the routing, request handling, and responding easier to write
 - **is-empty:** global function that will come in handy when we use validator
 - **jsonwebtoken**: used for authorization
-- **passport**: used to authenticate requests, which it does through an extensible set of plugins known as strategies
-- **passport-jwt**: passport strategy for authenticating with a JSON Web Token (JWT); lets you authenticate endpoints using a JWT.
 - **validator**: used to validate inputs (e.g. check for valid email format, confirming passwords match)
+- **swagger**: swagger-ui-express
+- **babel**: babel-core babel-node babel-preset
+- **morgan**: will log requests to the console so we can see what is happening
+- **helmet**: Helmet helps you secure your Express apps by setting various HTTP headers.
 
 ### Proyect Organization
+
+*TODO*
+
+## API
+
+*TODO*
+
+## Production Build
 
 *TODO*

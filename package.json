@@ -1,10 +1,14 @@
 {
-  "name": "backend-app",
+  "name": "node-express-mongo",
   "version": "1.0.0",
-  "description": "backend-app",
+  "description": "Backend Stack - Docker. https://omindbrand.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omindbrand/node-express-mongo"
+  },
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon --exec babel-node -L --watch . ./index.js"
   },
   "keywords": [],
   "author": "",
@@ -15,11 +19,18 @@
     "cors": "^2.8.5",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
+    "express-jwt": "^5.3.1",
+    "helmet": "^3.16.0",
     "is-empty": "^1.2.0",
     "jsonwebtoken": "^8.5.0",
     "mongoose": "^5.4.19",
-    "passport": "^0.4.0",
-    "passport-jwt": "^4.0.0",
+    "morgan": "^1.9.1",
+    "swagger-ui-express": "^4.0.2",
     "validator": "^10.11.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.0",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.4.1"
   }
 }

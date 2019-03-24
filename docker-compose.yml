@@ -9,7 +9,7 @@ services:
       - 'mongo'
     ports:
       - '${APP_PORT}:${APP_PORT}'
-    command: nodemon -L --watch . index.js
+    command: npm start
     volumes: 
       - .:/opt/backend-app
       #- /opt/backend-app/node_modules
