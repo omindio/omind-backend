@@ -1,7 +1,3 @@
-/*
-    TODO: 
-        - Validar campos aquí.
-*/
 import User from '../models/user.model';
 import bcrypt from 'bcryptjs';
 import Role from '../security/role.security';

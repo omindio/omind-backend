@@ -33,6 +33,4 @@ function loadConfig() {
   return Object.assign({}, defaultConfig, envConfig[env]);
 }
 
-const config = loadConfig()
-
-export { config };
+export const config = loadConfig();

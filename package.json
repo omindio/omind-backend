@@ -1,14 +1,14 @@
 {
   "name": "node-express-mongo",
   "version": "1.0.0",
-  "description": "Backend Stack - Docker. https://omindbrand.com",
+  "description": "Backend Stack (API) - Docker. https://omindbrand.com",
   "repository": {
     "type": "git",
     "url": "https://github.com/omindbrand/node-express-mongo"
   },
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node -L --watch . ./index.js"
+    "start": "nodemon --exec babel-node -L --watch . ./src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +25,7 @@
     "jsonwebtoken": "^8.5.0",
     "mongoose": "^5.4.19",
     "morgan": "^1.9.1",
+    "swagger-jsdoc": "^3.2.8",
     "swagger-ui-express": "^4.0.2",
     "validator": "^10.11.0"
   },

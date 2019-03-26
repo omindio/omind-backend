@@ -1,4 +1,4 @@
-# Node, Express & MongoDB - Docker
+# Node, Express & MongoDB - Docker (API)
 
 *TODO*
 
@@ -48,7 +48,8 @@ docker ps
 - **is-empty:** global function that will come in handy when we use validator
 - **jsonwebtoken**: used for authorization
 - **validator**: used to validate inputs (e.g. check for valid email format, confirming passwords match)
-- **swagger**: swagger-ui-express
+- **swagger-ui-express**: Adds middleware to your express app to serve the Swagger UI bound to your Swagger document. This acts as living documentation for your API hosted from within your app.
+- **swagger-jsdoc**: Generates swagger doc based on JSDoc comments in your code to keep a live and reusable OpenAPI (Swagger) specification.
 - **babel**: babel-core babel-node babel-preset
 - **morgan**: will log requests to the console so we can see what is happening
 - **helmet**: Helmet helps you secure your Express apps by setting various HTTP headers.

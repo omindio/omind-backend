@@ -5,39 +5,24 @@ import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 
-import { config } from './config';
-import { MongoService } from './services/mongo.service';
-
-import routes from './routes';
+import { userComponent } from './components';
 
 const app = express();
-const mongoService = new MongoService(config.dbUri);
-mongoService.connect();
 
-app.use(helmet());
-app.use(cors());
-//extended=false is a configuration option that tells the parser to use the classic encoding. When using it, values can be only strings or arrays.
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
+export const initialize = () => {
 
-//use morgan to log requests to the console
-app.use(morgan('dev'));
+    app.use(helmet());
+    app.use(cors());
+    //extended=false is a configuration option that tells the parser to use the classic encoding. When using it, values can be only strings or arrays.
+    app.use(bodyParser.urlencoded({extended: false}));
+    app.use(bodyParser.json());
 
-routes(app);
+    //use morgan to log requests to the console
+    app.use(morgan('dev'));
 
+    //initialize components
+    userComponent.initialize(app);
 
-//const passport = require('passport');
+    return app;
 
-// Passport middleware
-//app.use(passport.initialize());
-
-// Passport auth config
-//require('./middlewares/passport')(passport);
-
-// Routes
-//app.use('/api/users', users);
-//app.use('/api', routes)(app);
-
-export {
-    app
 };
