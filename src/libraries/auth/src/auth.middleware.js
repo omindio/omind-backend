@@ -1,6 +1,6 @@
 import expressJwt from 'express-jwt';
 
-import { config } from '../../../config';
+import { config } from '@config';
 
 export const authorize = (roles = []) => {
     // roles param can be a single role string (e.g. Role.User or 'User') 

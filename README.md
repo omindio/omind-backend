@@ -1,6 +1,6 @@
 # Node, Express & MongoDB - Docker (API)
 
-*TODO*
+*TODO:*
 
 ## Getting Started
 
@@ -35,7 +35,7 @@ docker ps
 
 ## Running the tests
 
-*TODO*
+*TODO:*
 
 ### Packages
 
@@ -53,15 +53,16 @@ docker ps
 - **babel**: babel-core babel-node babel-preset
 - **morgan**: will log requests to the console so we can see what is happening
 - **helmet**: Helmet helps you secure your Express apps by setting various HTTP headers.
+- **module-alias**: Create aliases of directories and register custom module paths.
 
 ### Proyect Organization
 
-*TODO*
+*TODO:*
 
 ## API
 
-*TODO*
+*TODO:*
 
 ## Production Build
 
-*TODO*
+*TODO:*

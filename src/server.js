@@ -1,8 +1,13 @@
-import * as mongo from './config/mongo'
+import 'module-alias/register';
+
+import { Mongo } from '@libraries';
 import * as App from './app';
 
 import https from 'https';
-import fs from 'fs';
+import http from 'http';
+//import fs from 'fs';
+
+global.__base = __dirname + '/';
 
 const options = {
   //key: fs.readFileSync('/srv/www/keys/my-site-key.pem'),
@@ -11,13 +16,14 @@ const options = {
 
 const port = process.env.APP_PORT;
 
-mongo
+Mongo
     .connect()
     .then(() => {
 
       const app = App.initialize(); 
 
-      app.listen(port);
+      //app.listen(port);
+      http.createServer(app).listen(port);
       //https.createServer(options, app).listen(port);
       
     })

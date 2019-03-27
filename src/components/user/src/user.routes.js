@@ -1,10 +1,10 @@
 import { Router } from 'express';
 const routes = Router();
 
-import { authLibrary } from '../../../libraries'; 
+import { AuthLibrary } from '@libraries'; 
 
-const authorize = authLibrary.authorize;
-const Role = authLibrary.roles;
+const authorize = AuthLibrary.authorize;
+const Role = AuthLibrary.roles;
 
 import * as Controller from './user.controller';
 

@@ -23,6 +23,7 @@
     "helmet": "^3.16.0",
     "is-empty": "^1.2.0",
     "jsonwebtoken": "^8.5.0",
+    "module-alias": "^2.2.0",
     "mongoose": "^5.4.19",
     "morgan": "^1.9.1",
     "swagger-jsdoc": "^3.2.8",
@@ -33,5 +34,10 @@
     "@babel/core": "^7.4.0",
     "@babel/node": "^7.2.2",
     "@babel/preset-env": "^7.4.1"
+  },
+  "_moduleAliases": {
+    "@components": "src/components",
+    "@libraries": "src/libraries",
+    "@config": "src/config"
   }
 }

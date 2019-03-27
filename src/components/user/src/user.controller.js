@@ -1,5 +1,5 @@
-import { authLibrary } from '../../../libraries'; 
-const Role = authLibrary.roles;
+import { AuthLibrary } from '@libraries'; 
+const Role = AuthLibrary.roles;
 
 import * as Service from './user.service';
 
@@ -7,7 +7,7 @@ export const create = (req, res, next) => {
     let userData = req.body;
     Service.create(userData)
         .then(user => {
-            res.status(201).json({
+            res.status(200).json({
                 status: 'success', 
                 message: 'User created successfully.',
                 //TODO: Return specific fields

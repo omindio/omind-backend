@@ -1,5 +1,5 @@
-import * as userComponent from './user';
+import * as UserComponent from './user';
 
 export {
-    userComponent
+    UserComponent
 };

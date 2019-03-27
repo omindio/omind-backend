@@ -1,0 +1,58 @@
+paths:
+
+  /users:
+    get:
+      tags:
+        - users
+      summary: Returns a list of users.
+      description: Only for User Admin.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema: 
+                type: array
+                properties: 
+                  _id: integer
+                  name: string
+      security:
+        - bearerAuth: []
+    #post:
+
+#/users/{id}:
+    ##get:
+      #security:
+        #- bearerAuth: []
+    #post:
+      #security:
+        #- bearerAuth: []
+    #patch:
+      #security:
+        #- bearerAuth: []
+
+  /users/auth:
+    post:
+      tags:
+        - users
+      summary: Returns auth token.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Success
+        
+
+    

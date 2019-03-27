@@ -1,13 +1,13 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-import { config } from '../../../config';
-import { authLibrary } from '../../../libraries'; 
+import { config } from '@config';
+import { AuthLibrary } from '@libraries'; 
 
 import User from './user.model';
 
 //Auth dependency
-const Role = authLibrary.roles;
+const Role = AuthLibrary.roles;
 //Excluding fields on find methods
 const projection = {
     __v: false,

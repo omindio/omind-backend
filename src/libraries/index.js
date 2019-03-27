@@ -1,5 +1,9 @@
-import * as authLibrary from './auth';
+import * as AuthLibrary from './auth';
+import * as Swagger from './swagger';
+import * as Mongo from './mongo';
 
 export {
-    authLibrary
+    AuthLibrary,
+    Swagger,
+    Mongo
 };

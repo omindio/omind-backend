@@ -5,9 +5,12 @@ import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 
-import { userComponent } from './components';
+import { UserComponent } from '@components';
+import { Swagger } from '@libraries';
 
 const app = express();
+
+global.__basedir = __dirname;
 
 export const initialize = () => {
 
@@ -21,7 +24,10 @@ export const initialize = () => {
     app.use(morgan('dev'));
 
     //initialize components
-    userComponent.initialize(app);
+    UserComponent.initialize(app);
+
+    //initialize libraries
+    Swagger.initialize(app);
 
     return app;
 
