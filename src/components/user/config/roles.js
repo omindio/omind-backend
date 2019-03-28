@@ -1,4 +1,4 @@
-export default {
+export const roles = {
     Admin: 'Admin',
     User: 'User'
 };

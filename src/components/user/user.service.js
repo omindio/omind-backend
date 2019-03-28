@@ -1,13 +1,14 @@
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-import { config } from '@config';
-import { AuthLibrary } from '@libraries'; 
-
+import { roles as Role } from './config/roles';
 import User from './user.model';
 
-//Auth dependency
-const Role = AuthLibrary.roles;
+import { UnauthorizedActionError } from '@libraries/error-handler';
+import {
+    EmailAlreadyExistsError,
+    UserNotFoundError
+} from './errors';
+
 //Excluding fields on find methods
 const projection = {
     __v: false,
@@ -21,14 +22,13 @@ export const create = (userData) => {
         User.findOne({ email: userData.email })
             .then(user => {
                 if (user)
-                    return reject(new Error('Email already exists.'));
+                    return reject(new EmailAlreadyExistsError());
 
                 const newUser = new User({
                     name: userData.name,
                     email: userData.email,
                     lastName: userData.lastName,
                     password: userData.password,
-                    role: userData.role
                 });
 
                 bcrypt.genSalt(passwordSalt, (err, salt) => {
@@ -40,7 +40,14 @@ export const create = (userData) => {
                         newUser.password = hash;
                         newUser.save()
                             .then(user => {
-                                resolve(user);
+                                resolve({
+                                    _id: user._id,
+                                    name: user.name,
+                                    lastName: user.lastName,
+                                    email: user.email,
+                                    role: user.role,
+                                    createdDate: user.createdDate
+                                });
                             })
                             .catch(err => reject(err));
                     });
@@ -56,24 +63,31 @@ export const update = (id, userData) => {
         User.findById(id)
             .then(user => {
                 if (!user) 
-                    return reject(new Error('This user does not exists.'));
+                    return reject(new UserNotFoundError());
                 
                 user.name = userData.name;
                 user.lastName = userData.lastName;
-                user.role = userData.role;
+                user.email = userData.email;
                 let newPassword = userData.password;
                 if (newPassword) {
                     try {
                         let salt = bcrypt.genSaltSync(passwordSalt);
                         let hash = bcrypt.hashSync(newPassword, salt);
+                        user.password = hash;
                     } catch (err) {
                         return reject(err);
                     }
-                    user.password = hash;
                 }
                 user.save()
                     .then(user => {
-                        resolve(user);
+                        resolve({
+                            _id: user._id,
+                            name: user.name,
+                            lastName: user.lastName,
+                            email: user.email,
+                            role: user.role,
+                            createdDate: user.createdDate
+                        });
                     })
                     .catch(err => reject(err));
             })
@@ -86,13 +100,13 @@ export const remove = (id) => {
         User.findById(id)
             .then(user => {
                 if (!user) 
-                    return reject(new Error('This user does not exists.'));
+                    return reject(new UserNotFoundError());
                 if (user.role == Role.Admin) 
-                    return reject(new Error('You can not delete Administrator.'));
+                    return reject(new UnauthorizedActionError('You can not remove this user.'));
 
                 user.remove()
                     .then(() => {
-                        resolve('User removed successfully.');
+                        resolve();
                     })
                     .catch(err => reject(err));
             })
@@ -105,9 +119,16 @@ export const getOne = (id) => {
         User.findById(id, projection)
         .then(user => {
             if (!user) 
-                return reject(new Error('This user does not exists.'));
+                return reject(new UserNotFoundError());
             
-            resolve(user);
+            resolve({
+                _id: user._id,
+                name: user.name,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+                createdDate: user.createdDate
+            });
         })
         .catch(err => reject(err));
     });
@@ -120,38 +141,5 @@ export const getAll = () => {
             resolve(users);
         })
         .catch(err => reject(err));
-    });
-}
-
-export const auth = (userData) => {
-    return new Promise((resolve, reject) => {
-        User.findOne({email: userData.email})
-            .then(user => {
-                if (!user) 
-                    return reject(new Error('Authentication failed. User not found.')); 
-
-                bcrypt.compare(userData.password, user.password)
-                    .then(isMatch => {
-                        if (isMatch) {
-                            const payload = {
-                                id: user.id,
-                                role: user.role
-                            };
-                            jwt.sign(
-                                payload, 
-                                config.auth.secret, 
-                                { expiresIn: config.auth.tokenTime },
-                                (err, token) => {
-                                    if (err) return reject(err);
-                                    resolve(token);
-                                }
-                            );
-                        } else {
-                            reject(new Error('Authentication failed. Wrong password.'));
-                        }
-                    })
-                    .catch(err => reject(err));
-            })
-            .catch(err => reject(err));
     });
 }

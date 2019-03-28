@@ -1,6 +1,8 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
+//TODO: Split in multiple files
+
 export const initialize = (app) => {
 
   let swaggerDefinition = {
@@ -29,7 +31,7 @@ export const initialize = (app) => {
   let options = {
       swaggerDefinition,
       // path to the API docs
-      apis: [__base+'components/**/doc.yaml'],
+      apis: [__base+'components/**/*.yaml'],
   };
 
   let swaggerSpec = swaggerJSDoc(options);

@@ -2,6 +2,8 @@ import expressJwt from 'express-jwt';
 
 import { config } from '@config';
 
+import { AccessDeniedError } from './errors';
+
 export const authorize = (roles = []) => {
     // roles param can be a single role string (e.g. Role.User or 'User') 
     // or an array of roles (e.g. [Role.Admin, Role.User] or ['Admin', 'User'])
@@ -17,8 +19,7 @@ export const authorize = (roles = []) => {
         (req, res, next) => {
             if (roles.length && !roles.includes(req.user.role)) {
                 // user's role is not authorized
-                //TODO: CREATE ERROR UNHAUTORIZED AND HANDLE TO MIDDLEWARE
-                return res.status(401).json({ message: 'Unauthorized' });
+                throw new AccessDeniedError();
             }
             // authentication and authorization successful
             next();

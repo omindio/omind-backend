@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 
 import { UserComponent } from '@components';
-import { Swagger } from '@libraries';
+import { Swagger, Error } from '@libraries';
 
 const app = express();
 
@@ -28,6 +28,7 @@ export const initialize = () => {
 
     //initialize libraries
     Swagger.initialize(app);
+    Error.Middleware.initialize(app);
 
     return app;
 

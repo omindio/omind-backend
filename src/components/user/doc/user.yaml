@@ -1,0 +1,175 @@
+paths:
+  /users/auth:
+    post:
+      tags:
+        - users
+      summary: Returns auth token.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Wrong email or password.
+
+  /users:
+    get:
+      tags:
+        - users
+      summary: Get all users.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '403':
+          description: Access denied. Insufficient permission.
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - users
+      summary: Create user.
+      requestBody:
+        $ref: '#/components/requestBodies/User'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Email already exists
+      security:
+        - bearerAuth: []
+
+  /users/{id}:
+    delete:
+      tags:
+        - users
+      summary: Delete user.
+      parameters:
+      - name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        '204':
+          description: User deleted successfully 
+        '400':
+          description: Missing id parameter
+        '403':
+          description: Can not delete Admin User
+        '404':
+          description: User not found  
+      security:
+        - bearerAuth: []
+    get:
+      tags:
+        - users
+      summary: Get one user.
+      parameters:
+      - name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/User' 
+        '400':
+          description: Missing id parameter
+        '404':
+          description: User not found
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - users
+      summary: Update one user
+      parameters:
+      - name: id
+        in: path
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/User'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/User' 
+        '400':
+          description: Missing id parameter
+        '404':
+          description: User not found
+      security:
+        - bearerAuth: []
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+        createdDate:
+          type: string
+          format: date-time
+  requestBodies:
+    User:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              name: 
+                type: string
+              lastName: 
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+                format: password
+
+
+    
