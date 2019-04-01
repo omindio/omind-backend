@@ -1,13 +1,13 @@
 import * as Service from './auth.service';
+import AuthDTO from './auth.dto';
 
 export const auth = (req, res, next) => {
-    let userData = req.body;
-
-    Service.auth(userData)
-        .then(token => {
-            res.status(200).json({
-                token: token
-            });
+    let authDTO = new AuthDTO(req.body);
+    Service.auth(authDTO)
+        .then(token => { 
+            res.status(200).json({ token: token }) 
         })
-        .catch(next);     
+        .catch(err => { 
+            return next(err) 
+        });    
 };

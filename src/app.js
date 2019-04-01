@@ -2,15 +2,14 @@ import express from 'express';
 
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import morgan from 'morgan';
 import helmet from 'helmet';
+import correlator from 'express-correlation-id';
+import morgan from 'morgan';
 
 import { UserComponent } from '@components';
-import { Swagger, Error } from '@libraries';
+import { Swagger, Error, Redis, Winston } from '@libraries';
 
 const app = express();
-
-global.__basedir = __dirname;
 
 export const initialize = () => {
 
@@ -20,14 +19,16 @@ export const initialize = () => {
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(bodyParser.json());
 
-    //use morgan to log requests to the console
-    app.use(morgan('dev'));
+    app.use(morgan('combined', { stream: Winston.stream }));
+
+    //correlator id - header (x-correlation-id)
+    app.use(correlator());
 
     //initialize components
     UserComponent.initialize(app);
 
-    //initialize libraries
     Swagger.initialize(app);
+    //Redis.initialize();
     Error.Middleware.initialize(app);
 
     return app;

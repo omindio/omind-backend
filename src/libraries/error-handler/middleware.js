@@ -1,12 +1,18 @@
-//TODO: Register error logs in file or db
-export const initialize = (app) => {
-    app.use((err, req, res, next) => {
-        if (!err.status) err.status = 500;
+import Winston from '@libraries/winston';
 
-        res.status(err.status).json({
-            status: err.status,
-            type: err.name,
-            error: err.message
-        });
-    });
+export const initialize = (app) => {
+    app.use((err, req, res, next) => {   
+        const error = {
+            id: req.correlationId(),
+            info: `${req.ip} - -\"${req.method} ${req.originalUrl} HTTP/${req.httpVersion}\" ${err.status ||
+                500} - ${req.headers["user-agent"]}`,
+            status: err.status || 500,
+            type: err.name || 'Internal Server Error',
+            error: err.message || err,
+        };
+        //print error on log file
+        Winston.error(JSON.stringify(error));     
+        //http response    
+        res.status(err.status || 500).json(error);
+    });    
 }

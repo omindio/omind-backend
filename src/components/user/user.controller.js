@@ -1,4 +1,5 @@
-import * as Service from './user.service';
+import * as UserService from './user.service';
+import UserDTO from './user.dto';
 import { roles as Role } from './config/roles';
 
 import { 
@@ -7,60 +8,77 @@ import {
 } from '@libraries/error-handler';
 
 export const create = (req, res, next) => {
-    let userData = req.body;
-    Service.create(userData)
+    let userDTO = new UserDTO(req.body);
+   
+    UserService.create(userDTO)
         .then(user => {
-            res.status(201).json({
-                user: user
-            })
+            res.status(201).json(user);
         })
-        .catch(next);
+        .catch(err => { return next(err) });
 };
 
 export const update = (req, res, next) => {
     let id = req.params.id;
-    if (!id) next(new MissingParametersError(['id']));
 
-    let userData = req.body;
+    if (!id) 
+        return next(new MissingParametersError(['id']));
 
     if (Role.Admin != req.user.role && id != req.user.id)
-        next(new UnauthorizedActionError('You can not update this user.'));
+        return next(new UnauthorizedActionError('You can not update this user.'));
 
-    Service.update(id, userData)
-        .then(user => {
-            res.status(200).json(user)
+    let userDTO = new UserDTO(req.body);
+    userDTO._id = id;
+
+    UserService.update(userDTO)
+        .then(user => { 
+            res.status(200).json(user) 
         })
-        .catch(next);
+        .catch(err => { 
+            return next(err) 
+        });
 };
 
 export const remove = (req, res, next) => {
     let id = req.params.id;
-    if (!id) next(new MissingParametersError(['id']));
 
-    Service.remove(id)
+    if (!id) 
+        return next(new MissingParametersError(['id']));
+
+    let userDTO = new UserDTO({_id: id});
+
+    UserService.remove(userDTO)
         .then(() => {
-            res.status(204).send();
+            res.status(204).send()
         })
-        .catch(next);
+        .catch(err => { 
+            return next(err) 
+        });
 };
 
 export const getOne = (req, res, next) => {
     let id = req.params.id;
-    if (!id) next(new MissingParametersError(['id']));
+    if (!id) 
+        return next(new MissingParametersError(['id']));
     if (Role.Admin != req.user.role && id != req.user.id)
-        next(new UnauthorizedActionError('You can not get this user.'));
+        return next(new UnauthorizedActionError('You can not get this user.'));
 
-    Service.getOne(id)
-        .then(user => {
-            res.status(200).json(user);
+    let userDTO = new UserDTO({_id: id});
+
+    UserService.getOne(userDTO)
+        .then(user => { 
+            res.status(200).json(user) 
         })
-        .catch(next);
+        .catch(err => { 
+            return next(err) 
+        });
 };
 
 export const getAll = (req, res, next) => {
-    Service.getAll()
-        .then(users => {
-            res.status(200).json(users);
+    UserService.getAll()
+        .then(users => { 
+            res.status(200).json(users) 
         })
-        .catch(next);
+        .catch(err => { 
+            return next(err) 
+        });
 };

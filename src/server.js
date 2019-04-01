@@ -25,7 +25,7 @@ Mongo
       //app.listen(port);
       http.createServer(app).listen(port);
       //https.createServer(options, app).listen(port);
-      
+      console.log('APP Running!');
     })
     .catch(err => {
       console.log('Error: ' + err);

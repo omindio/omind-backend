@@ -1,4 +1,4 @@
-import AppError from "../AppError";
+import AppError from "./AppError";
 
 export default class UnauthorizedActionError extends AppError {
     constructor(message) {

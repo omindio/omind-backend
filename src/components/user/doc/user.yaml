@@ -14,9 +14,11 @@ paths:
                 email:
                   type: string
                   format: email
+                  default: david@skaraboo.com
                 password:
                   type: string
                   format: password
+                  default: 12345678
       responses:
         '200':
           description: Success
@@ -163,13 +165,17 @@ components:
             properties:
               name: 
                 type: string
+                default: John
               lastName: 
                 type: string
+                default: Doe
               email:
                 type: string
+                default: test@test.com
               password:
                 type: string
                 format: password
+                default: 12345678
 
 
     

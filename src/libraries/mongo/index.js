@@ -8,9 +8,12 @@ export const connect = () => {
     if (db) return db;
 		mongoose.Promise = global.Promise;
 		mongoose
-			.connect(config.dbUri, { useCreateIndex: true, useNewUrlParser: true })
+			.connect(config.dbUri, { 
+				useCreateIndex: true, 
+				useNewUrlParser: true,
+				autoIndex: false
+			})
 			.then(() => {
-				console.log('Mongo connection created.');
 				resolve(db);
 			})
 			.catch(err => {
