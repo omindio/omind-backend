@@ -1,12 +1,12 @@
 import { roles as Role } from './config/roles';
 
-export default class UserContext {
+export default class UserDTO {
     constructor(data) {
         if (typeof data !== 'object' || data === null || typeof data === 'undefined')
             data = {};      
        
         this._id = data._id;
-        this.name = data.name ;
+        this.name = data.name;
         this.lastName = data.lastName;
         this.email = data.email;
         this.password = data.password;

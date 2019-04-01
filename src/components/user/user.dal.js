@@ -4,91 +4,79 @@ import UserModel from './user.model';
 import UserDTO from './user.dto';
 /*
     TODO: 
-        - For better abstraction don't use userModel Param.
-        - We are using mongoose ORM think about use Mongo driver (native).
+    - For better abstraction don't use userModel Param.
+    - We are using mongoose ORM think about use Mongo driver (native).
 */
-//TODO: ADD PROJECTION IN FUNCTION PARAMETER TO EXCLUDE FIELDS IF IT IS NECESARY.
-export const findOneByEmail = (emailParameter) => {
-    return new Promise((resolve, reject) => {
-        UserModel.findOne({ email: emailParameter })
-            .then(user => {
-                resolve({ userDTO: new UserDTO(user), userModel: user });
-            })
-            .catch(err => {
-                return reject(err)
-            });
-    });
+export const findOneByEmail = async (emailParameter) => {
+    try {
+        let user = await UserModel.findOne({email: emailParameter});
+        return {
+            userDTO: new UserDTO(user),
+            userModel: user
+        }
+    } catch (err) {
+        throw err;
+    }
 };
 
-//TODO:
-export const findOneById = (idParameter) => {
-    return new Promise((resolve, reject) => {
-        UserModel.findById(idParameter)
-            .then(user => {
-                resolve({ userDTO: new UserDTO(user), userModel: user });
-            })
-            .catch(err => {
-                return reject(err)
-            });
-    });    
+export const findOneById = async (idParameter) => {
+    try {
+        let user = await UserModel.findById(idParameter);
+        return {
+            userDTO: new UserDTO(user),
+            userModel: user   
+        }
+    } catch (err) {
+        throw err;
+    }
 };
 
-//TODO:
-export const findAll = (projection = {}) => {
-    return new Promise((resolve, reject) => {
-        UserModel.find({})
-        .then(users => {
-            let usersDTOArray = [];
-            users.forEach((user) => {
-                let userDTO = new UserDTO(user);
-                let userDTOResult = Object.assign({}, userDTO, projection);
-                usersDTOArray.push(userDTOResult);
-            });
-            resolve(usersDTOArray);
-        })
-        .catch(err => reject(err));
-    });
+export const findAll = async (projection = {}) => {
+    try {
+        let users = await UserModel.find({});
+        
+        let usersDTOArray = [];
+        users.forEach((user) => {
+            let userDTO = new UserDTO(user);
+            let userDTOResult = Object.assign({}, userDTO, projection);
+            
+            usersDTOArray.push(userDTOResult);
+        });
+
+        return usersDTOArray;
+    } catch (err) {
+        throw err;
+    }
 };
 
-export const create = (userDTOParameter) => {
-    return new Promise((resolve, reject) => {
-        //removing undefined or null variables if exists
-        let userDTO = _pickBy(userDTOParameter);
-        let userModel = new UserModel(userDTO);
+export const create = async (userDTOParameter) => {
+    let userDTO = _pickBy(userDTOParameter);
+    let userModel = new UserModel(userDTO);
 
-        userModel.save()
-            .then(user => {
-                resolve(new UserDTO(user))
-            })
-            .catch(err => {
-                return reject(err)
-            });
-    });
+    try {
+        let user = await userModel.save();
+        return new UserDTO(user);
+    } catch (err) {
+        throw err;
+    }
 };
 
-export const update = (userDTOParameter, userModelParameter) => {
-    return new Promise((resolve, reject) => {
-        //removing undefined or null variables if exists
-        let userDTO = _pickBy(userDTOParameter);
-        let userModel = Object.assign(userModelParameter, userDTO);
-
-        userModel.save()
-            .then(user => {
-                resolve(new UserDTO(user));
-            })
-            .catch(err => {
-                return reject(err);
-            });
-    });
+export const update = async (userDTOParameter, userModelParameter) => {
+    //removing undefined or null variables if exists
+    let userDTO = _pickBy(userDTOParameter);
+    let userModel = Object.assign(userModelParameter, userDTO);
+    try {
+        let user = await userModel.save();
+        return new UserDTO(user);
+    } catch (err) {
+        throw err;
+    }
 };
 
-//TODO:
-export const remove = (userDTOParameter, userModel) => {
-    return new Promise((resolve, reject) => {
-        userModel.remove((err, user) => {
-            if (err)
-                return reject(err);
-            resolve();
-        }); 
-    });
+export const remove = async (userDTOParameter, userModel) => {
+    try {
+        await userModel.remove();
+    } catch(err) {
+        throw err;
+    }
 };

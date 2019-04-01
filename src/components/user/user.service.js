@@ -21,172 +21,137 @@ import {
 
 const passwordSalt = 10;
 
-export const create = (userDTOParameter) => {
-    return new Promise((resolve, reject) => {
+export const create = async (userDTOParameter) => {
+    try {
+        //parameter validation
         if (!(userDTOParameter instanceof UserDTO))
-            return reject(new InstanceofError('Param sent need to be an UserDTO.'));
+            throw new InstanceofError('Param sent need to be an UserDTO.');
+        
+        //run validation. Returns exceptions if fails
+        await UserValidation.createUserSchema.validate(userDTOParameter);
 
-        //validate dto        
-        UserValidation.createUserSchema.validate(userDTOParameter)
-            .then(() => {
-                //find if exists user with this email
-                UserDAL.findOneByEmail(userDTOParameter.email)
-                    .then(({userDTO}) => {
-                        //if exits user return error
-                        if (userDTO._id) 
-                            return reject(new EmailAlreadyExistsError());
-                        //hash password
-                        try {
-                            let salt = bcrypt.genSaltSync(passwordSalt);
-                            let hash = bcrypt.hashSync(userDTOParameter.password, salt);
-                            userDTOParameter.password = hash;
-                        } catch (err) {
-                            return reject(err);
-                        } 
-                        //create user with Data access layer
-                        UserDAL.create(userDTOParameter)
-                            .then((userDTO) => {
-                                //Return User DTO without Password.
-                                let userDTOResult = Object.assign({}, userDTO, { 
-                                    password: undefined
-                                });
-                                resolve(userDTOResult);
-                            })
-                            .catch(err => { 
-                                return reject(err) 
-                            });
-                    })
-                    .catch(err => { 
-                        return reject(err) 
-                    });   
-            })
-            .catch(err => { 
-                if (err.hasOwnProperty('details')) {
-                    return reject(new ValidationSchemaError(err));
-                } else {
-                    return reject(err);
-                }   
-            });
-    });
+        //Check if exists some user with Email received
+        let { userDTO } = await UserDAL.findOneByEmail(userDTOParameter.email);
+        if (userDTO._id) 
+            throw new EmailAlreadyExistsError();
+
+        //hash and save password
+        let salt = await bcrypt.genSalt(passwordSalt);
+        let hash = await bcrypt.hash(userDTOParameter.password, salt);
+        userDTOParameter.password = hash;
+
+        //call to DAL for save User & returns DTO without password
+        userDTO = await UserDAL.create(userDTOParameter);
+        return Object.assign({}, userDTO, { 
+            password: undefined
+        });
+    } catch (err) {
+        if (err.hasOwnProperty('details'))
+            throw new ValidationSchemaError(err);
+        else
+            throw err;
+    }
 }
 
-export const update = (userDTOParameter) => {
-    return new Promise((resolve, reject) => {
+export const update = async (userDTOParameter) => {
+    try {
+        //parameter validation
         if (!(userDTOParameter instanceof UserDTO))
-            return reject(new InstanceofError('Param sent need to be an UserDTO.'));
+            throw new InstanceofError('Param sent need to be an UserDTO.');
 
-        UserValidation.updateUserSchema.validate(userDTOParameter)
-            .then(() => {
-                UserDAL.findOneById(userDTOParameter._id)
-                    .then(({userDTO, userModel}) => {
-                        if (!userDTO._id) 
-                            return reject(new UserNotFoundError());
+        //run validation. Returns exceptions if fails
+        await UserValidation.updateUserSchema.validate(userDTOParameter);
 
-                        let newPassword = userDTOParameter.password;    
-                        if (newPassword) {
-                            try {
-                                let salt = bcrypt.genSaltSync(passwordSalt);
-                                let hash = bcrypt.hashSync(newPassword, salt);
-                                userDTOParameter.password = hash;
-                            } catch (err) {
-                                return reject(err);
-                            }
-                        }    
+        let { userDTO, userModel } = await UserDAL.findOneById(userDTOParameter._id);
+        if (!userDTO._id) 
+            throw new UserNotFoundError();
 
-                        UserDAL.update(userDTOParameter, userModel)
-                            .then((userDTO) => {
-                                //Return User DTO without Password.
-                                let userDTOResult = Object.assign({}, userDTO, { 
-                                    password: undefined
-                                });
-                                resolve(userDTOResult);
-                            })
-                            .catch(err => { 
-                                return reject(err) 
-                            });   
-                    })
-                    .catch(err => { 
-                        return reject(err) 
-                    });   
-            })
-            .catch(err => { 
-                if (err.hasOwnProperty('details')) {
-                    return reject(new ValidationSchemaError(err));
-                } else {
-                    return reject(err);
-                }   
-            });
-    });
+        //check if exists new email        
+        if (userDTO.email != userDTOParameter.email) {
+            //TODO: Better way to naming VAR.
+            let { userDTO } = await UserDAL.findOneByEmail(userDTOParameter.email);
+            if (userDTO._id) 
+                throw new EmailAlreadyExistsError();
+        }
+
+        //if exists password hash and set New
+        let newPassword = userDTOParameter.password;    
+        if (newPassword) {
+            let salt = await bcrypt.genSalt(passwordSalt);
+            let hash = await bcrypt.hash(newPassword, salt);
+            userDTOParameter.password = hash;
+        }
+
+        //TODO: Send email verification
+
+        //call to DAL for save User & returns DTO without password
+        userDTO = await UserDAL.update(userDTOParameter, userModel);
+        return Object.assign({}, userDTO, { 
+            password: undefined
+        });
+    } catch (err) {
+        if (err.hasOwnProperty('details'))
+            throw new ValidationSchemaError(err);
+        else
+            throw err;
+    }
 }
 
-export const remove = (userDTOParameter) => {
-    return new Promise((resolve, reject) => {
-
+export const remove = async (userDTOParameter) => {
+    try {
         if (!(userDTOParameter instanceof UserDTO))
-            return reject(new InstanceofError('Param sent need to be an UserDTO.'));
+            throw new InstanceofError('Param sent need to be an UserDTO.');
 
-        UserValidation.updateUserSchema.validate(userDTOParameter)
-            .then(() => {
-                UserDAL.findOneById(userDTOParameter._id)
-                    .then(({userDTO, userModel}) => {
-                        if (!userDTO._id)
-                            return reject(new UserNotFoundError());
+        //validate
+        await UserValidation.updateUserSchema.validate(userDTOParameter);
 
-                        if (userDTO.role === Role.Admin) 
-                            return reject(new UnauthorizedActionError('You can not remove this user.'));
+        let { userDTO, userModel } = await UserDAL.findOneById(userDTOParameter._id);
+        if (!userDTO._id)
+            throw new UserNotFoundError();
 
-                        UserDAL.remove(userDTO, userModel)
-                            .then(() => {
-                                resolve()
-                            })
-                            .catch(err => { 
-                                return reject(err) 
-                            });    
-                    });
-            })
-            .catch(err => { 
-                if (err.hasOwnProperty('details')) {
-                    return reject(new ValidationSchemaError(err));
-                } else {
-                    return reject(err);
-                }   
-            });
-    });
+        if (userDTO.role === Role.Admin) 
+            throw new UnauthorizedActionError('You can not remove this user.');
+
+        await UserDAL.remove(userDTO, userModel);
+    } catch (err) {
+        if (err.hasOwnProperty('details'))
+            throw new ValidationSchemaError(err);
+        else
+            throw err;
+    }
 }
 
-export const getOne = (userDTOParameter) => {
-    return new Promise((resolve, reject) => {
+export const getOne = async (userDTOParameter) => {
+    try {
         if (!(userDTOParameter instanceof UserDTO))
-            return reject(new InstanceofError('Param sent need to be an UserDTO.'));
+            throw new InstanceofError('Param sent need to be an UserDTO.');
 
-            UserValidation.updateUserSchema.validate(userDTOParameter)
-            .then(() => {
-                UserDAL.findOneById(userDTOParameter._id)
-                    .then(({userDTO}) => {
-                        if (!userDTO._id)
-                            return reject(new UserNotFoundError());
+        //validate
+        await UserValidation.updateUserSchema.validate(userDTOParameter);
 
-                        resolve(userDTO)  
-                    });
-            })
-            .catch(err => { 
-                if (err.hasOwnProperty('details')) {
-                    return reject(new ValidationSchemaError(err));
-                } else {
-                    return reject(err);
-                }   
-            });
-    });
+        let { userDTO } = await UserDAL.findOneById(userDTOParameter._id);
+        if (!userDTO._id)
+            throw new UserNotFoundError();
+
+        //returns DTO without password
+        return Object.assign({}, userDTO, { 
+            password: undefined
+        });
+    } catch (err) {
+        if (err.hasOwnProperty('details'))
+            throw new ValidationSchemaError(err);
+        else
+            throw err;
+    }
 }
 
-export const getAll = () => {
-    return new Promise((resolve, reject) => {
-        UserDAL.findAll({password: undefined})
-            .then(usersDTOArray => {
-                resolve(usersDTOArray)
-            })
-            .catch(err => { 
-                return reject(err) 
-            });
-    });
+export const getAll = async () => {
+    try {
+        return await UserDAL.findAll({password: undefined});
+    } catch (err) {
+        if (err.hasOwnProperty('details'))
+            throw new ValidationSchemaError(err);
+        else
+            throw err;
+    }
 }
