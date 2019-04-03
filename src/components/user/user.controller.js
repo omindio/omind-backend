@@ -70,7 +70,11 @@ export const getOne = async (req, res, next) => {
 
 export const getAll = async (req, res, next) => {
     try {
-        let users = await UserService.getAll();
+        //TODO: Validate page param
+        let page = req.params.page;
+        let limit = req.params.limit;
+    
+        let users = await UserService.getAll(page, limit);
         res.status(200).json(users);
     } catch (err) {
         return next(err);

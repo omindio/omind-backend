@@ -1,3 +1,4 @@
+//Data Transfer Object
 import { roles as Role } from './config/roles';
 
 export default class UserDTO {

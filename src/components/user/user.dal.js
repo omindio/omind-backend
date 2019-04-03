@@ -2,39 +2,29 @@
 import _pickBy from 'lodash.pickby';
 import UserModel from './user.model';
 import UserDTO from './user.dto';
-/*
-    TODO: 
-    - For better abstraction don't use userModel Param.
-    - We are using mongoose ORM think about use Mongo driver (native).
-*/
-export const findOneByEmail = async (emailParameter) => {
+
+export const getOneByEmail = async (emailParameter) => {
     try {
         let user = await UserModel.findOne({email: emailParameter});
-        return {
-            userDTO: new UserDTO(user),
-            userModel: user
-        }
+        return new UserDTO(user);
     } catch (err) {
         throw err;
     }
 };
 
-export const findOneById = async (idParameter) => {
+export const getOneById = async (idParameter) => {
     try {
         let user = await UserModel.findById(idParameter);
-        return {
-            userDTO: new UserDTO(user),
-            userModel: user   
-        }
+        return new UserDTO(user);
     } catch (err) {
         throw err;
     }
 };
 
-export const findAll = async (projection = {}) => {
+export const getAll = async (projection = {}, pagination) => {
     try {
-        let users = await UserModel.find({});
-        
+        let users = await UserModel.find({}).skip(pagination.skip).limit(pagination.limit);
+        let count = await UserModel.countDocuments();
         let usersDTOArray = [];
         users.forEach((user) => {
             let userDTO = new UserDTO(user);
@@ -42,18 +32,19 @@ export const findAll = async (projection = {}) => {
             
             usersDTOArray.push(userDTOResult);
         });
-
-        return usersDTOArray;
+        return {
+            users: usersDTOArray,
+            count: count
+        };
     } catch (err) {
         throw err;
     }
 };
 
 export const create = async (userDTOParameter) => {
-    let userDTO = _pickBy(userDTOParameter);
-    let userModel = new UserModel(userDTO);
-
     try {
+        let userDTO = _pickBy(userDTOParameter);
+        let userModel = new UserModel(userDTO);
         let user = await userModel.save();
         return new UserDTO(user);
     } catch (err) {
@@ -61,21 +52,19 @@ export const create = async (userDTOParameter) => {
     }
 };
 
-export const update = async (userDTOParameter, userModelParameter) => {
-    //removing undefined or null variables if exists
-    let userDTO = _pickBy(userDTOParameter);
-    let userModel = Object.assign(userModelParameter, userDTO);
+export const update = async (userDTOParameter) => {
     try {
-        let user = await userModel.save();
+        let userDTO = _pickBy(userDTOParameter);
+        let user = await UserModel.findOneAndUpdate({_id: userDTO._id}, userDTO, {new: true});
         return new UserDTO(user);
     } catch (err) {
         throw err;
     }
 };
 
-export const remove = async (userDTOParameter, userModel) => {
+export const remove = async (userDTOParameter) => {
     try {
-        await userModel.remove();
+        await UserModel.findOneAndRemove({_id: userDTOParameter._id});
     } catch(err) {
         throw err;
     }

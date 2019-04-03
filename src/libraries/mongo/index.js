@@ -1,8 +1,7 @@
 import mongoose from 'mongoose';
 import { config } from '@config';
-
+//TODO: FIX
 let db;
-
 export const connect = () => {
   return new Promise(function(resolve, reject) {
     if (db) return db;
@@ -11,7 +10,8 @@ export const connect = () => {
 			.connect(config.dbUri, { 
 				useCreateIndex: true, 
 				useNewUrlParser: true,
-				autoIndex: false
+				autoIndex: false,
+				useFindAndModify: false
 			})
 			.then(() => {
 				resolve(db);

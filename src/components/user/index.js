@@ -1,12 +1,11 @@
-import i18n from 'i18n-2';
-
 import * as AuthMiddleware from './auth/auth.middleware';
 import * as UserService from './user.service';
 import UserDTO from './user.dto';
-import UserDAL from './user.dal';
 
 import routes from './user.routes';
 import authRoutes from './auth/auth.routes';
+
+import * as Seeds from './seeds';
 
 //TODO: https://github.com/tc39/ecma262/pull/1174
 //export * as Service from './user.service';
@@ -14,20 +13,21 @@ import authRoutes from './auth/auth.routes';
 //export { Role } from './user.roles';
 
 //Set auth to false to create custom auth.
-const initialize = (app, auth = true) => {
+const initialize = async (app, auth = true) => {
     app.use('/users', routes);
+   
     if (auth) app.use('/users/auth', authRoutes);
-    //lintl init
-    i18n.expressBind(app, {
-        locales: ['en', 'es'],
-    });
+    try {
+        await Seeds.createUserAdmin();
+    } catch (err) {
+        return;
+    }
 }
 
 export {
     initialize,
     AuthMiddleware,
     UserService,
-    UserDTO,
-    UserDAL
+    UserDTO
 }
 

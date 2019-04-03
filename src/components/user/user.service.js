@@ -6,6 +6,8 @@ import * as UserValidation from './validation/user.validation';
 
 import { roles as Role } from './config/roles';
 
+import * as Pagination from '@libraries/pagination';
+
 //Global errors
 import { 
     UnauthorizedActionError,
@@ -16,7 +18,8 @@ import {
 //User errors
 import {
     EmailAlreadyExistsError,
-    UserNotFoundError
+    UserNotFoundError,
+    SamePasswordError
 } from './errors';
 
 const passwordSalt = 10;
@@ -31,8 +34,8 @@ export const create = async (userDTOParameter) => {
         await UserValidation.createUserSchema.validate(userDTOParameter);
 
         //Check if exists some user with Email received
-        let { userDTO } = await UserDAL.findOneByEmail(userDTOParameter.email);
-        if (userDTO._id) 
+        let userDTOResult = await UserDAL.getOneByEmail(userDTOParameter.email);
+        if (userDTOResult._id) 
             throw new EmailAlreadyExistsError();
 
         //hash and save password
@@ -41,7 +44,7 @@ export const create = async (userDTOParameter) => {
         userDTOParameter.password = hash;
 
         //call to DAL for save User & returns DTO without password
-        userDTO = await UserDAL.create(userDTOParameter);
+        let userDTO = await UserDAL.create(userDTOParameter);
         return Object.assign({}, userDTO, { 
             password: undefined
         });
@@ -62,21 +65,24 @@ export const update = async (userDTOParameter) => {
         //run validation. Returns exceptions if fails
         await UserValidation.updateUserSchema.validate(userDTOParameter);
 
-        let { userDTO, userModel } = await UserDAL.findOneById(userDTOParameter._id);
-        if (!userDTO._id) 
+        let userDTOResult = await UserDAL.getOneById(userDTOParameter._id);
+        if (!userDTOResult._id) 
             throw new UserNotFoundError();
 
         //check if exists new email        
-        if (userDTO.email != userDTOParameter.email) {
-            //TODO: Better way to naming VAR.
-            let { userDTO } = await UserDAL.findOneByEmail(userDTOParameter.email);
-            if (userDTO._id) 
+        if (userDTOResult.email != userDTOParameter.email) {
+            userDTOResult = await UserDAL.getOneByEmail(userDTOParameter.email);
+            if (userDTOResult._id) 
                 throw new EmailAlreadyExistsError();
         }
 
         //if exists password hash and set New
         let newPassword = userDTOParameter.password;    
         if (newPassword) {
+            let isMatch = await bcrypt.compare(newPassword, userDTOResult.password);
+            if (isMatch)
+                throw new SamePasswordError();
+
             let salt = await bcrypt.genSalt(passwordSalt);
             let hash = await bcrypt.hash(newPassword, salt);
             userDTOParameter.password = hash;
@@ -85,7 +91,7 @@ export const update = async (userDTOParameter) => {
         //TODO: Send email verification
 
         //call to DAL for save User & returns DTO without password
-        userDTO = await UserDAL.update(userDTOParameter, userModel);
+        let userDTO = await UserDAL.update(userDTOParameter);
         return Object.assign({}, userDTO, { 
             password: undefined
         });
@@ -105,14 +111,14 @@ export const remove = async (userDTOParameter) => {
         //validate
         await UserValidation.updateUserSchema.validate(userDTOParameter);
 
-        let { userDTO, userModel } = await UserDAL.findOneById(userDTOParameter._id);
-        if (!userDTO._id)
+        let userDTOResult = await UserDAL.getOneById(userDTOParameter._id);
+        if (!userDTOResult._id)
             throw new UserNotFoundError();
 
-        if (userDTO.role === Role.Admin) 
+        if (userDTOResult.role === Role.Admin) 
             throw new UnauthorizedActionError('You can not remove this user.');
 
-        await UserDAL.remove(userDTO, userModel);
+        await UserDAL.remove(userDTOResult);
     } catch (err) {
         if (err.hasOwnProperty('details'))
             throw new ValidationSchemaError(err);
@@ -129,12 +135,19 @@ export const getOne = async (userDTOParameter) => {
         //validate
         await UserValidation.updateUserSchema.validate(userDTOParameter);
 
-        let { userDTO } = await UserDAL.findOneById(userDTOParameter._id);
-        if (!userDTO._id)
+        let userDTOResult;
+        //check if exists id and if not find by email
+        if (userDTOParameter._id) {
+            userDTOResult = await UserDAL.getOneById(userDTOParameter._id);
+        } else {
+            userDTOResult = await UserDAL.getOneByEmail(userDTOParameter.email);
+        }
+
+        if (!userDTOResult._id)
             throw new UserNotFoundError();
 
         //returns DTO without password
-        return Object.assign({}, userDTO, { 
+        return Object.assign({}, userDTOResult, { 
             password: undefined
         });
     } catch (err) {
@@ -145,9 +158,16 @@ export const getOne = async (userDTOParameter) => {
     }
 }
 
-export const getAll = async () => {
+export const getAll = async (page, limit) => {
     try {
-        return await UserDAL.findAll({password: undefined});
+        let pagination = Pagination.initialize(page, limit);
+        let result = await UserDAL.getAll({password: undefined}, pagination);
+        
+        return {
+            pages: Math.ceil(result.count / limit),
+            current: page,
+            users: result.users,
+        }
     } catch (err) {
         if (err.hasOwnProperty('details'))
             throw new ValidationSchemaError(err);

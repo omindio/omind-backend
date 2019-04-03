@@ -2,11 +2,10 @@ import Joi from 'joi';
 import { roles as Role } from '../config/roles';
 
 //TODO: INTL Validation messages
-const alphaNum = Joi.string().alphanum();
 
-const _idSchema = alphaNum.length(24);
-const nameSchema = alphaNum.min(3).max(50);
-const lastNameSchema = alphaNum.min(3).max(50);
+const _idSchema = Joi.string().alphanum().length(24);
+const nameSchema = Joi.string().min(3).max(50);
+const lastNameSchema = Joi.string().min(3).max(50);
 const emailSchema = Joi.string().email().lowercase().min(4).max(62);
 const passwordSchema = Joi.string().min(8).strip();
 const roleSchema = Joi.string().valid(Role.User, Role.Admin).default(Role.User);

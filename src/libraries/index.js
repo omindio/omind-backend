@@ -2,6 +2,7 @@ import * as Swagger from './swagger';
 import * as Mongo from './mongo';
 import * as Error from './error-handler';
 import * as Redis from './redis';
+import * as Pagination from './pagination';
 import * as Winston from './winston';
 
 export {
@@ -9,5 +10,6 @@ export {
     Mongo,
     Error,
     Redis,
-    Winston
+    Winston,
+    Pagination
 };

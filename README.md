@@ -46,7 +46,6 @@ docker ps
 - **bcryptjs**: used to hash passwords before we store them in our database
 - **body-parser**: used to parse incoming request bodies in a middleware
 - **express**: sits on top of Node to make the routing, request handling, and responding easier to write
-- **is-empty:** global function that will come in handy when we use validator
 - **jsonwebtoken**: used for authorization
 - **swagger-ui-express**: Adds middleware to your express app to serve the Swagger UI bound to your Swagger document. This acts as living documentation for your API hosted from within your app.
 - **swagger-jsdoc**: Generates swagger doc based on JSDoc comments in your code to keep a live and reusable OpenAPI (Swagger) specification.
@@ -61,6 +60,7 @@ docker ps
 - **winston-daily-rotate-file**: Generate a log file every day
 - **app-root-path**: app root path (not src)
 - **express-correlation-id**: Express middleware to set a correlation id per route in express. The correlation id will be consistent across async calls within the handling of a request.
+- **compression**: gzip and more
 
 ### Proyect Organization
 

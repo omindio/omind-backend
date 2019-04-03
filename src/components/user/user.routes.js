@@ -7,7 +7,7 @@ import * as UserController from './user.controller';
 import { roles as Role } from './config/roles';
 
 routes.get(
-    '/', 
+    '/:page?/:limit?', 
     AuthMiddleware.authorize([Role.Admin]), 
     UserController.getAll
 );

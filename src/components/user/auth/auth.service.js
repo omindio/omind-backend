@@ -19,17 +19,17 @@ export const auth = async (authDTOParameter) => {
         await AuthValidation.createAuthSchema.validate(authDTOParameter, {abortEarly: false});
         
         //check if exists User with Email sent
-        const { userDTO } = await UserDAL.findOneByEmail(authDTOParameter.email);
-        if (!userDTO._id)
+        const userDTOResult= await UserDAL.getOneByEmail(authDTOParameter.email);
+        if (!userDTOResult._id)
             throw new UnauthorizedAccessError('User not found.');
 
         //Compare password sent with User found
-        const isMatch = await bcrypt.compare(authDTOParameter.password, userDTO.password);
+        const isMatch = await bcrypt.compare(authDTOParameter.password, userDTOResult.password);
         if (isMatch) {
             const payload = {
-                id: userDTO._id,
-                name: userDTO.name,
-                role: userDTO.role
+                id: userDTOResult._id,
+                name: userDTOResult.name,
+                role: userDTOResult.role
             };
             return await jwt.sign(
                 payload, 

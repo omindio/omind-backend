@@ -32,7 +32,7 @@ paths:
         '401':
           description: Wrong email or password.
 
-  /users:
+  /users/{page}/{limit}:
     get:
       tags:
         - users
@@ -50,6 +50,15 @@ paths:
           description: Access denied. Insufficient permission.
       security:
         - bearerAuth: []
+      parameters:
+      - name: page
+        in: path
+        schema:
+          type: integer
+      - name: limit
+        in: path
+        schema:
+          type: integer
     post:
       tags:
         - users
