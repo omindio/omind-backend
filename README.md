@@ -52,15 +52,16 @@ docker ps
 - **babel**: babel-core babel-node babel-preset
 - **morgan**: will log requests to the console so we can see what is happening
 - **helmet**: Helmet helps you secure your Express apps by setting various HTTP headers.
-- **module-alias**: Create aliases of directories and register custom module paths.
+- **babel-plugin-module-resolver**: Create aliases of directories and register custom module paths.
 - **joi**: Joi allows you to create blueprints or schemas for JavaScript objects (an object that stores information) to ensure validation of key information.
 - **lodash.pickby**: to clean null and undefined values of object.
-- **redis**:
 - **winsont**: Logger library
 - **winston-daily-rotate-file**: Generate a log file every day
 - **app-root-path**: app root path (not src)
 - **express-correlation-id**: Express middleware to set a correlation id per route in express. The correlation id will be consistent across async calls within the handling of a request.
 - **compression**: gzip and more
+- **supertest**: 
+- **nodemailer**: 
 
 ### Proyect Organization
 
@@ -73,3 +74,5 @@ docker ps
 ## Production Build
 
 *TODO:*
+
+- Travis

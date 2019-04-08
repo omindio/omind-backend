@@ -8,7 +8,8 @@ export const createUserAdmin = async () => {
             lastName: 'González Hidalgo',
             email: 'omindbrand@gmail.com',
             password: '12345678',
-            role: 'Admin'
+            role: 'Admin',
+            isVerified: true
         });
         await UserService.create(userDTO);
     } catch (err) {

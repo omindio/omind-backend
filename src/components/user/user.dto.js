@@ -5,23 +5,24 @@ export default class UserDTO {
     constructor(data) {
         if (typeof data !== 'object' || data === null || typeof data === 'undefined')
             data = {};      
-       
-        this._id = data._id;
+
+        this.id = data.id;
         this.name = data.name;
         this.lastName = data.lastName;
         this.email = data.email;
         this.password = data.password;
-        this.createdDate = data.createdDate;
-        this.role = data.role || Role.User;
+        this.createdAt = data.createdAt;
+        this.role = data.role;
+        this.isVerified = data.isVerified;
     };
 
     toString() {
-        return `${this._id} | 
+        return `${this.id} | 
                 ${this.name} | 
                 ${this.lastName} | 
                 ${this.email} | 
                 ${this.password} | 
-                ${this.createdDate} |
+                ${this.createdAt} |
                 ${this.role}`;
     }
 

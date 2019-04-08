@@ -30,7 +30,7 @@ export const getAll = async (projection = {}, pagination) => {
             let userDTO = new UserDTO(user);
             let userDTOResult = Object.assign({}, userDTO, projection);
             
-            usersDTOArray.push(userDTOResult);
+            usersDTOArray.push(Object.assign({}, userDTO, projection));
         });
         return {
             users: usersDTOArray,
@@ -55,7 +55,7 @@ export const create = async (userDTOParameter) => {
 export const update = async (userDTOParameter) => {
     try {
         let userDTO = _pickBy(userDTOParameter);
-        let user = await UserModel.findOneAndUpdate({_id: userDTO._id}, userDTO, {new: true});
+        let user = await UserModel.findOneAndUpdate({_id: userDTO.id}, userDTO, {new: true});
         return new UserDTO(user);
     } catch (err) {
         throw err;
@@ -64,7 +64,7 @@ export const update = async (userDTOParameter) => {
 
 export const remove = async (userDTOParameter) => {
     try {
-        await UserModel.findOneAndRemove({_id: userDTOParameter._id});
+        await UserModel.findOneAndRemove({_id: userDTOParameter.id});
     } catch(err) {
         throw err;
     }

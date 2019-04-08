@@ -7,6 +7,8 @@ import correlator from 'express-correlation-id';
 import morgan from 'morgan';
 import compression from 'compression';
 
+import { config } from './config';
+
 //import i18next from 'i18next';
 //import BackendAdapter from 'i18next-multiload-backend-adapter';
 //import XHR from 'i18next-xhr-backend';
@@ -26,7 +28,8 @@ export const initialize = () => {
     app.use(bodyParser.json());
     app.use(compression());
 
-    app.use(morgan('combined', { stream: Winston.stream }));
+    if (config.env !== 'test')
+        app.use(morgan('combined', { stream: Winston.stream }));
     //correlator id - header (x-correlation-id)
     app.use(correlator());
     

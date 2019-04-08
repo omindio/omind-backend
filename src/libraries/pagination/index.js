@@ -1,9 +1,9 @@
 import { ExceededLimitError, InvalidTypeError } from './errors';
 
-export const initialize = (page, limit) => {
+export const initialize = async (page, limit) => {
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
-    
+
     if(page === 0)
         page = 1;
 

@@ -14,7 +14,7 @@ paths:
                 email:
                   type: string
                   format: email
-                  default: david@skaraboo.com
+                  default: omindbrand@gmail.com
                 password:
                   type: string
                   format: password
@@ -59,6 +59,7 @@ paths:
         in: path
         schema:
           type: integer
+  /users:
     post:
       tags:
         - users
@@ -129,8 +130,6 @@ paths:
         in: path
         schema:
           type: string
-      requestBody:
-        $ref: '#/components/requestBodies/User'
       responses:
         '200':
           description: Success
@@ -144,6 +143,38 @@ paths:
           description: User not found
       security:
         - bearerAuth: []
+  
+  /users/confirm-registration/{token}:
+    get:
+      parameters:
+      - name: token
+        in: path
+        schema:
+          type: string
+      tags:
+        - users
+      summary: Confirm registration.
+      responses:
+        '201':
+          description: Success
+        '404':
+          description: 
+
+  /users/confirm-registration/reset-token/{email}:
+    get:
+      parameters:
+      - name: email
+        in: path
+        schema:
+          type: string
+      tags:
+        - users
+      summary: Reset token registration.
+      responses:
+        '201':
+          description: Success
+        '404':
+          description: 
 
 components:
   schemas:
@@ -185,6 +216,7 @@ components:
                 type: string
                 format: password
                 default: 12345678
+                
 
 
     

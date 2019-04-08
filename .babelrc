@@ -1,5 +1,22 @@
 {
-    "presets": [
-      "@babel/preset-env"
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "current"
+        }
+      }
+    ]
+  ],
+    "plugins": [
+      ["module-resolver", {
+        "root": ["./"],
+        "alias": {
+          "@libraries": "./src/libraries",
+          "@components": "./src/components",
+          "@config": "./src/config"
+        }
+      }]
     ]
   }

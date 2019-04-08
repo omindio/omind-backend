@@ -7,7 +7,7 @@ import AuthDTO from './auth.dto';
 import * as UserDAL from '../user.dal';
 import * as AuthValidation from './validation/auth.validation';
 
-import { UnauthorizedAccessError } from './errors';
+import { UnauthorizedAccessError, UnverifiedUserError } from './errors';
 import { ValidationSchemaError } from '@libraries/error-handler';
 
 export const auth = async (authDTOParameter) => {
@@ -20,25 +20,28 @@ export const auth = async (authDTOParameter) => {
         
         //check if exists User with Email sent
         const userDTOResult= await UserDAL.getOneByEmail(authDTOParameter.email);
-        if (!userDTOResult._id)
+        if (!userDTOResult.id)
             throw new UnauthorizedAccessError('User not found.');
 
         //Compare password sent with User found
         const isMatch = await bcrypt.compare(authDTOParameter.password, userDTOResult.password);
-        if (isMatch) {
-            const payload = {
-                id: userDTOResult._id,
-                name: userDTOResult.name,
-                role: userDTOResult.role
-            };
-            return await jwt.sign(
-                payload, 
-                config.auth.secret, 
-                { expiresIn: config.auth.tokenTime }
-            );
-        } else {
+
+        if (!isMatch)
             throw new UnauthorizedAccessError('Wrong password.');
-        }
+        if (!userDTOResult.isVerified)
+            throw new UnverifiedUserError();
+
+        const payload = {
+            id: userDTOResult.id,
+            name: userDTOResult.name,
+            role: userDTOResult.role
+        };
+
+        return await jwt.sign(
+            payload, 
+            config.auth.secret, 
+            { expiresIn: config.auth.tokenTime }
+        );
     } catch (err) {
         if (err.hasOwnProperty('details'))
             throw new ValidationSchemaError(err);

@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { roles as Role } from './config/roles';
+
 const Schema = mongoose.Schema;
 
 // Create Schema
@@ -23,11 +25,15 @@ const UserSchema = new Schema({
   },
   role: {
     type: String,
-    default: 'User'
+    default: Role.User
   },
-  createdDate: {
+  createdAt: {
     type: Date,
     default: Date.now
+  },
+  isVerified: { 
+    type: Boolean, 
+    default: false 
   }
 });
 
