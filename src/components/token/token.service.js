@@ -88,4 +88,3 @@ export const reset = async (tokenDTOParameter) => {
             throw err;
     }
 };
-//reset token. if exists one change token and restart date.

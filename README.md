@@ -62,6 +62,7 @@ docker ps
 - **compression**: gzip and more
 - **supertest**: 
 - **nodemailer**: 
+- **node-2fa**:
 
 ### Proyect Organization
 
