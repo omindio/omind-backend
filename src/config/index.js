@@ -20,7 +20,7 @@ const envConfig = {
 };
 
 function loadConfig() {
-  const env = process.env.NODE_ENV || 'dev';
+  const env = process.env.NODE_ENV || 'test';
 
   if (!envConfig[env]) {
     throw new Error(
