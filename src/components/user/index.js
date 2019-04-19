@@ -5,8 +5,8 @@ import UserDTO from './user.dto';
 import routes from './user.routes';
 import authRoutes from './auth/auth.routes';
 
-import * as Seeds from './seeds/user.seed';
-import * as Test from './test/user.spec';
+import * as UserSeed from './seeds/user.seed';
+import * as UserTest from './test/user.spec';
 
 //TODO: https://github.com/tc39/ecma262/pull/1174
 //export * as Service from './user.service';
@@ -15,14 +15,15 @@ import * as Test from './test/user.spec';
 
 
 const initialize = async (app) => {
-    app.use('/users', routes);
    
     //initialize auth
     app.use('/users/auth', authRoutes);
 
+    app.use('/users', routes);
+   
     //seeding
     try {
-        await Seeds.createUserAdmin();
+        await UserSeed.createUserAdmin();
     } catch (err) {
         //TODO: Study handling errors (write in logs)
         //throw err;
@@ -35,6 +36,6 @@ export {
     AuthMiddleware,
     UserService,
     UserDTO,
-    Test
+    UserTest
 }
 
