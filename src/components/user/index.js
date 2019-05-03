@@ -13,29 +13,20 @@ import * as UserTest from './test/user.spec';
 //export * as Middleware from './user.middleware';
 //export { Role } from './user.roles';
 
+const initialize = async app => {
+  //initialize auth
+  app.use('/users/auth', authRoutes);
 
-const initialize = async (app) => {
-   
-    //initialize auth
-    app.use('/users/auth', authRoutes);
+  app.use('/users', routes);
 
-    app.use('/users', routes);
-   
-    //seeding
-    try {
-        await UserSeed.createUserAdmin();
-    } catch (err) {
-        //TODO: Study handling errors (write in logs)
-        //throw err;
-        return;
-    }
-}
+  //seeding
+  try {
+    await UserSeed.createUserAdmin();
+  } catch (err) {
+    //TODO: Study handling errors (write in logs)
+    //throw err;
+    return;
+  }
+};
 
-export {
-    initialize,
-    AuthMiddleware,
-    UserService,
-    UserDTO,
-    UserTest
-}
-
+export { initialize, AuthMiddleware, UserService, UserDTO, UserTest };

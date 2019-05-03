@@ -1,4 +1,4 @@
-import dotenv from 'dotenv'; 
+import dotenv from 'dotenv';
 dotenv.config();
 
 const defaultConfig = {
@@ -6,9 +6,9 @@ const defaultConfig = {
   env: process.env.NODE_ENV,
   bodyLimit: process.env.BODY_LIMIT,
   auth: {
-      tokenTime: process.env.TOKEN_TIME,
-      secret: process.env.SECRET_TOKEN,
-  }
+    tokenTime: process.env.TOKEN_TIME,
+    secret: process.env.SECRET_TOKEN,
+  },
 };
 
 const envConfig = {
@@ -16,7 +16,7 @@ const envConfig = {
   development: {},
   test: {
     dbUri: process.env.DB_TEST_URI,
-  }
+  },
 };
 
 function loadConfig() {
@@ -25,8 +25,8 @@ function loadConfig() {
   if (!envConfig[env]) {
     throw new Error(
       `Environment config for environment '${env}' not found. process.env.NODE_ENV must be one of '${Object.keys(
-        envConfig
-      )}'`
+        envConfig,
+      )}'`,
     );
   }
 

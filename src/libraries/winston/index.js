@@ -6,24 +6,21 @@ import fs from 'fs';
 import appRoot from 'app-root-path';
 import DailyRotateFile from 'winston-daily-rotate-file';
 
-const logDirectory = path.resolve(`${appRoot}`, "logs");
+const logDirectory = path.resolve(`${appRoot}`, 'logs');
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
 
 const logger = createLogger({
-    format: combine(
-        timestamp(),
-        prettyPrint()
-    ),
-    transports: [
-        new DailyRotateFile({
-            level: 'info',
-            filename: path.resolve(logDirectory, 'combined-%DATE%.log'),
-            datePattern: 'YYYYMMDD',
-            handleExceptions: true,
-            json: true,
-            zippedArchive: true,
-            maxSize: '50m',
-            maxFiles: '14d',
+  format: combine(timestamp(), prettyPrint()),
+  transports: [
+    new DailyRotateFile({
+      level: 'info',
+      filename: path.resolve(logDirectory, 'combined-%DATE%.log'),
+      datePattern: 'YYYYMMDD',
+      handleExceptions: true,
+      json: true,
+      zippedArchive: true,
+      maxSize: '50m',
+      maxFiles: '14d',
     }),
     new DailyRotateFile({
       level: 'error',
@@ -34,9 +31,9 @@ const logger = createLogger({
       zippedArchive: true,
       maxSize: '50m',
       maxFiles: '14d',
-    })
+    }),
   ],
-  exitOnError: false
+  exitOnError: false,
 });
 
 logger.stream = {

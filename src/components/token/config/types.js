@@ -1,4 +1,4 @@
 export const types = {
-    RecoverPassword: 'RecoverPassword',
-    ConfirmRegistration: 'ConfirmRegistration'
+  RecoverPassword: 'RecoverPassword',
+  ConfirmRegistration: 'ConfirmRegistration',
 };

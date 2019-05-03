@@ -51,14 +51,14 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-      - name: page
-        in: path
-        schema:
-          type: integer
-      - name: limit
-        in: path
-        schema:
-          type: integer
+        - name: page
+          in: path
+          schema:
+            type: integer
+        - name: limit
+          in: path
+          schema:
+            type: integer
   /users:
     post:
       tags:
@@ -71,7 +71,7 @@ paths:
           description: Success
           content:
             application/json:
-              schema: 
+              schema:
                 $ref: '#/components/schemas/User'
         '404':
           description: Email already exists
@@ -84,19 +84,19 @@ paths:
         - users
       summary: Delete user.
       parameters:
-      - name: id
-        in: path
-        schema:
-          type: string
+        - name: id
+          in: path
+          schema:
+            type: string
       responses:
         '204':
-          description: User deleted successfully 
+          description: User deleted successfully
         '400':
           description: Missing id parameter
         '403':
           description: Can not delete Admin User
         '404':
-          description: User not found  
+          description: User not found
       security:
         - bearerAuth: []
     get:
@@ -104,17 +104,17 @@ paths:
         - users
       summary: Get one user.
       parameters:
-      - name: id
-        in: path
-        schema:
-          type: string
+        - name: id
+          in: path
+          schema:
+            type: string
       responses:
         '200':
           description: Success
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/User' 
+              schema:
+                $ref: '#/components/schemas/User'
         '400':
           description: Missing id parameter
         '404':
@@ -126,31 +126,31 @@ paths:
         - users
       summary: Update one user
       parameters:
-      - name: id
-        in: path
-        schema:
-          type: string
+        - name: id
+          in: path
+          schema:
+            type: string
       responses:
         '200':
           description: Success
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/User' 
+              schema:
+                $ref: '#/components/schemas/User'
         '400':
           description: Missing id parameter
         '404':
           description: User not found
       security:
         - bearerAuth: []
-  
+
   /users/confirm-registration/{token}:
     get:
       parameters:
-      - name: token
-        in: path
-        schema:
-          type: string
+        - name: token
+          in: path
+          schema:
+            type: string
       tags:
         - users
       summary: Confirm registration.
@@ -158,15 +158,15 @@ paths:
         '201':
           description: Success
         '404':
-          description: 
+          description:
 
   /users/confirm-registration/reset-token/{email}:
     get:
       parameters:
-      - name: email
-        in: path
-        schema:
-          type: string
+        - name: email
+          in: path
+          schema:
+            type: string
       tags:
         - users
       summary: Reset token registration.
@@ -174,7 +174,7 @@ paths:
         '201':
           description: Success
         '404':
-          description: 
+          description:
 
 components:
   schemas:
@@ -203,10 +203,10 @@ components:
           schema:
             type: object
             properties:
-              name: 
+              name:
                 type: string
                 default: John
-              lastName: 
+              lastName:
                 type: string
                 default: Doe
               email:
@@ -216,7 +216,3 @@ components:
                 type: string
                 format: password
                 default: 12345678
-                
-
-
-    

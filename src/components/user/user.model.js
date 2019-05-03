@@ -7,34 +7,34 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   lastName: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
     required: true,
     unique: true,
-    index: true
+    index: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   role: {
     type: String,
-    default: Role.User
+    default: Role.User,
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
-  isVerified: { 
-    type: Boolean, 
-    default: false 
-  }
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 let User = mongoose.model('User', UserSchema);

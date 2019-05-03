@@ -15,33 +15,27 @@ import { config } from './config';
 //import Backend from 'i18next-chained-backend';
 
 import { UserComponent } from '@components';
-import { Swagger, Error, Winston } from '@libraries';
+import { Swagger, ErrorHandler, Winston } from '@libraries';
 
 const app = express();
 
 export const initialize = () => {
+  app.use(helmet());
+  app.use(cors());
+  //extended=false is a configuration option that tells the parser to use the classic encoding. When using it, values can be only strings or arrays.
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json());
+  app.use(compression());
 
-    app.use(helmet());
-    app.use(cors());
-    //extended=false is a configuration option that tells the parser to use the classic encoding. When using it, values can be only strings or arrays.
-    app.use(bodyParser.urlencoded({extended: false}));
-    app.use(bodyParser.json());
-    app.use(compression());
+  if (config.env !== 'test') app.use(morgan('combined', { stream: Winston.stream }));
+  //correlator id - header (x-correlation-id)
+  app.use(correlator());
 
-    if (config.env !== 'test')
-        app.use(morgan('combined', { stream: Winston.stream }));
-    //correlator id - header (x-correlation-id)
-    app.use(correlator());
-    
-    //intl init
-    //TODO: Add in library
+  //initialize components
+  UserComponent.initialize(app);
 
-    //initialize components
-    UserComponent.initialize(app);
+  Swagger.initialize(app);
+  ErrorHandler.Middleware.initialize(app);
 
-    Swagger.initialize(app);
-    Error.Middleware.initialize(app);
-
-    return app;
-
+  return app;
 };
