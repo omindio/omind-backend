@@ -33,6 +33,7 @@ export const auth = async authDTOParameter => {
     const payload = {
       id: userDTOResult.id,
       name: userDTOResult.name,
+      lastName: userDTOResult.lastName,
       email: userDTOResult.email,
       role: userDTOResult.role,
     };

@@ -28,6 +28,7 @@ export const getAll = async (projection = {}, pagination) => {
       .limit(pagination.limit);
     let count = await UserModel.countDocuments();
     let usersDTOArray = [];
+
     users.forEach(user => {
       let userDTO = new UserDTO(user);
       usersDTOArray.push(Object.assign({}, userDTO, projection));
