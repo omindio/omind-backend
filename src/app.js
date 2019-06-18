@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import correlator from 'express-correlation-id';
 import morgan from 'morgan';
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
 
 import { config } from './config';
 
@@ -21,7 +22,20 @@ const app = express();
 
 export const initialize = () => {
   app.use(helmet());
-  app.use(cors());
+  app.use(
+    cors({
+      origin: [
+        'http://0.0.0.0:4000',
+        'http://localhost:4000',
+        'http://192.168.1.101:4000',
+        'https://omindbrand.com',
+        'https://www.omindbrand.com',
+        'https://omind-frontend-production.herokuapp.com',
+        'https://omind-frontend-staging.herokuapp.com',
+      ],
+    }),
+  );
+  // app.use(cookieParser());
   //extended=false is a configuration option that tells the parser to use the classic encoding. When using it, values can be only strings or arrays.
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());

@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import { config } from '@config';
 import * as App from './app';
 
-import https from 'https';
 import http from 'http';
 
 global.__base = __dirname + '/';
@@ -18,10 +17,10 @@ mongoose.connect(config.dbUri, {
 });
 
 const app = App.initialize();
+const server = http.createServer(app);
 
-app.listen(port);
-//http.createServer(app).listen(port);
-//https.createServer(options, app).listen(port);
+// app.listen(port);
+server.listen(port);
 console.log('APP Running!');
 
 export default app;
