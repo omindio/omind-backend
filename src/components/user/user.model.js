@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { roles as Role } from './config/roles';
+import { Role } from './config';
 
 const Schema = mongoose.Schema;
 
@@ -27,7 +27,7 @@ const UserSchema = new Schema({
     type: String,
     default: Role.User,
   },
-  createdAt: {
+  createdDate: {
     type: Date,
     default: Date.now,
   },

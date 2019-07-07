@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { roles as Role } from '../config/roles';
+import { Role } from '../config';
 
 //TODO: INTL Validation messages
 //TODO: Correct validation of ID
@@ -21,10 +21,10 @@ const passwordSchema = Joi.string()
   .min(8)
   .strip();
 const roleSchema = Joi.string()
-  .valid(Role.User, Role.Admin)
+  .valid(Role.User, Role.Admin, Role.Client, Role.Employee)
   .default(Role.User);
 const isVerifiedSchema = Joi.boolean();
-const createdAtSchema = Joi.date();
+const createdDateSchema = Joi.date();
 
 export const createUserSchema = Joi.object()
   .keys({
@@ -35,7 +35,7 @@ export const createUserSchema = Joi.object()
     email: emailSchema.required(),
     password: passwordSchema.required(),
     isVerified: isVerifiedSchema.optional(),
-    createdAt: createdAtSchema.optional(),
+    createdDate: createdDateSchema.optional(),
   })
   .options({ abortEarly: false });
 
@@ -48,7 +48,7 @@ export const updateUserSchema = Joi.object()
     email: emailSchema.optional().allow(''),
     password: passwordSchema.optional().allow(''),
     isVerified: isVerifiedSchema.optional(),
-    createdAt: createdAtSchema.optional(),
+    createdDate: createdDateSchema.optional(),
   })
   .options({ abortEarly: false });
 
@@ -61,6 +61,6 @@ export const getUserSchema = Joi.object()
     email: emailSchema.optional(),
     password: passwordSchema.optional(),
     isVerified: isVerifiedSchema.optional(),
-    createdAt: createdAtSchema.optional(),
+    createdDate: createdDateSchema.optional(),
   })
   .options({ abortEarly: false });

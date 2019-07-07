@@ -4,7 +4,7 @@ import UserDTO from './user.dto';
 import * as UserDAL from './user.dal';
 import * as UserValidation from './validation/user.validation';
 
-import { roles as Role } from './config/roles';
+import { Role } from './config';
 
 import * as Pagination from '@libraries/pagination';
 import { TokenService, TokenDTO, Type } from '@components/token';

@@ -1,22 +1,13 @@
-import * as AuthMiddleware from './auth/auth.middleware';
-import * as UserService from './user.service';
-import UserDTO from './user.dto';
+import * as Service from './user.service';
+import DTO from './user.dto';
+import * as DAL from './user.dal';
 
 import routes from './user.routes';
-import authRoutes from './auth/auth.routes';
-
 import * as UserSeed from './seeds/user.seed';
-import * as UserTest from './test/user.spec';
 
-//TODO: https://github.com/tc39/ecma262/pull/1174
-//export * as Service from './user.service';
-//export * as Middleware from './user.middleware';
-//export { Role } from './user.roles';
+import { Role } from './config';
 
 const initialize = async app => {
-  //initialize auth
-  app.use('/users/auth', authRoutes);
-
   app.use('/users', routes);
 
   //seeding
@@ -29,4 +20,4 @@ const initialize = async app => {
   }
 };
 
-export { initialize, AuthMiddleware, UserService, UserDTO, UserTest };
+export { initialize, Service, DTO, DAL, Role };

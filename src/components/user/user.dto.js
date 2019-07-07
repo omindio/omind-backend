@@ -10,7 +10,7 @@ export default class UserDTO {
     this.lastName = data.lastName;
     this.email = data.email;
     this.password = data.password;
-    this.createdAt = data.createdAt;
+    this.createdDate = data.createdDate;
     this.role = data.role;
     this.isVerified = data.isVerified;
   }
@@ -21,7 +21,7 @@ export default class UserDTO {
                 ${this.lastName} |
                 ${this.email} |
                 ${this.password} |
-                ${this.createdAt} |
+                ${this.createdDate} |
                 ${this.role}`;
   }
 

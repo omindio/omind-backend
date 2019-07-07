@@ -4,7 +4,9 @@ import bcrypt from 'bcryptjs';
 import { config } from '@config';
 
 import AuthDTO from './auth.dto';
-import * as UserDAL from '../user.dal';
+
+import { DAL as UserDAL, Role } from '@components/user';
+import { DAL as ClientDAL } from '@components/client';
 import * as AuthValidation from './validation/auth.validation';
 
 import { UnauthorizedAccessError, UnverifiedUserError } from './Error';
@@ -37,6 +39,16 @@ export const auth = async authDTOParameter => {
       email: userDTOResult.email,
       role: userDTOResult.role,
     };
+
+    switch (userDTOResult.role) {
+      case Role.Client:
+        payload.clientId = await ClientDAL.getOne({ user: userDTOResult.id });
+        break;
+      case Role.Employee:
+        //TODO: TO
+        //payload.employeeId = ;
+        break;
+    }
 
     return await jwt.sign(payload, config.auth.secret, {
       expiresIn: config.auth.tokenTime,

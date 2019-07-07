@@ -1,9 +1,9 @@
 paths:
-  /users/{page}/{limit}:
+  /clients/{page}/{limit}:
     get:
       tags:
-        - users
-      summary: Get all users.
+        - clients
+      summary: Get all clients.
       responses:
         '200':
           description: Success
@@ -12,7 +12,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/Client'
         '403':
           description: Access denied. Insufficient permission.
       security:
@@ -26,30 +26,29 @@ paths:
           in: path
           schema:
             type: integer
-  /users:
+  /clients:
     post:
       tags:
-        - users
-      summary: Create user.
+        - clients
+      summary: Create client.
       requestBody:
-        $ref: '#/components/requestBodies/User'
+        $ref: '#/components/requestBodies/Client'
       responses:
         '201':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Client'
         '404':
           description: Email already exists
       security:
         - bearerAuth: []
-
-  /users/{id}:
+  /clients/{id}:
     delete:
       tags:
-        - users
-      summary: Delete user.
+        - clients
+      summary: Delete client.
       parameters:
         - name: id
           in: path
@@ -57,19 +56,19 @@ paths:
             type: string
       responses:
         '204':
-          description: User deleted successfully
+          description: Client deleted successfully
         '400':
           description: Missing id parameter
         '403':
-          description: Can not delete Admin User
+          description: Can not delete Admin Client
         '404':
-          description: User not found
+          description: Clint not found
       security:
         - bearerAuth: []
     get:
       tags:
-        - users
-      summary: Get one user.
+        - clients
+      summary: Get one client.
       parameters:
         - name: id
           in: path
@@ -81,17 +80,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Client'
         '400':
           description: Missing id parameter
         '404':
-          description: User not found
+          description: Client not found
       security:
         - bearerAuth: []
     patch:
       tags:
-        - users
-      summary: Update one user
+        - clients
+      summary: Update one client
       parameters:
         - name: id
           in: path
@@ -103,67 +102,50 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Client'
         '400':
           description: Missing id parameter
         '404':
-          description: User not found
+          description: Client not found
       security:
         - bearerAuth: []
-
-  /users/confirm-registration/{token}:
-    get:
-      parameters:
-        - name: token
-          in: path
-          schema:
-            type: string
-      tags:
-        - users
-      summary: Confirm registration.
-      responses:
-        '201':
-          description: Success
-        '404':
-          description:
-
-  /users/confirm-registration/reset-token/{email}:
-    get:
-      parameters:
-        - name: email
-          in: path
-          schema:
-            type: string
-      tags:
-        - users
-      summary: Reset token registration.
-      responses:
-        '201':
-          description: Success
-        '404':
-          description:
-
 components:
   schemas:
-    User:
+    Client:
       type: object
       properties:
         id:
           type: integer
-        name:
+        companyName:
           type: string
-        lastName:
+        slug:
           type: string
-        email:
+        description:
           type: string
-          format: email
-        role:
+        logo:
           type: string
-        createdDate:
+        cif:
           type: string
-          format: date-time
+        fiscalAddress:
+          type: string
+        phone:
+          type: string
+        #bankAccount:
+        # type: string
+        public:
+          type: string
+        socialLinkedin:
+          type: string
+        socialFacebook:
+          type: string
+        socialInstagram:
+          type: string
+        web:
+          type: string
+        user:
+          type: object
   requestBodies:
-    User:
+    Client:
       required: true
       content:
         application/x-www-form-urlencoded:
@@ -183,3 +165,30 @@ components:
                 type: string
                 format: password
                 default: 12345678
+              companyName:
+                type: string
+                default: Test
+              description:
+                type: string
+              logo:
+                type: string
+                format: binary
+              cif:
+                type: string
+              fiscalAddress:
+                type: string
+              phone:
+                type: string
+              #bankAccount:
+              # type: string
+              public:
+                type: boolean
+                default: false
+              socialLinkedin:
+                type: string
+              socialFacebook:
+                type: string
+              socialInstagram:
+                type: string
+              web:
+                type: string
