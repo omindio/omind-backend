@@ -1,4 +1,4 @@
-import Joi from 'joi';
+import Joi from '@hapi/joi';
 import { types as Type } from '../config/types';
 
 //TODO: INTL Validation messages

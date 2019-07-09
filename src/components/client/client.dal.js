@@ -7,9 +7,9 @@ import { DTO as UserDTO } from '@components/user';
 
 export const getOne = async params => {
   try {
-    let client = await ClientModel.findOne({ params }).populate('user');
+    let client = await ClientModel.findOne(params).populate('user');
     let clientDTO = new ClientDTO(client);
-    if (clientDTO.user) {
+    if (client && clientDTO.user) {
       clientDTO.user = _getUserDTO(client.user);
     }
     return clientDTO;
@@ -22,7 +22,7 @@ export const getOneById = async idParameter => {
   try {
     const client = await ClientModel.findById(idParameter).populate('user');
     let clientDTO = new ClientDTO(client);
-    clientDTO.user = _getUserDTO(client.user);
+    if (client) clientDTO.user = _getUserDTO(client.user);
     return clientDTO;
   } catch (err) {
     throw err;
@@ -65,7 +65,7 @@ export const create = async clientDTOParameter => {
 let user = await User.create({ ... })
 user = await user.populate('company').execPopulate()
 */
-export const update = async userDTOParameter => {
+export const update = async clientDTOParameter => {
   try {
     let clientDTO = _pickBy(clientDTOParameter);
     let client = await ClientModel.findOneAndUpdate({ _id: clientDTO.id }, clientDTO, {

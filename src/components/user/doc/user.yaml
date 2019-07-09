@@ -97,6 +97,8 @@ paths:
           in: path
           schema:
             type: string
+      requestBody:
+        $ref: '#/components/requestBodies/User'
       responses:
         '200':
           description: Success

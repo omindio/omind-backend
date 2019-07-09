@@ -1,16 +1,20 @@
 import * as ClientService from './client.service';
 import ClientDTO from './client.dto';
-import { DTO as UserDTO, Role } from '@components/user';
 
-import { MissingParametersError, UnauthorizedActionError } from '@libraries/Error';
+import { DTO as UserDTO } from '@components/user';
+import { roles as Role } from '@components/user/config';
+
+import { MissingParameterError, UnauthorizedActionError } from '@libraries/Error';
 
 //TODO: Think about create DTO in Service
 export const create = async (req, res, next) => {
   try {
-    let clientDTO = new ClientDTO(req.body);
-    let userDTO = new UserDTO(req.body);
+    const clientDTO = new ClientDTO(req.body);
+    const userDTO = new UserDTO(req.body);
 
-    let client = await ClientService.create(userDTO, clientDTO);
+    if (req.file) clientDTO.logoFile = req.file;
+
+    const client = await ClientService.create(userDTO, clientDTO);
     res.status(201).json(client);
   } catch (err) {
     return next(err);
@@ -18,16 +22,19 @@ export const create = async (req, res, next) => {
 };
 
 export const update = async (req, res, next) => {
-  let id = req.params.id;
+  const id = req.params.id;
   try {
-    if (!id) throw new MissingParametersError(['id']);
-    if (Role.Admin != req.user.role && id != req.user.id)
+    if (!id) throw new MissingParameterError(['id']);
+    if (Role.Admin != req.user.role && id != req.user.clientId)
       throw new UnauthorizedActionError('You can not update this client.');
 
     let clientDTO = new ClientDTO(req.body);
+    const userDTO = new UserDTO(req.body);
     clientDTO.id = id;
 
-    let client = await ClientService.update(clientDTO);
+    if (req.file) clientDTO.logoFile = req.file;
+
+    const client = await ClientService.update(userDTO, clientDTO);
     res.status(200).json(client);
   } catch (err) {
     return next(err);
@@ -35,12 +42,10 @@ export const update = async (req, res, next) => {
 };
 
 export const remove = async (req, res, next) => {
-  let id = req.params.id;
+  const id = req.params.id;
   try {
-    if (!id) throw new MissingParametersError(['id']);
-
-    let clientDTO = new ClientDTO({ id: id });
-
+    if (!id) throw new MissingParameterError(['id']);
+    const clientDTO = new ClientDTO({ id: id });
     await ClientService.remove(clientDTO);
     res.status(204).send();
   } catch (err) {
@@ -50,15 +55,14 @@ export const remove = async (req, res, next) => {
 
 export const getOne = async (req, res, next) => {
   const id = req.params.id;
-  const slug = req.params.id;
-  console.log(req.user);
+  const slug = req.params.slug;
   try {
-    if (!id && !slug) throw new MissingParametersError(['id', 'slug']);
+    if (!id && !slug) throw new MissingParameterError(['id', 'slug']);
 
-    //TODO: Check Owner of client.
-
-    //if (Role.Admin != req.user.role && id != req.user.id)
-    //throw new UnauthorizedActionError('You can not get this client.');
+    //Check Owner of client.
+    //TODO: Por ahora comprobaremos la propiedad en el update.
+    // if (Role.Admin != req.user.role && id != req.user.clientId)
+    // throw new UnauthorizedActionError('You can not get this client.');
 
     let clientDTO = new ClientDTO({ id, slug });
 

@@ -6,7 +6,9 @@ import helmet from 'helmet';
 import correlator from 'express-correlation-id';
 import morgan from 'morgan';
 import compression from 'compression';
-import cookieParser from 'cookie-parser';
+import appRoot from 'app-root-path';
+
+//import cookieParser from 'cookie-parser';
 
 import { config } from './config';
 
@@ -21,6 +23,8 @@ import { Swagger, ErrorHandler, Winston } from '@libraries';
 const app = express();
 
 export const initialize = () => {
+  //app.use(`${appRoot}/uploads`, express.static(`${appRoot}/uploads`));
+
   app.use(helmet());
   app.use(
     cors({

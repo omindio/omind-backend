@@ -5,8 +5,6 @@ import * as DAL from './user.dal';
 import routes from './user.routes';
 import * as UserSeed from './seeds/user.seed';
 
-import { Role } from './config';
-
 const initialize = async app => {
   app.use('/users', routes);
 
@@ -20,4 +18,4 @@ const initialize = async app => {
   }
 };
 
-export { initialize, Service, DTO, DAL, Role };
+export { initialize, Service, DTO, DAL };

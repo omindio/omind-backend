@@ -4,7 +4,7 @@ import UserDTO from './user.dto';
 import * as UserDAL from './user.dal';
 import * as UserValidation from './validation/user.validation';
 
-import { Role } from './config';
+import { roles as Role } from './config';
 
 import * as Pagination from '@libraries/pagination';
 import { TokenService, TokenDTO, Type } from '@components/token';
@@ -121,6 +121,15 @@ export const remove = async userDTOParameter => {
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
+  }
+};
+
+export const removeById = async userId => {
+  try {
+    const userDTO = new UserDTO({ id: userId });
+    await remove(userDTO);
+  } catch (err) {
+    throw err;
   }
 };
 

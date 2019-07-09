@@ -1,12 +1,15 @@
-import bcrypt from 'bcryptjs';
 import urlSlug from 'url-slug';
+import appRoot from 'app-root-path';
+import fs from 'fs';
 
 import ClientDTO from './client.dto';
 import * as ClientDAL from './client.dal';
 import * as ClientValidation from './validation/client.validation';
 
-import { Role, Service as ClientService } from '@components/user';
-console.log(Role);
+import { ImageResize } from '@libraries';
+import { Service as UserService } from '@components/user';
+import { roles as Role } from '@components/user/config';
+
 import * as Pagination from '@libraries/pagination';
 
 //Global errors
@@ -14,12 +17,8 @@ import { UnauthorizedActionError, InstanceofError, ValidationSchemaError } from 
 //User errors
 import { ClientAlreadyExistsError, ClientNotFoundError } from './Error';
 
-const passwordSalt = 10;
+const imagePath = `${appRoot}/uploads/images`;
 
-/*
-  TODO:
-  - check slug if exists.
-*/
 export const create = async (userDTOParameter, clientDTOParameter) => {
   try {
     //parameter validation
@@ -40,11 +39,18 @@ export const create = async (userDTOParameter, clientDTOParameter) => {
     userDTOParameter.role = Role.Client;
 
     //validate user credentials and create
-    return ClientService.create(userDTOParameter)
+    return UserService.create(userDTOParameter)
       .then(async ({ user, verificationToken }) => {
         clientDTOParameter.user = user.id;
 
-        let clientDTO = await ClientDAL.create(clientDTOParameter);
+        if (clientDTOParameter.logoFile) {
+          const fileUpload = new ImageResize(imagePath);
+          const filename = await fileUpload.save(clientDTOParameter.logoFile.buffer);
+
+          clientDTOParameter.logo = filename;
+        }
+
+        const clientDTO = await ClientDAL.create(clientDTOParameter);
 
         return {
           client: clientDTO,
@@ -55,80 +61,92 @@ export const create = async (userDTOParameter, clientDTOParameter) => {
       .catch(err => {
         throw err;
       });
-
-    //Check if exists some user with Email received
-    // let userDTOResult = await ClientDAL.getOneByEmail(userDTOParameter.email);
-    // if (userDTOResult.id) throw new EmailAlreadyExistsError();
-
-    //hash and save password
-    // let salt = await bcrypt.genSalt(passwordSalt);
-    // let hash = await bcrypt.hash(userDTOParameter.password, salt);
-    // userDTOParameter.password = hash;
-
-    //call to DAL for save User & returns DTO without password
-
-    //Create Token if user is not verified
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
   }
 };
 
-export const update = async userDTOParameter => {
+export const update = async (userDTOParameter, clientDTOParameter) => {
   try {
     //parameter validation
-    if (!(userDTOParameter instanceof ClientDTO))
+    if (!(clientDTOParameter instanceof ClientDTO))
       throw new InstanceofError('Param sent need to be an ClientDTO.');
 
     //run validation. Returns exceptions if fails
-    await ClientValidation.updateUserSchema.validate(userDTOParameter);
+    await ClientValidation.updateClientSchema.validate(clientDTOParameter);
 
-    let userDTOResult = await ClientDAL.getOneById(userDTOParameter.id);
-    if (!userDTOResult.id) throw new UserNotFoundError();
+    let clientDTOResult = await ClientDAL.getOneById(clientDTOParameter.id);
+    if (!clientDTOResult.id) throw new ClientNotFoundError();
 
-    //check if exists new email
-    if (userDTOResult.email != userDTOParameter.email) {
-      let checkUserDTOResult = await ClientDAL.getOneByEmail(userDTOParameter.email);
-      if (checkUserDTOResult.id) throw new EmailAlreadyExistsError();
+    //if (clientDTOParameter.slug != clientDTOResult.slug) {
+    if (clientDTOParameter.companyName.trim() != clientDTOResult.companyName.trim()) {
+      clientDTOParameter.slug = urlSlug(clientDTOParameter.companyName);
+      //Check if exists some user with slug/company name received
+      let clientDTOResult = await ClientDAL.getOne({ slug: clientDTOParameter.slug });
+      if (clientDTOResult.id) throw new ClientAlreadyExistsError();
     }
 
-    //if exists password hash and set New
-    let newPassword = userDTOParameter.password;
-    if (newPassword) {
-      let isMatch = await bcrypt.compare(newPassword, userDTOResult.password);
-      if (isMatch) throw new SamePasswordError();
+    userDTOParameter.id = clientDTOResult.user.id;
 
-      let salt = await bcrypt.genSalt(passwordSalt);
-      let hash = await bcrypt.hash(newPassword, salt);
-      userDTOParameter.password = hash;
-    }
+    return UserService.update(userDTOParameter)
+      .then(async user => {
+        if (clientDTOParameter.logoFile) {
+          if (clientDTOResult.logo) {
+            fs.unlink(`${imagePath}/${clientDTOResult.logo}`, err => {
+              if (err) throw err;
+            });
+          }
 
-    //call to DAL for save User & returns DTO without password
-    let userDTO = await ClientDAL.update(userDTOParameter);
-    return Object.assign({}, userDTO, {
-      password: undefined,
-    });
+          const fileUpload = new ImageResize(imagePath);
+          const filename = await fileUpload.save(clientDTOParameter.logoFile.buffer);
+
+          clientDTOParameter.logo = filename;
+        }
+
+        const clientDTO = await ClientDAL.update(clientDTOParameter);
+
+        return {
+          client: clientDTO,
+          user,
+        };
+      })
+      .catch(err => {
+        throw err;
+      });
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
   }
 };
 
-export const remove = async userDTOParameter => {
+export const remove = async clientDTOParameter => {
   try {
-    if (!(userDTOParameter instanceof ClientDTO))
+    if (!(clientDTOParameter instanceof ClientDTO))
       throw new InstanceofError('Param sent need to be an ClientDTO.');
 
     //validate
-    await ClientValidation.updateUserSchema.validate(userDTOParameter);
+    await ClientValidation.updateClientSchema.validate(clientDTOParameter);
 
-    let userDTOResult = await ClientDAL.getOneById(userDTOParameter.id);
-    if (!userDTOResult.id) throw new UserNotFoundError();
+    let clientDTOResult = await ClientDAL.getOneById(clientDTOParameter.id);
+    if (!clientDTOResult.id) throw new ClientNotFoundError();
 
-    if (userDTOResult.role === Role.Admin)
+    if (clientDTOResult.role === Role.Admin)
       throw new UnauthorizedActionError('You can not remove this user.');
 
-    await ClientDAL.remove(userDTOResult);
+    return UserService.removeById(clientDTOResult.user.id)
+      .then(async () => {
+        await ClientDAL.remove(clientDTOResult);
+        //remove image if exists
+        if (clientDTOResult.logo) {
+          fs.unlink(`${imagePath}/${clientDTOResult.logo}`, err => {
+            if (err) throw err;
+          });
+        }
+      })
+      .catch(err => {
+        throw err;
+      });
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;

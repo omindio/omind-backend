@@ -1,21 +1,33 @@
 import { Router } from 'express';
 const routes = Router();
 import * as ClientController from './client.controller';
-//import { Role } from '@components/user';
-const Role = {
-  Admin: '',
-  Client: '',
-};
+import { roles as Role } from '@components/user/config';
 import { middleware } from '@components/auth';
 
-routes.get('/:id', middleware.authorize([Role.Admin, Role.Client]), ClientController.getOne);
+import { UploadMidleware } from '@libraries';
 
-routes.post('/', middleware.authorize([Role.Admin]), ClientController.create);
+routes.get('/:id', /*middleware.authorize([Role.Admin, Role.Client]),*/ ClientController.getOne);
+routes.get(
+  '/slug/:slug',
+  /*middleware.authorize([Role.Admin, Role.Client]),*/ ClientController.getOne,
+);
 
-routes.patch('/:id', middleware.authorize([Role.Admin, Role.Client]), ClientController.update);
+routes.post(
+  '/',
+  UploadMidleware.single('logoFile'),
+  middleware.authorize([Role.Admin]),
+  ClientController.create,
+);
+
+routes.patch(
+  '/:id',
+  UploadMidleware.single('logoFile'),
+  middleware.authorize([Role.Admin, Role.Client]),
+  ClientController.update,
+);
 
 routes.delete('/:id', middleware.authorize([Role.Admin]), ClientController.remove);
 
-routes.get('/:page?/:limit?', middleware.authorize([Role.Admin]), ClientController.getAll);
+routes.get('/:page?/:limit?', /*middleware.authorize([Role.Admin]),*/ ClientController.getAll);
 
 export default routes;

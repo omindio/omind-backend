@@ -5,7 +5,9 @@ import { config } from '@config';
 
 import AuthDTO from './auth.dto';
 
-import { DAL as UserDAL, Role } from '@components/user';
+import { DAL as UserDAL } from '@components/user';
+import { roles as Role } from '@components/user/config';
+
 import { DAL as ClientDAL } from '@components/client';
 import * as AuthValidation from './validation/auth.validation';
 
@@ -42,7 +44,8 @@ export const auth = async authDTOParameter => {
 
     switch (userDTOResult.role) {
       case Role.Client:
-        payload.clientId = await ClientDAL.getOne({ user: userDTOResult.id });
+        const clientDTO = await ClientDAL.getOne({ user: userDTOResult.id });
+        payload.clientId = clientDTO.id;
         break;
       case Role.Employee:
         //TODO: TO

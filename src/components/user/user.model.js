@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Role } from './config';
+import { roles as Role } from './config';
 
 const Schema = mongoose.Schema;
 

@@ -1,5 +1,5 @@
-import Joi from 'joi';
-import { Role } from '../config';
+import Joi from '@hapi/joi';
+import { roles as Role } from '../config';
 
 //TODO: INTL Validation messages
 //TODO: Correct validation of ID

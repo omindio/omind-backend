@@ -1,3 +1,3 @@
-import { roles as Role } from './roles';
+import roles from './roles';
 
-export { Role };
+export { roles };

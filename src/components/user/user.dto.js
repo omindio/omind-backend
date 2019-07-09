@@ -1,5 +1,5 @@
 //Data Transfer Object
-import { roles as Role } from './config/roles';
+import { roles as Role } from './config';
 
 export default class UserDTO {
   constructor(data) {

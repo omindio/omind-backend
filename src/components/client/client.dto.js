@@ -7,6 +7,7 @@ export default class ClientDTO {
     this.companyName = data.companyName;
     this.slug = data.slug;
     this.description = data.description;
+    this.logoFile = data.logoFile;
     this.logo = data.logo;
     this.cif = data.cif;
     this.fiscalAddress = data.fiscalAddress;

@@ -44,6 +44,29 @@ paths:
           description: Email already exists
       security:
         - bearerAuth: []
+  /clients/slug/{slug}:
+    get:
+      tags:
+        - clients
+      summary: Get one client by slug.
+      parameters:
+        - name: slug
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        '400':
+          description: Missing slug parameter
+        '404':
+          description: Client not found
+      security:
+        - bearerAuth: []
   /clients/{id}:
     delete:
       tags:
@@ -68,7 +91,7 @@ paths:
     get:
       tags:
         - clients
-      summary: Get one client.
+      summary: Get one client by id.
       parameters:
         - name: id
           in: path
@@ -96,6 +119,8 @@ paths:
           in: path
           schema:
             type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Client'
       responses:
         '200':
           description: Success
@@ -148,7 +173,7 @@ components:
     Client:
       required: true
       content:
-        application/x-www-form-urlencoded:
+        multipart/form-data:
           schema:
             type: object
             properties:
@@ -170,7 +195,7 @@ components:
                 default: Test
               description:
                 type: string
-              logo:
+              logoFile:
                 type: string
                 format: binary
               cif:
@@ -192,3 +217,6 @@ components:
                 type: string
               web:
                 type: string
+          encoding: # The same level as schema
+            profileImage: # Property name (see above)
+              contentType: image/png, image/jpeg
