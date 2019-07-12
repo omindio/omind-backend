@@ -8,9 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-Docker dependency. Install it from:
-
-[https://docs.docker.com/install/](https://docs.docker.com/install/)
+_TODO:_
 
 ### Installing
 
@@ -40,5 +38,3 @@ _TODO:_
 ## Production Build
 
 _TODO:_
-
-- Travis

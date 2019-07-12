@@ -6,11 +6,7 @@ export const initialize = async (page, limit) => {
 
   if (page === 0) page = 1;
 
-  try {
-    validate(page, limit);
-  } catch (err) {
-    throw err;
-  }
+  validate(page, limit);
 
   return {
     page: page,
