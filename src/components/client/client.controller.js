@@ -34,6 +34,7 @@ export const update = async (req, res, next) => {
     clientDTO.id = id;
 
     if (req.file) clientDTO.logoFile = req.file;
+    if (req.file === undefined) clientDTO.logoFile = null;
 
     const client = await ClientService.update(userDTO, clientDTO);
     res.status(200).json(client);
