@@ -7,13 +7,13 @@ export default class ClientDTO {
     this.companyName = data.companyName;
     this.slug = data.slug;
     this.description = data.description;
-    this.logoFile = data.logoFile;
+    this.logoFile = data.logoFile || undefined;
     this.logo = data.logo;
     this.cif = data.cif;
     this.fiscalAddress = data.fiscalAddress;
     this.phone = data.phone;
     // this.bankAccount = data.bankAccount;
-    this.public = data.public;
+    this.published = data.published;
     this.socialLinkedin = data.socialLinkedin;
     this.socialFacebook = data.socialFacebook;
     this.socialInstagram = data.socialInstagram;

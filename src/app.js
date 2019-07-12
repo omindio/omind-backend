@@ -23,7 +23,7 @@ import { Swagger, ErrorHandler, Winston } from '@libraries';
 const app = express();
 
 export const initialize = () => {
-  //app.use(`${appRoot}/uploads`, express.static(`${appRoot}/uploads`));
+  app.use('/public', express.static(`${appRoot}/uploads`));
 
   app.use(helmet());
   app.use(

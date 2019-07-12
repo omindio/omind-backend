@@ -38,7 +38,7 @@ const ClientSchema = new Schema({
     type: String,
     required: false,
   },*/
-  public: {
+  published: {
     type: Boolean,
     default: false,
   },

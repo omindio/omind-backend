@@ -40,7 +40,7 @@ export const remove = async (req, res, next) => {
 
     let userDTO = new UserDTO({ id: id });
 
-    await UserService.remove(userDTO);
+    await UserService.remove(userDTO, true);
     res.status(204).send();
   } catch (err) {
     return next(err);

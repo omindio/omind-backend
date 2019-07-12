@@ -13,6 +13,7 @@ export const create = async (req, res, next) => {
     const userDTO = new UserDTO(req.body);
 
     if (req.file) clientDTO.logoFile = req.file;
+    if (req.file === undefined) clientDTO.logoFile = null;
 
     const client = await ClientService.create(userDTO, clientDTO);
     res.status(201).json(client);
@@ -43,9 +44,10 @@ export const update = async (req, res, next) => {
 
 export const remove = async (req, res, next) => {
   const id = req.params.id;
+
   try {
     if (!id) throw new MissingParameterError(['id']);
-    const clientDTO = new ClientDTO({ id: id });
+    const clientDTO = new ClientDTO({ id });
     await ClientService.remove(clientDTO);
     res.status(204).send();
   } catch (err) {

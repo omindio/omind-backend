@@ -103,7 +103,7 @@ export const update = async userDTOParameter => {
   }
 };
 
-export const remove = async userDTOParameter => {
+export const remove = async (userDTOParameter, userAPI = false) => {
   try {
     if (!(userDTOParameter instanceof UserDTO))
       throw new InstanceofError('Param sent need to be an UserDTO.');
@@ -116,6 +116,11 @@ export const remove = async userDTOParameter => {
 
     if (userDTOResult.role === Role.Admin)
       throw new UnauthorizedActionError('You can not remove this user.');
+
+    if (userAPI && userDTOResult.role != 'User')
+      throw new UnauthorizedActionError(
+        `To delete ${userDTOResult.role} user use the correct API for the Role.`,
+      );
 
     await UserDAL.remove(userDTOResult);
   } catch (err) {

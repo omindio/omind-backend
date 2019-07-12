@@ -157,7 +157,7 @@ components:
           type: string
         #bankAccount:
         # type: string
-        public:
+        published:
           type: string
         socialLinkedin:
           type: string
@@ -206,7 +206,7 @@ components:
                 type: string
               #bankAccount:
               # type: string
-              public:
+              published:
                 type: boolean
                 default: false
               socialLinkedin:

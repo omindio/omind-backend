@@ -1,4 +1,5 @@
 import urlSlug from 'url-slug';
+import sgMail from '@sendgrid/mail';
 import appRoot from 'app-root-path';
 import fs from 'fs';
 
@@ -37,6 +38,8 @@ export const create = async (userDTOParameter, clientDTOParameter) => {
 
     //set client Role
     userDTOParameter.role = Role.Client;
+    //TODO: Remove this to set password in client.
+    const plainPassword = userDTOParameter.password;
 
     //validate user credentials and create
     return UserService.create(userDTOParameter)
@@ -51,6 +54,10 @@ export const create = async (userDTOParameter, clientDTOParameter) => {
         }
 
         const clientDTO = await ClientDAL.create(clientDTOParameter);
+
+        _sendEmailAfterCreate(userDTOParameter.email, plainPassword)
+          .then()
+          .catch(err => console.log(err));
 
         return {
           client: clientDTO,
@@ -193,5 +200,24 @@ export const getAll = async (page, limit) => {
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
+  }
+};
+
+const _sendEmailAfterCreate = async (email, plainPassword) => {
+  try {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+      to: email,
+      from: 'noreply@omindbrand.com',
+      subject: 'Email & Password to access Omind platform.',
+      html: `
+    <p><strong>Email:</strong> ${email}</p><p>
+    <strong>Password:</strong> ${plainPassword}</p>
+    <p><small>For security: Remember to change your password.</small></p>
+    `,
+    };
+    sgMail.send(msg);
+  } catch (err) {
+    throw err;
   }
 };

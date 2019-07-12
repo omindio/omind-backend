@@ -21,7 +21,7 @@ const fiscalAddressSchema = Joi.string();
 const phoneSchema = Joi.string()
   .min(9)
   .max(11);
-const publicSchema = Joi.boolean();
+const publishedSchema = Joi.boolean();
 const socialLinkedinSchema = Joi.string().uri();
 const socialFacebookSchema = Joi.string().uri();
 const socialInstagramSchema = Joi.string().uri();
@@ -36,13 +36,13 @@ export const createClientSchema = Joi.object()
     companyName: companyNameSchema.required(),
     slug: slugSchema.optional().allow(''),
     logo: logoSchema.optional().allow(''),
-    logoFile: logoFileSchema.optional().allow(''),
+    logoFile: logoFileSchema.optional().allow(null),
     description: descriptionSchema.optional().allow(''),
     cif: cifSchema.optional().allow(''),
     fiscalAddress: fiscalAddressSchema.optional().allow(''),
     phone: phoneSchema.optional().allow(''),
     //bankAccount: createdAtSchema.optional(),
-    public: publicSchema.optional().allow(''),
+    published: publishedSchema.optional().allow(''),
     socialLinkedin: socialLinkedinSchema.optional().allow(''),
     socialFacebook: socialFacebookSchema.optional().allow(''),
     socialInstagram: socialInstagramSchema.optional().allow(''),
@@ -58,13 +58,13 @@ export const updateClientSchema = Joi.object()
     companyName: companyNameSchema.optional().allow(''),
     slug: slugSchema.optional().allow(''),
     logo: logoSchema.optional().allow(''),
-    logoFile: logoFileSchema.optional().allow(''),
+    logoFile: logoFileSchema.optional().allow(null),
     description: descriptionSchema.optional().allow(''),
     cif: cifSchema.optional().allow(''),
     fiscalAddress: fiscalAddressSchema.optional().allow(''),
     phone: phoneSchema.optional().allow(''),
     //bankAccount: createdAtSchema.optional(),
-    public: publicSchema.optional().allow(''),
+    published: publishedSchema.optional().allow(''),
     socialLinkedin: socialLinkedinSchema.optional().allow(''),
     socialFacebook: socialFacebookSchema.optional().allow(''),
     socialInstagram: socialInstagramSchema.optional().allow(''),
@@ -86,7 +86,7 @@ export const getClientSchema = Joi.object()
     fiscalAddress: fiscalAddressSchema.optional(),
     phone: phoneSchema.optional(),
     //bankAccount: createdAtSchema.optional(),
-    public: publicSchema.optional(),
+    published: publishedSchema.optional(),
     socialLinkedin: socialLinkedinSchema.optional(),
     socialFacebook: socialFacebookSchema.optional(),
     socialInstagram: socialInstagramSchema.optional(),
