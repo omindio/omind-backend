@@ -4,12 +4,13 @@ import { roles as Role } from './config';
 
 import { MissingParameterError, UnauthorizedActionError } from '@libraries/Error';
 
-//TODO: Think about create DTO in Service
 export const create = async (req, res, next) => {
   try {
-    let userDTO = new UserDTO(req.body);
+    const { name, lastName, email, password } = req.body;
 
-    let user = await UserService.create(userDTO);
+    const userDTO = new UserDTO({ name, lastName, email, password });
+
+    const user = await UserService.create(userDTO);
     res.status(201).json(user);
   } catch (err) {
     return next(err);
@@ -17,16 +18,18 @@ export const create = async (req, res, next) => {
 };
 
 export const update = async (req, res, next) => {
-  let id = req.params.id;
+  const idParameter = req.params.id;
   try {
-    if (!id) throw new MissingParameterError(['id']);
+    if (!idParameter) throw new MissingParameterError(['id']);
     if (Role.Admin != req.user.role && id != req.user.id)
       throw new UnauthorizedActionError('You can not update this user.');
+    const { name, lastName, email, password, id } = Object.assign({}, req.body, {
+      id: idParameter,
+    });
 
-    let userDTO = new UserDTO(req.body);
-    userDTO.id = id;
+    const userDTO = new UserDTO({ name, lastName, email, password, id });
 
-    let user = await UserService.update(userDTO);
+    const user = await UserService.update(userDTO);
     res.status(200).json(user);
   } catch (err) {
     return next(err);
@@ -34,11 +37,11 @@ export const update = async (req, res, next) => {
 };
 
 export const remove = async (req, res, next) => {
-  let id = req.params.id;
+  const idParameter = req.params.id;
   try {
-    if (!id) throw new MissingParameterError(['id']);
+    if (!idParameter) throw new MissingParameterError(['id']);
 
-    let userDTO = new UserDTO({ id: id });
+    const userDTO = new UserDTO({ id: idParameter });
 
     await UserService.remove(userDTO, true);
     res.status(204).send();
@@ -48,15 +51,15 @@ export const remove = async (req, res, next) => {
 };
 
 export const getOne = async (req, res, next) => {
-  let id = req.params.id;
+  const idParameter = req.params.id;
   try {
-    if (!id) throw new MissingParameterError(['id']);
-    if (Role.Admin != req.user.role && id != req.user.id)
+    if (!idParameter) throw new MissingParameterError(['id']);
+    if (Role.Admin != req.user.role && idParameter != req.user.id)
       throw new UnauthorizedActionError('You can not get this user.');
 
-    let userDTO = new UserDTO({ id: id });
+    const userDTO = new UserDTO({ id: idParameter });
 
-    let user = await UserService.getOne(userDTO);
+    const user = await UserService.getOne(userDTO);
     res.status(200).json(user);
   } catch (err) {
     return next(err);
@@ -65,10 +68,10 @@ export const getOne = async (req, res, next) => {
 
 export const getAll = async (req, res, next) => {
   try {
-    let page = req.params.page;
-    let limit = req.params.limit;
+    const page = req.params.page;
+    const limit = req.params.limit;
 
-    let users = await UserService.getAll(page, limit);
+    const users = await UserService.getAll(page, limit);
     res.status(200).json(users);
   } catch (err) {
     return next(err);
@@ -77,10 +80,10 @@ export const getAll = async (req, res, next) => {
 
 export const confirmRegistration = async (req, res, next) => {
   try {
-    let token = req.params.token;
-    if (!token) throw new MissingParameterError(['token']);
+    const tokenParameter = req.params.token;
+    if (!tokenParameter) throw new MissingParameterError(['token']);
 
-    await UserService.confirmRegistration(token);
+    await UserService.confirmRegistration(tokenParameter);
     res.status(204).send();
   } catch (err) {
     return next(err);
@@ -89,10 +92,10 @@ export const confirmRegistration = async (req, res, next) => {
 
 export const resetTokenRegistration = async (req, res, next) => {
   try {
-    let email = req.params.email;
-    if (!email) throw new MissingParameterError(['email']);
+    const emailParameter = req.params.email;
+    if (!emailParameter) throw new MissingParameterError(['email']);
 
-    let token = await UserService.resetTokenRegistration(email);
+    const token = await UserService.resetTokenRegistration(emailParameter);
     res.status(200).json(token);
   } catch (err) {
     return next(err);

@@ -8,6 +8,8 @@ _SpecRunner.html
 __benchmarks__
 build/
 logs/*
+uploads
+uploads/*
 remote-repo/
 coverage/
 .module-cache

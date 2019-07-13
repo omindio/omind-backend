@@ -6,14 +6,42 @@ import { roles as Role } from '@components/user/config';
 
 import { MissingParameterError, UnauthorizedActionError } from '@libraries/Error';
 
-//TODO: Think about create DTO in Service
 export const create = async (req, res, next) => {
   try {
-    const clientDTO = new ClientDTO(req.body);
-    const userDTO = new UserDTO(req.body);
+    const {
+      cif,
+      lastName,
+      socialInstagram,
+      companyName,
+      name,
+      socialLinkedin,
+      phone,
+      published,
+      socialFacebook,
+      web,
+      fiscalAddress,
+      password,
+      email,
+      description,
+    } = req.body;
 
-    if (req.file) clientDTO.logoFile = req.file;
-    if (req.file === undefined) clientDTO.logoFile = null;
+    let logoFile = req.file;
+    if (logoFile === undefined) logoFile = null;
+
+    const clientDTO = new ClientDTO({
+      companyName,
+      cif,
+      fiscalAddress,
+      description,
+      web,
+      socialFacebook,
+      published,
+      phone,
+      socialLinkedin,
+      socialInstagram,
+      logoFile,
+    });
+    const userDTO = new UserDTO({ name, lastName, email, password });
 
     const client = await ClientService.create(userDTO, clientDTO);
     res.status(201).json(client);
@@ -23,18 +51,50 @@ export const create = async (req, res, next) => {
 };
 
 export const update = async (req, res, next) => {
-  const id = req.params.id;
+  const idParameter = req.params.id;
   try {
-    if (!id) throw new MissingParameterError(['id']);
-    if (Role.Admin != req.user.role && id != req.user.clientId)
+    if (!idParameter) throw new MissingParameterError(['id']);
+    if (Role.Admin != req.user.role && idParameter != req.user.clientId)
       throw new UnauthorizedActionError('You can not update this client.');
 
-    let clientDTO = new ClientDTO(req.body);
-    const userDTO = new UserDTO(req.body);
-    clientDTO.id = id;
+    const {
+      cif,
+      lastName,
+      socialInstagram,
+      companyName,
+      name,
+      socialLinkedin,
+      phone,
+      published,
+      socialFacebook,
+      web,
+      fiscalAddress,
+      password,
+      email,
+      description,
+      id,
+    } = Object.assign({}, req.body, {
+      id: idParameter,
+    });
 
-    if (req.file) clientDTO.logoFile = req.file;
-    if (req.file === undefined) clientDTO.logoFile = null;
+    let logoFile = req.file;
+    if (logoFile === undefined) logoFile = null;
+
+    const clientDTO = new ClientDTO({
+      companyName,
+      cif,
+      fiscalAddress,
+      description,
+      web,
+      socialFacebook,
+      published,
+      phone,
+      socialLinkedin,
+      socialInstagram,
+      logoFile,
+      id,
+    });
+    const userDTO = new UserDTO({ name, lastName, email, password });
 
     const client = await ClientService.update(userDTO, clientDTO);
     res.status(200).json(client);
@@ -44,11 +104,11 @@ export const update = async (req, res, next) => {
 };
 
 export const remove = async (req, res, next) => {
-  const id = req.params.id;
+  const idParameter = req.params.id;
 
   try {
-    if (!id) throw new MissingParameterError(['id']);
-    const clientDTO = new ClientDTO({ id });
+    if (!idParameter) throw new MissingParameterError(['id']);
+    const clientDTO = new ClientDTO({ id: idParameter });
     await ClientService.remove(clientDTO);
     res.status(204).send();
   } catch (err) {
@@ -57,19 +117,18 @@ export const remove = async (req, res, next) => {
 };
 
 export const getOne = async (req, res, next) => {
-  const id = req.params.id;
-  const slug = req.params.slug;
+  const idParameter = req.params.id;
+  const slugParameter = req.params.slug;
   try {
-    if (!id && !slug) throw new MissingParameterError(['id', 'slug']);
+    if (!idParameter && !slugParameter) throw new MissingParameterError(['id', 'slug']);
 
     //Check Owner of client.
     //TODO: Por ahora comprobaremos la propiedad en el update.
     // if (Role.Admin != req.user.role && id != req.user.clientId)
     // throw new UnauthorizedActionError('You can not get this client.');
 
-    let clientDTO = new ClientDTO({ id, slug });
-
-    let client = await ClientService.getOne(clientDTO);
+    const clientDTO = new ClientDTO({ id: idParameter, slug: slugParameter });
+    const client = await ClientService.getOne(clientDTO);
     res.status(200).json(client);
   } catch (err) {
     return next(err);
@@ -78,10 +137,10 @@ export const getOne = async (req, res, next) => {
 
 export const getAll = async (req, res, next) => {
   try {
-    let page = req.params.page;
-    let limit = req.params.limit;
+    const pageParameter = req.params.page;
+    const limitParameter = req.params.limit;
 
-    let users = await ClientService.getAll(page, limit);
+    const users = await ClientService.getAll(pageParameter, limitParameter);
     res.status(200).json(users);
   } catch (err) {
     return next(err);
