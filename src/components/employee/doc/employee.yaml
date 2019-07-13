@@ -1,0 +1,175 @@
+paths:
+  /employees/{page}/{limit}:
+    get:
+      tags:
+        - employees
+      summary: Get all employees.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+        '403':
+          description: Access denied. Insufficient permission.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: path
+          schema:
+            type: integer
+        - name: limit
+          in: path
+          schema:
+            type: integer
+  /employees:
+    post:
+      tags:
+        - employees
+      summary: Create employee.
+      requestBody:
+        $ref: '#/components/requestBodies/Employee'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '404':
+          description: Email already exists
+      security:
+        - bearerAuth: []
+  /employees/{id}:
+    delete:
+      tags:
+        - employees
+      summary: Delete employee.
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Employee deleted successfully
+        '400':
+          description: Missing id parameter
+        '403':
+          description: Can not delete Admin Employee
+        '404':
+          description: Clint not found
+      security:
+        - bearerAuth: []
+    get:
+      tags:
+        - employees
+      summary: Get one employee by id.
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: Employee not found
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - employees
+      summary: Update one employee
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Employee'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: Employee not found
+      security:
+        - bearerAuth: []
+components:
+  schemas:
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+        dni:
+          type: string
+        phone:
+          type: string
+        fiscalAddress:
+          type: string
+        workPosition:
+          type: string
+        socialLinkedin:
+          type: string
+        socialFacebook:
+          type: string
+        socialInstagram:
+          type: string
+        web:
+          type: string
+        user:
+          type: object
+  requestBodies:
+    Employee:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                default: John
+              fiscalAddress:
+                type: string
+              lastName:
+                type: string
+                default: Doe
+              email:
+                type: string
+                default: test@test.com
+              password:
+                type: string
+                format: password
+                default: 12345678
+              dni:
+                type: string
+              phone:
+                type: string
+              workPosition:
+                type: string
+              socialLinkedin:
+                type: string
+              socialFacebook:
+                type: string
+              socialInstagram:
+                type: string
+              web:
+                type: string

@@ -31,30 +31,32 @@ export const create = async userDTOParameter => {
     await UserValidation.createUserSchema.validate(userDTOParameter);
 
     //Check if exists some user with Email received
-    let userDTOResult = await UserDAL.getOneByEmail(userDTOParameter.email);
+    const userDTOResult = await UserDAL.getOneByEmail(userDTOParameter.email);
     if (userDTOResult.id) throw new EmailAlreadyExistsError();
 
     //hash and save password
-    let salt = await bcrypt.genSalt(passwordSalt);
-    let hash = await bcrypt.hash(userDTOParameter.password, salt);
-    userDTOParameter.password = hash;
+    const salt = await bcrypt.genSalt(passwordSalt);
+    const hash = await bcrypt.hash(userDTOParameter.password, salt);
+
+    // userDTOParameter.password = hash;
+    const userDTO = Object.assign({}, userDTOParameter, { password: hash });
 
     //call to DAL for save User & returns DTO without password
-    let userDTO = await UserDAL.create(userDTOParameter);
+    const user = await UserDAL.create(userDTO);
 
     //Create Token if user is not verified
     let tokenDTO = {};
-    if (!userDTO.isVerified) {
+    if (!user.isVerified) {
       tokenDTO = await TokenService.create(
         new TokenDTO({
-          userId: userDTO.id,
+          userId: user.id,
           type: Type.ConfirmRegistration,
         }),
       );
     }
 
     return {
-      user: Object.assign({}, userDTO, { password: undefined }),
+      user: Object.assign({}, user, { password: undefined }),
       verificationToken: tokenDTO,
     };
   } catch (err) {
@@ -72,29 +74,33 @@ export const update = async userDTOParameter => {
     //run validation. Returns exceptions if fails
     await UserValidation.updateUserSchema.validate(userDTOParameter);
 
-    let userDTOResult = await UserDAL.getOneById(userDTOParameter.id);
+    const userDTOResult = await UserDAL.getOneById(userDTOParameter.id);
     if (!userDTOResult.id) throw new UserNotFoundError();
 
     //check if exists new email
     if (userDTOResult.email != userDTOParameter.email) {
-      let checkUserDTOResult = await UserDAL.getOneByEmail(userDTOParameter.email);
+      const checkUserDTOResult = await UserDAL.getOneByEmail(userDTOParameter.email);
       if (checkUserDTOResult.id) throw new EmailAlreadyExistsError();
     }
 
+    let newData = {};
     //if exists password hash and set New
-    let newPassword = userDTOParameter.password;
+    const newPassword = userDTOParameter.password;
     if (newPassword) {
-      let isMatch = await bcrypt.compare(newPassword, userDTOResult.password);
+      const isMatch = await bcrypt.compare(newPassword, userDTOResult.password);
       if (isMatch) throw new SamePasswordError();
 
-      let salt = await bcrypt.genSalt(passwordSalt);
-      let hash = await bcrypt.hash(newPassword, salt);
-      userDTOParameter.password = hash;
+      const salt = await bcrypt.genSalt(passwordSalt);
+      const hash = await bcrypt.hash(newPassword, salt);
+      //userDTOParameter.password = hash;
+      newData.password = hash;
     }
 
+    const userDTO = Object.assign({}, userDTOParameter, newData);
+
     //call to DAL for save User & returns DTO without password
-    let userDTO = await UserDAL.update(userDTOParameter);
-    return Object.assign({}, userDTO, {
+    const user = await UserDAL.update(userDTO);
+    return Object.assign({}, user, {
       password: undefined,
     });
   } catch (err) {
@@ -129,9 +135,11 @@ export const remove = async (userDTOParameter, userAPI = false) => {
   }
 };
 
+//TODO: Check to add validations like default remove ^^
 export const removeById = async userId => {
   try {
     const userDTO = new UserDTO({ id: userId });
+
     await remove(userDTO);
   } catch (err) {
     throw err;
@@ -169,8 +177,8 @@ export const getOne = async userDTOParameter => {
 export const getAll = async (page, limit) => {
   try {
     //validate pagination params and return values
-    let pagination = await Pagination.initialize(page, limit);
-    let result = await UserDAL.getAll({ password: undefined }, pagination);
+    const pagination = await Pagination.initialize(page, limit);
+    const result = await UserDAL.getAll({ password: undefined }, pagination);
 
     return {
       pages: Math.ceil(result.count / pagination.limit),
@@ -185,13 +193,14 @@ export const getAll = async (page, limit) => {
 
 export const confirmRegistration = async token => {
   try {
-    let tokenDTO = new TokenDTO({ token: token });
-    let tokenDTOResult = await TokenService.confirm(tokenDTO);
+    const tokenDTO = new TokenDTO({ token: token });
+    const tokenDTOResult = await TokenService.confirm(tokenDTO);
 
-    let userDTO = await UserDAL.getOneById(tokenDTOResult.userId);
-    userDTO.isVerified = true;
+    const userDTO = await UserDAL.getOneById(tokenDTOResult.userId);
+    const user = Object.assign({}, userDTO, { isVerified: true });
+    // userDTO.isVerified = true;
 
-    await UserDAL.update(userDTO);
+    await UserDAL.update(user);
   } catch (err) {
     throw err;
   }
@@ -199,12 +208,12 @@ export const confirmRegistration = async token => {
 
 export const resetTokenRegistration = async email => {
   try {
-    let userDTO = new UserDTO({ email: email });
-    let userDTOResult = await getOne(userDTO);
+    const userDTO = new UserDTO({ email: email });
+    const userDTOResult = await getOne(userDTO);
 
     if (userDTOResult.isVerified) throw new UserVerifiedError();
 
-    let tokenDTO = new TokenDTO({ userId: userDTOResult.id });
+    const tokenDTO = new TokenDTO({ userId: userDTOResult.id });
     return await TokenService.reset(tokenDTO);
   } catch (err) {
     throw err;

@@ -13,6 +13,8 @@ export default class UserDTO {
     this.createdDate = data.createdDate;
     this.role = data.role;
     this.isVerified = data.isVerified;
+
+    Object.freeze(this);
   }
 
   toString() {
