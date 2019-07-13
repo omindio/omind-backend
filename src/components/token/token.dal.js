@@ -5,7 +5,7 @@ import TokenModel from './token.model';
 
 export const getOneByUserId = async userIdParameter => {
   try {
-    let token = await TokenModel.findOne({ userId: userIdParameter });
+    const token = await TokenModel.findOne({ userId: userIdParameter });
     return new TokenDTO(token);
   } catch (err) {
     throw err;
@@ -14,7 +14,7 @@ export const getOneByUserId = async userIdParameter => {
 
 export const getOneByToken = async tokenParameter => {
   try {
-    let token = await TokenModel.findOne({ token: tokenParameter });
+    const token = await TokenModel.findOne({ token: tokenParameter });
     return new TokenDTO(token);
   } catch (err) {
     throw err;
@@ -23,9 +23,9 @@ export const getOneByToken = async tokenParameter => {
 
 export const create = async tokenDTOParameter => {
   try {
-    let tokenDTO = _pickBy(tokenDTOParameter);
-    let tokenModel = new TokenModel(tokenDTO);
-    let token = await tokenModel.save();
+    const tokenDTO = _pickBy(tokenDTOParameter);
+    const tokenModel = new TokenModel(tokenDTO);
+    const token = await tokenModel.save();
     return new TokenDTO(token);
   } catch (err) {
     throw err;
@@ -34,8 +34,8 @@ export const create = async tokenDTOParameter => {
 
 export const update = async tokenDTOParameter => {
   try {
-    let tokenDTO = _pickBy(tokenDTOParameter);
-    let token = await TokenModel.findOneAndUpdate({ _id: tokenDTO.id }, tokenDTO, { new: true });
+    const tokenDTO = _pickBy(tokenDTOParameter);
+    const token = await TokenModel.findOneAndUpdate({ _id: tokenDTO.id }, tokenDTO, { new: true });
     return new TokenDTO(token);
   } catch (err) {
     throw err;

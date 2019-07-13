@@ -7,8 +7,8 @@ import { DTO as UserDTO } from '@components/user';
 
 export const getOne = async params => {
   try {
-    let client = await ClientModel.findOne(params).populate('user');
-    let clientDTO = new ClientDTO(client);
+    const client = await ClientModel.findOne(params).populate('user');
+    const clientDTO = new ClientDTO(client);
     if (client && clientDTO.user) {
       clientDTO.user = _getUserDTO(client.user);
     }
@@ -21,8 +21,9 @@ export const getOne = async params => {
 export const getOneById = async idParameter => {
   try {
     const client = await ClientModel.findById(idParameter).populate('user');
-    let clientDTO = new ClientDTO(client);
+    const clientDTO = new ClientDTO(client);
     if (client) clientDTO.user = _getUserDTO(client.user);
+
     return clientDTO;
   } catch (err) {
     throw err;
@@ -31,12 +32,12 @@ export const getOneById = async idParameter => {
 
 export const getAll = async (projection = {}, pagination) => {
   try {
-    let clients = await ClientModel.find({})
+    const clients = await ClientModel.find({})
       .populate('user')
       .skip(pagination.skip)
       .limit(pagination.limit);
-    let count = await ClientModel.countDocuments();
-    let clientsDTOArray = [];
+    const count = await ClientModel.countDocuments();
+    const clientsDTOArray = [];
     clients.forEach(client => {
       let clientDTO = new ClientDTO(client);
       clientDTO.user = _getUserDTO(client.user);
@@ -53,9 +54,9 @@ export const getAll = async (projection = {}, pagination) => {
 
 export const create = async clientDTOParameter => {
   try {
-    let clientDTO = _pickBy(clientDTOParameter);
-    let userModel = new ClientModel(clientDTO);
-    let client = await userModel.save();
+    const clientDTO = _pickBy(clientDTOParameter);
+    const userModel = new ClientModel(clientDTO);
+    const client = await userModel.save();
     return new ClientDTO(client);
   } catch (err) {
     throw err;
@@ -67,11 +68,14 @@ user = await user.populate('company').execPopulate()
 */
 export const update = async clientDTOParameter => {
   try {
-    let clientDTO = _pickBy(clientDTOParameter);
-    let client = await ClientModel.findOneAndUpdate({ _id: clientDTO.id }, clientDTO, {
+    const clientDTO = _pickBy(clientDTOParameter);
+    const client = await ClientModel.findOneAndUpdate({ _id: clientDTO.id }, clientDTO, {
       new: true,
-    });
-    return new ClientDTO(client);
+    }).populate('user');
+    const clientDTOResult = new ClientDTO(client);
+    clientDTOResult.user = _getUserDTO(client.user);
+
+    return clientDTOResult;
   } catch (err) {
     throw err;
   }

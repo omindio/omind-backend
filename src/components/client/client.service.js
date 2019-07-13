@@ -113,10 +113,7 @@ export const update = async (userDTOParameter, clientDTOParameter) => {
 
         const clientDTO = await ClientDAL.update(clientDTOParameter);
 
-        return {
-          client: clientDTO,
-          user,
-        };
+        return clientDTO;
       })
       .catch(err => {
         throw err;

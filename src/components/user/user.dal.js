@@ -5,7 +5,7 @@ import UserDTO from './user.dto';
 
 export const getOneByEmail = async emailParameter => {
   try {
-    let user = await UserModel.findOne({ email: emailParameter });
+    const user = await UserModel.findOne({ email: emailParameter });
     return new UserDTO(user);
   } catch (err) {
     throw err;
@@ -14,7 +14,7 @@ export const getOneByEmail = async emailParameter => {
 
 export const getOneById = async idParameter => {
   try {
-    let user = await UserModel.findById(idParameter);
+    const user = await UserModel.findById(idParameter);
     return new UserDTO(user);
   } catch (err) {
     throw err;
@@ -23,11 +23,11 @@ export const getOneById = async idParameter => {
 
 export const getAll = async (projection = {}, pagination) => {
   try {
-    let users = await UserModel.find({})
+    const users = await UserModel.find({})
       .skip(pagination.skip)
       .limit(pagination.limit);
-    let count = await UserModel.countDocuments();
-    let usersDTOArray = [];
+    const count = await UserModel.countDocuments();
+    const usersDTOArray = [];
 
     users.forEach(user => {
       let userDTO = new UserDTO(user);
@@ -44,9 +44,9 @@ export const getAll = async (projection = {}, pagination) => {
 
 export const create = async userDTOParameter => {
   try {
-    let userDTO = _pickBy(userDTOParameter);
-    let userModel = new UserModel(userDTO);
-    let user = await userModel.save();
+    const userDTO = _pickBy(userDTOParameter);
+    const userModel = new UserModel(userDTO);
+    const user = await userModel.save();
     return new UserDTO(user);
   } catch (err) {
     throw err;
@@ -55,8 +55,8 @@ export const create = async userDTOParameter => {
 
 export const update = async userDTOParameter => {
   try {
-    let userDTO = _pickBy(userDTOParameter);
-    let user = await UserModel.findOneAndUpdate({ _id: userDTO.id }, userDTO, {
+    const userDTO = _pickBy(userDTOParameter);
+    const user = await UserModel.findOneAndUpdate({ _id: userDTO.id }, userDTO, {
       new: true,
     });
     return new UserDTO(user);
