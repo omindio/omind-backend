@@ -12,7 +12,6 @@ export default class ClientDTO {
     this.cif = data.cif;
     this.fiscalAddress = data.fiscalAddress;
     this.phone = data.phone;
-    // this.bankAccount = data.bankAccount;
     this.published = data.published;
     this.socialLinkedin = data.socialLinkedin;
     this.socialFacebook = data.socialFacebook;
@@ -20,5 +19,7 @@ export default class ClientDTO {
     this.web = data.web;
     this.createdDate = data.createdDate;
     this.user = data.user;
+
+    Object.freeze(this);
   }
 }

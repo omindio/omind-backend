@@ -20,9 +20,14 @@ export const create = async tokenDTOParameter => {
     //run validation. Returns exceptions if fails
     await TokenValidation.createTokenSchema.validate(tokenDTOParameter);
 
-    tokenDTOParameter.token = crypto.randomBytes(16).toString('hex');
+    const token = crypto.randomBytes(16).toString('hex');
+    const tokenDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(tokenDTOParameter)),
+      tokenDTOParameter,
+      { token: token },
+    );
 
-    return await TokenDAL.create(tokenDTOParameter);
+    return await TokenDAL.create(tokenDTO);
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
@@ -38,12 +43,12 @@ export const confirm = async tokenDTOParameter => {
     //run validation. Returns exceptions if fails
     await TokenValidation.confirmTokenSchema.validate(tokenDTOParameter);
 
-    let tokenDTO = await TokenDAL.getOneByToken(tokenDTOParameter.token);
+    const tokenDTO = await TokenDAL.getOneByToken(tokenDTOParameter.token);
 
     if (!tokenDTO.id) throw new TokenNotFoundError();
 
     //check if token has expired
-    let tokenCreatedAt = tokenDTO.createdAt;
+    const tokenCreatedAt = tokenDTO.createdAt;
     tokenCreatedAt.setSeconds(tokenCreatedAt.getSeconds() + expires);
 
     if (Date.now() > tokenCreatedAt.getTime()) throw new TokenExpiredError();
@@ -65,13 +70,21 @@ export const reset = async tokenDTOParameter => {
     //run validation. Returns exceptions if fails
     await TokenValidation.resetTokenSchema.validate(tokenDTOParameter);
 
-    let tokenDTO = await TokenDAL.getOneByUserId(tokenDTOParameter.userId);
+    const tokenDTOResult = await TokenDAL.getOneByUserId(tokenDTOParameter.userId);
 
     //if not exists any token, then create
-    if (!tokenDTO.id) return create(tokenDTOParameter);
+    if (!tokenDTOResult.id) return create(tokenDTOParameter);
 
-    tokenDTO.createdAt = new Date();
-    tokenDTO.token = crypto.randomBytes(16).toString('hex');
+    const newData = {
+      createdAt: new Date(),
+      token: crypto.randomBytes(16).toString('hex'),
+    };
+
+    const tokenDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(tokenDTOResult)),
+      tokenDTOResult,
+      newData,
+    );
 
     return await TokenDAL.update(tokenDTO);
   } catch (err) {

@@ -31,7 +31,10 @@ export const getAll = async (projection = {}, pagination) => {
 
     users.forEach(user => {
       let userDTO = new UserDTO(user);
-      usersDTOArray.push(Object.assign({}, userDTO, projection));
+      //usersDTOArray.push(Object.assign({}, userDTO, projection));
+      usersDTOArray.push(
+        Object.assign(Object.create(Object.getPrototypeOf(userDTO)), userDTO, projection),
+      );
     });
     return {
       users: usersDTOArray,

@@ -7,6 +7,8 @@ export default class TokenDTO {
     this.token = data.token;
     this.createdAt = data.createdAt;
     this.type = data.type;
+
+    Object.freeze(this);
   }
 
   toString() {

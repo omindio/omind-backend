@@ -9,6 +9,7 @@ import { DAL as UserDAL } from '@components/user';
 import { roles as Role } from '@components/user/config';
 
 import { DAL as ClientDAL } from '@components/client';
+import { DAL as EmployeeDAL } from '@components/client';
 import * as AuthValidation from './validation/auth.validation';
 
 import { UnauthorizedAccessError, UnverifiedUserError } from './Error';
@@ -48,8 +49,8 @@ export const auth = async authDTOParameter => {
         payload.clientId = clientDTO.id;
         break;
       case Role.Employee:
-        //TODO: TO
-        //payload.employeeId = ;
+        const employeeDTO = await EmployeeDAL.getOne({ user: userDTOResult.id });
+        payload.employeeId = employeeDTO.id;
         break;
     }
 

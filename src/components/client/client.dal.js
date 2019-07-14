@@ -7,12 +7,16 @@ import { DTO as UserDTO } from '@components/user';
 
 export const getOne = async params => {
   try {
-    const client = await ClientModel.findOne(params).populate('user');
-    const clientDTO = new ClientDTO(client);
-    if (client && clientDTO.user) {
-      clientDTO.user = _getUserDTO(client.user);
+    const clientResult = await ClientModel.findOne(params).populate('user');
+    const clientDTO = new ClientDTO(clientResult);
+    if (clientResult && clientDTO.user) {
+      const client = Object.assign(Object.create(Object.getPrototypeOf(clientDTO)), clientDTO, {
+        user: _getUserDTO(clientResult.user),
+      });
+      return client;
+    } else {
+      return {};
     }
-    return clientDTO;
   } catch (err) {
     throw err;
   }
@@ -20,11 +24,16 @@ export const getOne = async params => {
 
 export const getOneById = async idParameter => {
   try {
-    const client = await ClientModel.findById(idParameter).populate('user');
-    const clientDTO = new ClientDTO(client);
-    if (client) clientDTO.user = _getUserDTO(client.user);
-
-    return clientDTO;
+    const clientResult = await ClientModel.findById(idParameter).populate('user');
+    const clientDTO = new ClientDTO(clientResult);
+    if (clientResult) {
+      const client = Object.assign(Object.create(Object.getPrototypeOf(clientDTO)), clientDTO, {
+        user: _getUserDTO(clientResult.user),
+      });
+      return client;
+    } else {
+      return {};
+    }
   } catch (err) {
     throw err;
   }
@@ -39,9 +48,12 @@ export const getAll = async (projection = {}, pagination) => {
     const count = await ClientModel.countDocuments();
     const clientsDTOArray = [];
     clients.forEach(client => {
-      let clientDTO = new ClientDTO(client);
-      clientDTO.user = _getUserDTO(client.user);
-      clientsDTOArray.push(Object.assign({}, clientDTO, projection));
+      const clientDTO = new ClientDTO(client);
+      projection.user = _getUserDTO(client.user);
+      //clientsDTOArray.push(Object.assign({}, clientDTO, projection));
+      clientsDTOArray.push(
+        Object.assign(Object.create(Object.getPrototypeOf(clientDTO)), clientDTO, projection),
+      );
     });
     return {
       clients: clientsDTOArray,
@@ -68,14 +80,20 @@ user = await user.populate('company').execPopulate()
 */
 export const update = async clientDTOParameter => {
   try {
-    const clientDTO = _pickBy(clientDTOParameter);
-    const client = await ClientModel.findOneAndUpdate({ _id: clientDTO.id }, clientDTO, {
-      new: true,
-    }).populate('user');
-    const clientDTOResult = new ClientDTO(client);
-    clientDTOResult.user = _getUserDTO(client.user);
+    const clientDTOClean = _pickBy(clientDTOParameter);
+    const clientResult = await ClientModel.findOneAndUpdate(
+      { _id: clientDTOClean.id },
+      clientDTOClean,
+      {
+        new: true,
+      },
+    ).populate('user');
+    const clientDTO = new ClientDTO(clientResult);
+    const client = Object.assign(Object.create(Object.getPrototypeOf(clientDTO)), clientDTO, {
+      user: _getUserDTO(clientResult.user),
+    });
 
-    return clientDTOResult;
+    return client;
   } catch (err) {
     throw err;
   }
@@ -91,5 +109,7 @@ export const remove = async clientDTOParameter => {
 
 const _getUserDTO = user => {
   const userDTO = new UserDTO(user);
-  return Object.assign({}, userDTO, { password: undefined });
+  return Object.assign(Object.create(Object.getPrototypeOf(userDTO)), userDTO, {
+    password: undefined,
+  });
 };

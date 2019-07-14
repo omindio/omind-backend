@@ -14,5 +14,7 @@ export default class ClientDTO {
     this.web = data.web;
     this.createdDate = data.createdDate;
     this.user = data.user;
+
+    Object.freeze(this);
   }
 }

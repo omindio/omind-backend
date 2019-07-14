@@ -30,37 +30,49 @@ export const create = async (userDTOParameter, clientDTOParameter) => {
     await ClientValidation.createClientSchema.validate(clientDTOParameter);
 
     //generate slug
-    clientDTOParameter.slug = urlSlug(clientDTOParameter.companyName);
+    const newData = {
+      slug: urlSlug(clientDTOParameter.companyName),
+    };
 
     //Check if exists some user with slug/company name received
-    let clientDTOResult = await ClientDAL.getOne({ slug: clientDTOParameter.slug });
+    const clientDTOResult = await ClientDAL.getOne({ slug: newData.slug });
     if (clientDTOResult.id) throw new ClientAlreadyExistsError();
 
     //set client Role
-    userDTOParameter.role = Role.Client;
+    const userDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(userDTOParameter)),
+      userDTOParameter,
+      { role: Role.Client },
+    );
+
     //TODO: Remove this to set password in client.
-    const plainPassword = userDTOParameter.password;
+    const plainPassword = userDTO.password;
 
     //validate user credentials and create
-    return UserService.create(userDTOParameter)
+    return UserService.create(userDTO)
       .then(async ({ user, verificationToken }) => {
-        clientDTOParameter.user = user.id;
+        newData.user = user.id;
 
         if (clientDTOParameter.logoFile) {
           const fileUpload = new ImageResize(imagePath);
           const filename = await fileUpload.save(clientDTOParameter.logoFile.buffer);
 
-          clientDTOParameter.logo = filename;
+          newData.logo = filename;
         }
 
-        const clientDTO = await ClientDAL.create(clientDTOParameter);
+        const clientDTO = Object.assign(
+          Object.create(Object.getPrototypeOf(clientDTOParameter)),
+          clientDTOParameter,
+          newData,
+        );
+        const client = await ClientDAL.create(clientDTO);
 
-        _sendEmailAfterCreate(userDTOParameter.email, plainPassword)
+        _sendEmailAfterCreate(userDTO.email, plainPassword)
           .then()
           .catch(err => console.log(err));
 
         return {
-          client: clientDTO,
+          client: client,
           user,
           verificationToken,
         };
@@ -86,18 +98,26 @@ export const update = async (userDTOParameter, clientDTOParameter) => {
     let clientDTOResult = await ClientDAL.getOneById(clientDTOParameter.id);
     if (!clientDTOResult.id) throw new ClientNotFoundError();
 
+    const newData = {};
+
     //if (clientDTOParameter.slug != clientDTOResult.slug) {
     if (clientDTOParameter.companyName.trim() != clientDTOResult.companyName.trim()) {
-      clientDTOParameter.slug = urlSlug(clientDTOParameter.companyName);
+      //clientDTOParameter.slug = urlSlug(clientDTOParameter.companyName);
+      newData.slug = urlSlug(clientDTOParameter.companyName);
       //Check if exists some user with slug/company name received
-      let clientDTOResult = await ClientDAL.getOne({ slug: clientDTOParameter.slug });
-      if (clientDTOResult.id) throw new ClientAlreadyExistsError();
+      let clientDTOSlugResult = await ClientDAL.getOne({ slug: newData.slug });
+      if (clientDTOSlugResult.id) throw new ClientAlreadyExistsError();
     }
 
-    userDTOParameter.id = clientDTOResult.user.id;
+    const userDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(userDTOParameter)),
+      userDTOParameter,
+      { id: clientDTOResult.user.id },
+    );
+    //userDTOParameter.id = clientDTOResult.user.id;
 
-    return UserService.update(userDTOParameter)
-      .then(async user => {
+    return UserService.update(userDTO)
+      .then(async () => {
         if (clientDTOParameter.logoFile) {
           if (clientDTOResult.logo) {
             fs.unlink(`${imagePath}/${clientDTOResult.logo}`, err => {
@@ -108,12 +128,19 @@ export const update = async (userDTOParameter, clientDTOParameter) => {
           const fileUpload = new ImageResize(imagePath);
           const filename = await fileUpload.save(clientDTOParameter.logoFile.buffer);
 
-          clientDTOParameter.logo = filename;
+          newData.logo = filename;
+          //clientDTOParameter.logo = filename;
         }
 
-        const clientDTO = await ClientDAL.update(clientDTOParameter);
+        const clientDTO = Object.assign(
+          Object.create(Object.getPrototypeOf(clientDTOParameter)),
+          clientDTOParameter,
+          newData,
+        );
 
-        return clientDTO;
+        const client = await ClientDAL.update(clientDTO);
+
+        return client;
       })
       .catch(err => {
         throw err;
@@ -132,7 +159,7 @@ export const remove = async clientDTOParameter => {
     //validate
     await ClientValidation.updateClientSchema.validate(clientDTOParameter);
 
-    let clientDTOResult = await ClientDAL.getOneById(clientDTOParameter.id);
+    const clientDTOResult = await ClientDAL.getOneById(clientDTOParameter.id);
     if (!clientDTOResult.id) throw new ClientNotFoundError();
 
     if (clientDTOResult.role === Role.Admin)
@@ -173,7 +200,7 @@ export const getOne = async clientDTOParameter => {
       clientDTOResult = await ClientDAL.getOne({ slug: clientDTOParameter.slug });
     }
 
-    if (!clientDTOResult.id) throw new ClientNotFoundError();
+    if (!clientDTOResult || !clientDTOResult.id) throw new ClientNotFoundError();
 
     //returns DTO without password
     return clientDTOResult;
@@ -208,11 +235,11 @@ const _sendEmailAfterCreate = async (email, plainPassword) => {
       from: 'noreply@omindbrand.com',
       subject: 'Email & Password to access Omind platform.',
       html: `
-    <p><strong>Email:</strong> ${email}</p><p>
-    <strong>Password:</strong> ${plainPassword}</p>
-    <p><small>For security: Remember to change your password.</small></p>
-    `,
-    };
+        <p><strong>Email:</strong> ${email}</p><p>
+        <strong>Password:</strong> ${plainPassword}</p>
+        <p><small>For security: Remember to change your password.</small></p>
+      `,
+      };
     sgMail.send(msg);
   } catch (err) {
     throw err;

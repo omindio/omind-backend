@@ -4,6 +4,8 @@ export default class AuthDTO {
 
     this.email = data.email;
     this.password = data.password;
+
+    Object.freeze(this);
   }
 
   toString() {

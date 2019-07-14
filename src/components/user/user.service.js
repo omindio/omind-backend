@@ -38,8 +38,11 @@ export const create = async userDTOParameter => {
     const salt = await bcrypt.genSalt(passwordSalt);
     const hash = await bcrypt.hash(userDTOParameter.password, salt);
 
-    // userDTOParameter.password = hash;
-    const userDTO = Object.assign({}, userDTOParameter, { password: hash });
+    const userDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(userDTOParameter)),
+      userDTOParameter,
+      { password: hash },
+    );
 
     //call to DAL for save User & returns DTO without password
     const user = await UserDAL.create(userDTO);
@@ -56,7 +59,9 @@ export const create = async userDTOParameter => {
     }
 
     return {
-      user: Object.assign({}, user, { password: undefined }),
+      user: Object.assign(Object.create(Object.getPrototypeOf(user)), user, {
+        password: undefined,
+      }),
       verificationToken: tokenDTO,
     };
   } catch (err) {
@@ -83,7 +88,7 @@ export const update = async userDTOParameter => {
       if (checkUserDTOResult.id) throw new EmailAlreadyExistsError();
     }
 
-    let newData = {};
+    const newData = {};
     //if exists password hash and set New
     const newPassword = userDTOParameter.password;
     if (newPassword) {
@@ -92,15 +97,19 @@ export const update = async userDTOParameter => {
 
       const salt = await bcrypt.genSalt(passwordSalt);
       const hash = await bcrypt.hash(newPassword, salt);
-      //userDTOParameter.password = hash;
+
       newData.password = hash;
     }
 
-    const userDTO = Object.assign({}, userDTOParameter, newData);
+    const userDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(userDTOParameter)),
+      userDTOParameter,
+      newData,
+    );
 
     //call to DAL for save User & returns DTO without password
     const user = await UserDAL.update(userDTO);
-    return Object.assign({}, user, {
+    return Object.assign(Object.create(Object.getPrototypeOf(user)), user, {
       password: undefined,
     });
   } catch (err) {
@@ -165,7 +174,7 @@ export const getOne = async userDTOParameter => {
     if (!userDTOResult.id) throw new UserNotFoundError();
 
     //returns DTO without password
-    return Object.assign({}, userDTOResult, {
+    return Object.assign(Object.create(Object.getPrototypeOf(userDTOResult)), userDTOResult, {
       password: undefined,
     });
   } catch (err) {
@@ -197,8 +206,9 @@ export const confirmRegistration = async token => {
     const tokenDTOResult = await TokenService.confirm(tokenDTO);
 
     const userDTO = await UserDAL.getOneById(tokenDTOResult.userId);
-    const user = Object.assign({}, userDTO, { isVerified: true });
-    // userDTO.isVerified = true;
+    const user = Object.assign(Object.create(Object.getPrototypeOf(userDTO)), userDTO, {
+      isVerified: true,
+    });
 
     await UserDAL.update(user);
   } catch (err) {

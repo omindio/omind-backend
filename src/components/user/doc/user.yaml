@@ -124,7 +124,7 @@ paths:
         - users
       summary: Confirm registration.
       responses:
-        '201':
+        '204':
           description: Success
         '404':
           description:
