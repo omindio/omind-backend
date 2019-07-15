@@ -26,7 +26,6 @@ export const create = async (req, res, next) => {
     const employeeDTO = new EmployeeDTO({
       dni,
       fiscalAddress,
-      description,
       web,
       socialFacebook,
       workPosition,
@@ -71,7 +70,6 @@ export const update = async (req, res, next) => {
     const employeeDTO = new EmployeeDTO({
       dni,
       fiscalAddress,
-      description,
       web,
       socialFacebook,
       workPosition,

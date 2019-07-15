@@ -5,7 +5,7 @@ export default class ClientDTO {
 
     this.id = data.id;
     this.workPosition = data.workPosition;
-    this.dni = data.workPosition;
+    this.dni = data.dni;
     this.fiscalAddress = data.fiscalAddress;
     this.phone = data.phone;
     this.socialLinkedin = data.socialLinkedin;

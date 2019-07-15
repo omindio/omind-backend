@@ -17,7 +17,7 @@ import { config } from './config';
 //import XHR from 'i18next-xhr-backend';
 //import Backend from 'i18next-chained-backend';
 
-import { UserComponent, AuthComponent, ClientComponent } from '@components';
+import { UserComponent, AuthComponent, ClientComponent, EmployeeComponent } from '@components';
 import { Swagger, ErrorHandler, Winston } from '@libraries';
 
 const app = express();
@@ -52,6 +52,7 @@ export const initialize = () => {
   //initialize components
   UserComponent.initialize(app);
   ClientComponent.initialize(app);
+  EmployeeComponent.initialize(app);
   AuthComponent.initialize(app);
 
   Swagger.initialize(app);

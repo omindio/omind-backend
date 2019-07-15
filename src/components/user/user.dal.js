@@ -3,6 +3,8 @@ import _pickBy from 'lodash.pickby';
 import UserModel from './user.model';
 import UserDTO from './user.dto';
 
+import { InstanceofError } from '@libraries/Error';
+
 export const getOneByEmail = async emailParameter => {
   try {
     const user = await UserModel.findOne({ email: emailParameter });
@@ -47,6 +49,9 @@ export const getAll = async (projection = {}, pagination) => {
 
 export const create = async userDTOParameter => {
   try {
+    if (!(userDTOParameter instanceof UserDTO))
+      throw new InstanceofError('Param sent need to be an UserDTO.');
+
     const userDTO = _pickBy(userDTOParameter);
     const userModel = new UserModel(userDTO);
     const user = await userModel.save();
@@ -58,6 +63,9 @@ export const create = async userDTOParameter => {
 
 export const update = async userDTOParameter => {
   try {
+    if (!(userDTOParameter instanceof UserDTO))
+      throw new InstanceofError('Param sent need to be an UserDTO.');
+
     const userDTO = _pickBy(userDTOParameter);
     const user = await UserModel.findOneAndUpdate({ _id: userDTO.id }, userDTO, {
       new: true,
@@ -70,6 +78,9 @@ export const update = async userDTOParameter => {
 
 export const remove = async userDTOParameter => {
   try {
+    if (!(userDTOParameter instanceof UserDTO))
+      throw new InstanceofError('Param sent need to be an UserDTO.');
+
     await UserModel.findOneAndRemove({ _id: userDTOParameter.id });
   } catch (err) {
     throw err;

@@ -55,7 +55,7 @@ export const updateEmployeeSchema = Joi.object()
 
 export const getEmployeeSchema = Joi.object()
   .keys({
-    id: idSchema.optional(),
+    id: idSchema.required(),
     workPosition: workPositionSchema.optional(),
     dni: dniSchema.optional(),
     fiscalAddress: fiscalAddressSchema.optional(),

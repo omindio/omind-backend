@@ -4,6 +4,7 @@ import ClientModel from './client.model';
 import ClientDTO from './client.dto';
 
 import { DTO as UserDTO } from '@components/user';
+import { InstanceofError } from '@libraries/Error';
 
 export const getOne = async params => {
   try {
@@ -66,6 +67,9 @@ export const getAll = async (projection = {}, pagination) => {
 
 export const create = async clientDTOParameter => {
   try {
+    if (!(clientDTOParameter instanceof ClientDTO))
+      throw new InstanceofError('Param sent need to be an ClientDTO.');
+
     const clientDTO = _pickBy(clientDTOParameter);
     const userModel = new ClientModel(clientDTO);
     const client = await userModel.save();
@@ -80,6 +84,9 @@ user = await user.populate('company').execPopulate()
 */
 export const update = async clientDTOParameter => {
   try {
+    if (!(clientDTOParameter instanceof ClientDTO))
+      throw new InstanceofError('Param sent need to be an ClientDTO.');
+
     const clientDTOClean = _pickBy(clientDTOParameter);
     const clientResult = await ClientModel.findOneAndUpdate(
       { _id: clientDTOClean.id },
@@ -101,6 +108,9 @@ export const update = async clientDTOParameter => {
 
 export const remove = async clientDTOParameter => {
   try {
+    if (!(clientDTOParameter instanceof ClientDTO))
+      throw new InstanceofError('Param sent need to be an ClientDTO.');
+
     await ClientModel.findOneAndRemove({ _id: clientDTOParameter.id });
   } catch (err) {
     throw err;

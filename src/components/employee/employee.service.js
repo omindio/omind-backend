@@ -23,23 +23,40 @@ export const create = async (userDTOParameter, employeeDTOParameter) => {
     //run validation. Returns exceptions if fails
     await EmployeeValidation.createEmployeeSchema.validate(employeeDTOParameter);
 
+    const newData = {};
     //set employee Role
-    userDTOParameter.role = Role.Employee;
-    const plainPassword = userDTOParameter.password;
+    //userDTOParameter.role = Role.Employee;
+    //const plainPassword = userDTOParameter.password;
+    //set client Role
+    const userDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(userDTOParameter)),
+      userDTOParameter,
+      { role: Role.Client },
+    );
+
+    //TODO: Remove this to set password in client.
+    const plainPassword = userDTO.password;
 
     //validate user credentials and create
     return UserService.create(userDTOParameter)
       .then(async ({ user, verificationToken }) => {
-        employeeDTOParameter.user = user.id;
+        //employeeDTOParameter.user = user.id;
+        newData.user = user.id;
 
-        const employeeDTO = await EmployeeDAL.create(employeeDTOParameter);
+        const employeeDTO = Object.assign(
+          Object.create(Object.getPrototypeOf(employeeDTOParameter)),
+          employeeDTOParameter,
+          newData,
+        );
 
-        _sendEmailAfterCreate(userDTOParameter.email, plainPassword)
+        const employee = await EmployeeDAL.create(employeeDTO);
+
+        _sendEmailAfterCreate(userDTO.email, plainPassword)
           .then()
           .catch(err => console.log(err));
 
         return {
-          employee: employeeDTO,
+          employee: employee,
           user,
           verificationToken,
         };
@@ -65,33 +82,16 @@ export const update = async (userDTOParameter, employeeDTOParameter) => {
     let employeeDTOResult = await EmployeeDAL.getOneById(employeeDTOParameter.id);
     if (!employeeDTOResult.id) throw new EmployeeNotFoundError();
 
-    //if (employeeDTOParameter.slug != employeeDTOResult.slug) {
-    /*
-    if (employeeDTOParameter.companyName.trim() != employeeDTOResult.companyName.trim()) {
-      employeeDTOParameter.slug = urlSlug(employeeDTOParameter.companyName);
-      //Check if exists some user with slug/company name received
-      let employeeDTOResult = await EmployeeDAL.getOne({ slug: employeeDTOParameter.slug });
-      if (employeeDTOResult.id) throw new EmployeeAlreadyExistsError();
-    }
-    */
+    // const newData = {};
 
-    userDTOParameter.id = employeeDTOResult.user.id;
+    const userDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(userDTOParameter)),
+      userDTOParameter,
+      { id: employeeDTOResult.user.id },
+    );
 
-    return UserService.update(userDTOParameter)
-      .then(async user => {
-        if (employeeDTOParameter.logoFile) {
-          if (employeeDTOResult.logo) {
-            fs.unlink(`${imagePath}/${employeeDTOResult.logo}`, err => {
-              if (err) throw err;
-            });
-          }
-
-          const fileUpload = new ImageResize(imagePath);
-          const filename = await fileUpload.save(employeeDTOParameter.logoFile.buffer);
-
-          employeeDTOParameter.logo = filename;
-        }
-
+    return UserService.update(userDTO)
+      .then(async () => {
         const employeeDTO = await EmployeeDAL.update(employeeDTOParameter);
 
         return employeeDTO;
@@ -119,21 +119,13 @@ export const remove = async employeeDTOParameter => {
     if (employeeDTOResult.role === Role.Admin)
       throw new UnauthorizedActionError('You can not remove this user.');
 
-    /*
     return UserService.removeById(employeeDTOResult.user.id)
       .then(async () => {
         await EmployeeDAL.remove(employeeDTOResult);
-        //remove image if exists
-        if (employeeDTOResult.logo) {
-          fs.unlink(`${imagePath}/${employeeDTOResult.logo}`, err => {
-            if (err) throw err;
-          });
-        }
       })
       .catch(err => {
         throw err;
       });
-    */
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
@@ -148,13 +140,13 @@ export const getOne = async employeeDTOParameter => {
     //validate
     await EmployeeValidation.getEmployeeSchema.validate(employeeDTOParameter);
 
-    let employeeDTOResult;
+    //let employeeDTOResult;
     //check if exists id and if not find by email
-    if (employeeDTOParameter.id) {
-      employeeDTOResult = await EmployeeDAL.getOneById(employeeDTOParameter.id);
-    } else {
-      employeeDTOResult = await EmployeeDAL.getOne({ slug: employeeDTOParameter.slug });
-    }
+    //if (employeeDTOParameter.id) {
+    const employeeDTOResult = await EmployeeDAL.getOneById(employeeDTOParameter.id);
+    //} else {
+    //employeeDTOResult = await EmployeeDAL.getOne({ slug: employeeDTOParameter.slug });
+    //}
 
     if (!employeeDTOResult.id) throw new EmployeeNotFoundError();
 
@@ -169,8 +161,8 @@ export const getOne = async employeeDTOParameter => {
 export const getAll = async (page, limit) => {
   try {
     //validate pagination params and return values
-    let pagination = await Pagination.initialize(page, limit);
-    let result = await EmployeeDAL.getAll({ password: undefined }, pagination);
+    const pagination = await Pagination.initialize(page, limit);
+    const result = await EmployeeDAL.getAll({ password: undefined }, pagination);
 
     return {
       pages: Math.ceil(result.count / pagination.limit),
@@ -191,10 +183,10 @@ const _sendEmailAfterCreate = async (email, plainPassword) => {
       from: 'noreply@omindbrand.com',
       subject: 'Email & Password to access Omind platform.',
       html: `
-    <p><strong>Email:</strong> ${email}</p><p>
-    <strong>Password:</strong> ${plainPassword}</p>
-    <p><small>For security: Remember to change your password.</small></p>
-    `,
+        <p><strong>Email:</strong> ${email}</p><p>
+        <strong>Password:</strong> ${plainPassword}</p>
+        <p><small>For security: Remember to change your password.</small></p>
+      `,
     };
     sgMail.send(msg);
   } catch (err) {

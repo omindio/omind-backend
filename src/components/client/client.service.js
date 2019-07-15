@@ -95,7 +95,7 @@ export const update = async (userDTOParameter, clientDTOParameter) => {
     //run validation. Returns exceptions if fails
     await ClientValidation.updateClientSchema.validate(clientDTOParameter);
 
-    let clientDTOResult = await ClientDAL.getOneById(clientDTOParameter.id);
+    const clientDTOResult = await ClientDAL.getOneById(clientDTOParameter.id);
     if (!clientDTOResult.id) throw new ClientNotFoundError();
 
     const newData = {};

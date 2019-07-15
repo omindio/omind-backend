@@ -4,10 +4,6 @@ const Schema = mongoose.Schema;
 
 // Create Schema
 const EmployeeSchema = new Schema({
-  companyName: {
-    type: String,
-    required: true,
-  },
   dni: {
     type: String,
     required: false,
