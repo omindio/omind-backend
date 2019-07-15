@@ -8,7 +8,11 @@
   },
   "main": "index.js",
   "scripts": {
-    "start": "npx nodemon --exec babel-node -L --watch . ./src/server.js",
+    "start:dev": "npx nodemon --exec babel-node -L --watch . ./src/index.js",
+    "start": "npm run build && node ./build/index.js",
+    "build": "npm run clean && npm run build-babel",
+    "build-babel": "babel -d ./build ./src -s",
+    "clean": "rm -rf build && mkdir build",
     "test": "./node_modules/.bin/mocha --timeout 10000 --require @babel/register './src/test/setup.spec.js'"
   },
   "keywords": [],
@@ -44,19 +48,20 @@
     "winston-daily-rotate-file": "^3.9.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.0.0",
     "@babel/core": "^7.4.5",
-    "@babel/node": "^7.4.5",
+    "@babel/node": "^7.0.0",
     "@babel/preset-env": "^7.4.5",
     "babel-plugin-module-resolver": "^3.2.0",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
-    "mocha": "^6.1.4",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-prettier": "^4.3.0",
     "eslint-import-resolver-babel-module": "^5.1.0",
     "eslint-loader": "^2.1.2",
-    "eslint-plugin-import": "^2.17.3"
+    "eslint-plugin-import": "^2.17.3",
+    "mocha": "^6.1.4"
   },
   "engines": {
     "node": "11"
