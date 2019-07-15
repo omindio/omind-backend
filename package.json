@@ -11,6 +11,7 @@
     "start:dev": "npx nodemon --exec babel-node -L --watch . ./src/index.js",
     "start": "npm run build && node ./build/index.js",
     "build": "npm run clean && npm run build-babel",
+    "heroku-postbuild": "npm run build",
     "build-babel": "babel -d ./build ./src -s",
     "clean": "rm -rf build && mkdir build",
     "test": "./node_modules/.bin/mocha --timeout 10000 --require @babel/register './src/test/setup.spec.js'"
