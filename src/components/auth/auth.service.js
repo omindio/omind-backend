@@ -9,7 +9,7 @@ import { DAL as UserDAL } from '@components/user';
 import { roles as Role } from '@components/user/config';
 
 import { DAL as ClientDAL } from '@components/client';
-import { DAL as EmployeeDAL } from '@components/client';
+import { DAL as EmployeeDAL } from '@components/employee';
 import * as AuthValidation from './validation/auth.validation';
 
 import { UnauthorizedAccessError, UnverifiedUserError } from './Error';

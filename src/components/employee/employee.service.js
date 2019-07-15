@@ -12,7 +12,7 @@ import * as Pagination from '@libraries/pagination';
 //Global errors
 import { UnauthorizedActionError, InstanceofError, ValidationSchemaError } from '@libraries/Error';
 //User errors
-import { EmployeeAlreadyExistsError, EmployeeNotFoundError } from './Error';
+import { EmployeeNotFoundError } from './Error';
 
 export const create = async (userDTOParameter, employeeDTOParameter) => {
   try {
@@ -31,14 +31,14 @@ export const create = async (userDTOParameter, employeeDTOParameter) => {
     const userDTO = Object.assign(
       Object.create(Object.getPrototypeOf(userDTOParameter)),
       userDTOParameter,
-      { role: Role.Client },
+      { role: Role.Employee },
     );
 
     //TODO: Remove this to set password in client.
     const plainPassword = userDTO.password;
 
     //validate user credentials and create
-    return UserService.create(userDTOParameter)
+    return UserService.create(userDTO)
       .then(async ({ user, verificationToken }) => {
         //employeeDTOParameter.user = user.id;
         newData.user = user.id;

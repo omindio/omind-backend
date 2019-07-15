@@ -26,6 +26,7 @@ export const getOneById = async idParameter => {
 export const getAll = async (projection = {}, pagination) => {
   try {
     const users = await UserModel.find({})
+      .sort({ createdDate: 'desc' })
       .skip(pagination.skip)
       .limit(pagination.limit);
     const count = await UserModel.countDocuments();

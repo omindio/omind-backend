@@ -43,6 +43,7 @@ export const getOneById = async idParameter => {
 export const getAll = async (projection = {}, pagination) => {
   try {
     const clients = await ClientModel.find({})
+      .sort({ createdDate: 'desc' })
       .populate('user')
       .skip(pagination.skip)
       .limit(pagination.limit);

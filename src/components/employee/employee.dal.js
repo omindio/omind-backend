@@ -11,9 +11,13 @@ export const getOne = async params => {
     const employeeResult = await EmployeeModel.findOne(params).populate('user');
     const employeeDTO = new EmployeeDTO(employeeResult);
     if (employeeResult && employeeDTO.user) {
-      const employee = Object.assign(Object.create(Object.getPrototypeOf(employeeDTO)), employeeDTO, {
-        user: _getUserDTO(employeeResult.user),
-      });
+      const employee = Object.assign(
+        Object.create(Object.getPrototypeOf(employeeDTO)),
+        employeeDTO,
+        {
+          user: _getUserDTO(employeeResult.user),
+        },
+      );
       return employee;
     } else {
       return {};
@@ -28,9 +32,13 @@ export const getOneById = async idParameter => {
     const employeeResult = await EmployeeModel.findById(idParameter).populate('user');
     const employeeDTO = new EmployeeDTO(employeeResult);
     if (employeeResult) {
-      const employee = Object.assign(Object.create(Object.getPrototypeOf(employeeDTO)), employeeDTO, {
-        user: _getUserDTO(employeeResult.user),
-      });
+      const employee = Object.assign(
+        Object.create(Object.getPrototypeOf(employeeDTO)),
+        employeeDTO,
+        {
+          user: _getUserDTO(employeeResult.user),
+        },
+      );
       return employee;
     } else {
       return {};
@@ -44,6 +52,7 @@ export const getAll = async (projection = {}, pagination) => {
   try {
     const employees = await EmployeeModel.find({})
       .populate('user')
+      .sort({ createdDate: 'desc' })
       .skip(pagination.skip)
       .limit(pagination.limit);
     const count = await EmployeeModel.countDocuments();
