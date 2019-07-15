@@ -7,7 +7,7 @@ import http from 'http';
 
 global.__base = __dirname + '/';
 
-const port = process.env.PORT || process.env.APP_PORT || 80;
+const port = process.env.PORT || process.env.APP_PORT || 3000;
 
 mongoose.connect(config.dbUri, {
   useCreateIndex: true,
