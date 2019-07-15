@@ -9,7 +9,7 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "npx nodemon --exec babel-node -L --watch . ./src/index.js",
-    "start": "npm run build && node ./build/index.js",
+    "start": "node ./build/index.js",
     "build": "npm run clean && npm run build-babel",
     "heroku-postbuild": "npm run build",
     "build-babel": "babel -d ./build ./src -s",
