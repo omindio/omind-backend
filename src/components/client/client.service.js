@@ -72,8 +72,7 @@ export const create = async (userDTOParameter, clientDTOParameter) => {
           .catch(err => console.log(err));
 
         return {
-          client: client,
-          user,
+          client: Object.assign(Object.create(Object.getPrototypeOf(client)), client, { user }),
           verificationToken,
         };
       })
@@ -100,9 +99,7 @@ export const update = async (userDTOParameter, clientDTOParameter) => {
 
     const newData = {};
 
-    //if (clientDTOParameter.slug != clientDTOResult.slug) {
     if (clientDTOParameter.companyName.trim() != clientDTOResult.companyName.trim()) {
-      //clientDTOParameter.slug = urlSlug(clientDTOParameter.companyName);
       newData.slug = urlSlug(clientDTOParameter.companyName);
       //Check if exists some user with slug/company name received
       let clientDTOSlugResult = await ClientDAL.getOne({ slug: newData.slug });
@@ -114,7 +111,6 @@ export const update = async (userDTOParameter, clientDTOParameter) => {
       userDTOParameter,
       { id: clientDTOResult.user.id },
     );
-    //userDTOParameter.id = clientDTOResult.user.id;
 
     return UserService.update(userDTO)
       .then(async () => {
@@ -239,7 +235,7 @@ const _sendEmailAfterCreate = async (email, plainPassword) => {
         <strong>Password:</strong> ${plainPassword}</p>
         <p><small>For security: Remember to change your password.</small></p>
       `,
-      };
+    };
     sgMail.send(msg);
   } catch (err) {
     throw err;

@@ -36,6 +36,7 @@ export const initialize = () => {
         'https://www.omindbrand.com',
         'https://omind-frontend-production.herokuapp.com',
         'https://omind-frontend-staging.herokuapp.com',
+        'http://omind-frontend-staging.herokuapp.com',
       ],
     }),
   );

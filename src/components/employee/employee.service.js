@@ -24,10 +24,7 @@ export const create = async (userDTOParameter, employeeDTOParameter) => {
     await EmployeeValidation.createEmployeeSchema.validate(employeeDTOParameter);
 
     const newData = {};
-    //set employee Role
-    //userDTOParameter.role = Role.Employee;
-    //const plainPassword = userDTOParameter.password;
-    //set client Role
+
     const userDTO = Object.assign(
       Object.create(Object.getPrototypeOf(userDTOParameter)),
       userDTOParameter,
@@ -40,7 +37,6 @@ export const create = async (userDTOParameter, employeeDTOParameter) => {
     //validate user credentials and create
     return UserService.create(userDTO)
       .then(async ({ user, verificationToken }) => {
-        //employeeDTOParameter.user = user.id;
         newData.user = user.id;
 
         const employeeDTO = Object.assign(
@@ -56,8 +52,9 @@ export const create = async (userDTOParameter, employeeDTOParameter) => {
           .catch(err => console.log(err));
 
         return {
-          employee: employee,
-          user,
+          employee: Object.assign(Object.create(Object.getPrototypeOf(employee)), employee, {
+            user,
+          }),
           verificationToken,
         };
       })
