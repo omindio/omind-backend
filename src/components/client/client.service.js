@@ -8,6 +8,7 @@ import * as ClientDAL from './client.dal';
 import * as ClientValidation from './validation/client.validation';
 
 import { ImageResize } from '@libraries';
+import { config } from '@config';
 import { Service as UserService } from '@components/user';
 import { roles as Role } from '@components/user/config';
 
@@ -225,7 +226,7 @@ export const getAll = async (page, limit) => {
 
 const _sendEmailAfterCreate = async (email, plainPassword) => {
   try {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    sgMail.setApiKey(config.sendgridApiKey);
     const msg = {
       to: email,
       from: 'noreply@omindbrand.com',

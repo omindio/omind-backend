@@ -1,0 +1,157 @@
+paths:
+  /bank-accounts/{page}/{limit}:
+    get:
+      tags:
+        - bank-accounts
+      summary: Get all bank-accounts.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BankAccount'
+        '403':
+          description: Access denied. Insufficient permission.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: path
+          schema:
+            type: integer
+        - name: limit
+          in: path
+          schema:
+            type: integer
+  /bank-accounts/{userId}:
+    post:
+      tags:
+        - bank-accounts
+      parameters:
+        - name: userId
+          in: path
+          schema:
+            type: string
+      summary: Create bank-account.
+      requestBody:
+        $ref: '#/components/requestBodies/BankAccount'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccount'
+        '404':
+          description: Email already exists
+      security:
+        - bearerAuth: []
+  /bank-accounts/{id}:
+    delete:
+      tags:
+        - bank-accounts
+      summary: Delete bank-account.
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: BankAccount deleted successfully
+        '400':
+          description: Missing id parameter
+        '403':
+          description: Can not delete Admin BankAccount
+        '404':
+          description: Clint not found
+      security:
+        - bearerAuth: []
+    get:
+      tags:
+        - bank-accounts
+      summary: Get one bank-account by id.
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccount'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: BankAccount not found
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - bank-accounts
+      summary: Update one bank-account
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/BankAccount'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccount'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: BankAccount not found
+      security:
+        - bearerAuth: []
+components:
+  schemas:
+    BankAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+        vat:
+          type: string
+        swift:
+          type: string
+        iban:
+          type: string
+        bankName:
+          type: string
+        routeNumber:
+          type: string
+        status:
+          type: string
+        user:
+          type: object
+  requestBodies:
+    BankAccount:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              vat:
+                type: string
+              swift:
+                type: string
+              iban:
+                type: string
+              routeNumber:
+                type: string
+              bankName:
+                type: string

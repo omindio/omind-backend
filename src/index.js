@@ -9,34 +9,12 @@ global.__base = __dirname + '/';
 
 const port = process.env.PORT || process.env.APP_PORT || 3000;
 
-mongoose.connect(config.dbUri, {
-  useCreateIndex: true,
-  useNewUrlParser: true,
-  autoIndex: false,
-  useFindAndModify: false,
-});
+mongoose.connect(config.dbUri, config.mongoOpts);
 
 const app = App.initialize();
 const server = http.createServer(app);
 
-// app.listen(port);
 server.listen(port);
 console.log('APP Running!');
 
 export default app;
-
-/*Mongo
-    .connect()
-    .then(() => {
-
-      const app = App.initialize();
-
-      app.listen(port);
-      //http.createServer(app).listen(port);
-      //https.createServer(options, app).listen(port);
-      console.log('APP Running!');
-
-    })
-    .catch(err => {
-      console.log('Error: ' + err);
-    });*/

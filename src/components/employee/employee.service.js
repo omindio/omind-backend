@@ -7,6 +7,7 @@ import * as EmployeeValidation from './validation/employee.validation';
 import { Service as UserService } from '@components/user';
 import { roles as Role } from '@components/user/config';
 
+import { config } from '@config';
 import * as Pagination from '@libraries/pagination';
 
 //Global errors
@@ -137,15 +138,10 @@ export const getOne = async employeeDTOParameter => {
     //validate
     await EmployeeValidation.getEmployeeSchema.validate(employeeDTOParameter);
 
-    //let employeeDTOResult;
     //check if exists id and if not find by email
-    //if (employeeDTOParameter.id) {
     const employeeDTOResult = await EmployeeDAL.getOneById(employeeDTOParameter.id);
-    //} else {
-    //employeeDTOResult = await EmployeeDAL.getOne({ slug: employeeDTOParameter.slug });
-    //}
 
-    if (!employeeDTOResult.id) throw new EmployeeNotFoundError();
+    if (!employeeDTOResult || !employeeDTOResult.id) throw new EmployeeNotFoundError();
 
     //returns DTO without password
     return employeeDTOResult;
@@ -174,7 +170,7 @@ export const getAll = async (page, limit) => {
 
 const _sendEmailAfterCreate = async (email, plainPassword) => {
   try {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    sgMail.setApiKey(config.sendgridApiKey);
     const msg = {
       to: email,
       from: 'noreply@omindbrand.com',

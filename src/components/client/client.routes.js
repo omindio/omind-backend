@@ -6,11 +6,8 @@ import { middleware } from '@components/auth';
 
 import { UploadMidleware } from '@libraries';
 
-routes.get('/:id', /*middleware.authorize([Role.Admin, Role.Client]),*/ ClientController.getOne);
-routes.get(
-  '/slug/:slug',
-  /*middleware.authorize([Role.Admin, Role.Client]),*/ ClientController.getOne,
-);
+routes.get('/:id', middleware.authorize([Role.Admin, Role.Client]), ClientController.getOne);
+routes.get('/slug/:slug', middleware.authorize([Role.Admin, Role.Client]), ClientController.getOne);
 
 routes.post(
   '/',
@@ -28,6 +25,6 @@ routes.patch(
 
 routes.delete('/:id', middleware.authorize([Role.Admin]), ClientController.remove);
 
-routes.get('/:page?/:limit?', /*middleware.authorize([Role.Admin]),*/ ClientController.getAll);
+routes.get('/:page?/:limit?', middleware.authorize([Role.Admin]), ClientController.getAll);
 
 export default routes;

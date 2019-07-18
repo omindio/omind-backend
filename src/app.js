@@ -1,5 +1,4 @@
 import express from 'express';
-
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -8,56 +7,69 @@ import morgan from 'morgan';
 import compression from 'compression';
 import appRoot from 'app-root-path';
 
-//import cookieParser from 'cookie-parser';
-
 import { config } from './config';
 
-//import i18next from 'i18next';
-//import BackendAdapter from 'i18next-multiload-backend-adapter';
-//import XHR from 'i18next-xhr-backend';
-//import Backend from 'i18next-chained-backend';
-
-import { UserComponent, AuthComponent, ClientComponent, EmployeeComponent } from '@components';
-import { Swagger, ErrorHandler, Winston } from '@libraries';
+import {
+  UserComponent,
+  AuthComponent,
+  ClientComponent,
+  EmployeeComponent,
+  ContactComponent,
+} from '@components';
+import { Swagger, ErrorHandler, Winston, RateLimiterMiddleware } from '@libraries';
 
 const app = express();
 
 export const initialize = () => {
   app.use('/public', express.static(`${appRoot}/uploads`));
 
+  //correlator id - header (x-correlation-id)
+  app.use(correlator());
+
   app.use(helmet());
-  app.use(
-    cors({
-      origin: [
-        'http://0.0.0.0:4000',
-        'http://localhost:4000',
-        'http://192.168.1.101:4000',
-        'https://omindbrand.com',
-        'https://www.omindbrand.com',
-        'https://omind-frontend-production.herokuapp.com',
-        'https://omind-frontend-staging.herokuapp.com',
-        'http://omind-frontend-staging.herokuapp.com',
-      ],
-    }),
-  );
-  // app.use(cookieParser());
+  app.use(cors({ origin: config.cors }));
+
   //extended=false is a configuration option that tells the parser to use the classic encoding. When using it, values can be only strings or arrays.
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
   app.use(compression());
 
+  app.use(RateLimiterMiddleware);
+
   if (config.env !== 'test') app.use(morgan('combined', { stream: Winston.stream }));
-  //correlator id - header (x-correlation-id)
-  app.use(correlator());
 
   //initialize components
   UserComponent.initialize(app);
   ClientComponent.initialize(app);
   EmployeeComponent.initialize(app);
   AuthComponent.initialize(app);
+  ContactComponent.initialize(app);
 
   Swagger.initialize(app);
+
   ErrorHandler.Middleware.initialize(app);
 
+  /*
+  _initializeComponents(
+    {
+      UserComponent,
+      ClientComponent,
+      EmployeeComponent,
+      AuthComponent,
+      ContactComponent,
+      Swagger,
+      ErrorHandler: ErrorHandler.Middleware,
+    },
+    app,
+  );
+*/
   return app;
 };
+
+/*
+const _initializeComponents = (Components, app) => {
+  Components.forEach(Component => {
+    Component.initialize(app);
+  });
+};
+*/

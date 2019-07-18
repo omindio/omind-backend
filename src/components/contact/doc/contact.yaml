@@ -1,0 +1,36 @@
+paths:
+  /contact/send:
+    post:
+      tags:
+        - contact
+      summary: Send contact email.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: John Doe
+                email:
+                  type: string
+                  format: email
+                  default: test@test.com
+                subject:
+                  type: string
+                  default: Web budget for Artist
+                message:
+                  type: string
+                  default: Some text to test.
+      responses:
+        '204':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string

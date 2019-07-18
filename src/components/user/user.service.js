@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 
 import UserDTO from './user.dto';
 import * as UserDAL from './user.dal';

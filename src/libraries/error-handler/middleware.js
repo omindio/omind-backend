@@ -18,6 +18,8 @@ export const initialize = app => {
     }\" ${err.status || 500} - ${req.headers['user-agent']}`;
 
     //print error on log file
-    Winston.error(JSON.stringify(error));
+    if (err.status === 500) {
+      Winston.error(JSON.stringify(error));
+    }
   });
 };
