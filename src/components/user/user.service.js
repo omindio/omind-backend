@@ -8,6 +8,7 @@ import { roles as Role } from './config';
 
 import * as Pagination from '@libraries/pagination';
 import { TokenService, TokenDTO, Type } from '@components/token';
+import { Service as BankAccountService, DTO as BankAccountDTO } from '@components/bankAccount';
 
 //Global errors
 import { UnauthorizedActionError, InstanceofError, ValidationSchemaError } from '@libraries/Error';
@@ -57,6 +58,10 @@ export const create = async userDTOParameter => {
         }),
       );
     }
+
+    //create bank Account
+    const bankAccountDTO = new BankAccountDTO({ id: user.id });
+    await BankAccountService.create(bankAccountDTO);
 
     return {
       user: Object.assign(Object.create(Object.getPrototypeOf(user)), user, {

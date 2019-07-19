@@ -26,6 +26,30 @@ paths:
           in: path
           schema:
             type: integer
+  /users/bank-account/{userId}:
+    get:
+      tags:
+        - users
+      parameters:
+        - name: userId
+          in: path
+          schema:
+            type: string
+      summary: Get Bank Account.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BankAccount'
+        '403':
+          description: Access denied. Insufficient permission.
+      security:
+        - bearerAuth: []
+
   /users:
     post:
       tags:

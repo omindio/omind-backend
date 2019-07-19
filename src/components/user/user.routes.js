@@ -12,6 +12,12 @@ routes.get('/confirm-registration/reset-token/:email', UserController.resetToken
 
 routes.get('/:id', middleware.authorize([Role.Admin, Role.Client]), UserController.getOne);
 
+routes.get(
+  '/bank-account/:userId',
+  middleware.authorize([Role.Admin, Role.Client, Role.Employee]),
+  UserController.getBankAccount,
+);
+
 routes.post('/', middleware.authorize([Role.Admin]), UserController.create);
 
 routes.patch('/:id', middleware.authorize([Role.Admin, Role.Client]), UserController.update);

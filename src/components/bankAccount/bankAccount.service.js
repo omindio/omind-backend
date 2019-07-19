@@ -3,81 +3,78 @@ import * as BankAccountDAL from './bankAccount.dal';
 import * as BankAccountValidation from './validation/bankAccount.validation';
 
 import { Service as UserService, DTO as UserDTO } from '@components/user';
-import { roles as Role } from '@components/user/config';
-
 import * as Pagination from '@libraries/pagination';
 
 //Global errors
 import { UnauthorizedActionError, InstanceofError, ValidationSchemaError } from '@libraries/Error';
 //User errors
-import { EmployeeNotFoundError } from './Error';
+import { BankAccountNotFoundError, BankAccountAlreadyExistsError } from './Error';
 
-export const create = async (userDTOParameter, BankAccountDTOParameter) => {
+export const create = async (userDTOParameter, bankAccountDTOParameter) => {
   try {
     //parameter validation
-    if (!(BankAccountDTOParameter instanceof BankAccountDTO))
+    if (!(bankAccountDTOParameter instanceof BankAccountDTO))
       throw new InstanceofError('Param sent need to be an BankAccountDTO.');
 
     //run validation. Returns exceptions if fails
-    await BankAccountValidation.createEmployeeSchema.validate(BankAccountDTOParameter);
+    await BankAccountValidation.createBankAccountSchema.validate(bankAccountDTOParameter);
 
-    const newData = {};
+    //check if exists user (if no exists throw exception)
+    await UserService.getOne(userDTOParameter);
 
-    const BankAccountDTOResult = await getOneByUserId(userDTOParameter);
+    //check if exists bank account associated to user
+    const bankAccountDTOResult = await getOneByUserId(userDTOParameter);
 
-    if (BankAccountDTOResult) {
-    }
-  } catch (err) {
-    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
-    else throw err;
-  }
-};
+    if (bankAccountDTOResult) throw new BankAccountAlreadyExistsError();
 
-export const update = async (userDTOParameter, BankAccountDTOParameter) => {
-  try {
-    //parameter validation
-    if (!(BankAccountDTOParameter instanceof BankAccountDTO))
-      throw new InstanceofError('Param sent need to be an BankAccountDTO.');
-
-    //run validation. Returns exceptions if fails
-    await BankAccountValidation.updateEmployeeSchema.validate(BankAccountDTOParameter);
-
-    let BankAccountDTOResult = await BankAccountDAL.getOneById(BankAccountDTOParameter.id);
-    if (!BankAccountDTOResult.id) throw new EmployeeNotFoundError();
-
-    // const newData = {};
-
-    const userDTO = Object.assign(
-      Object.create(Object.getPrototypeOf(userDTOParameter)),
-      userDTOParameter,
-      { id: BankAccountDTOResult.user.id },
+    const bankAccountDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(bankAccountDTOParameter)),
+      bankAccountDTOParameter,
+      { user: userDTOParameter.id },
     );
 
-    return UserService.update(userDTO)
-      .then(async () => {
-        const BankAccountDTO = await BankAccountDAL.update(BankAccountDTOParameter);
-
-        return BankAccountDTO;
-      })
-      .catch(err => {
-        throw err;
-      });
+    const bankAccount = await BankAccountDAL.create(bankAccountDTO);
+    return bankAccount;
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
   }
 };
 
-export const remove = async BankAccountDTOParameter => {
+export const update = async (bankAccountDTOParameter, userRequestDTOParameter = null) => {
   try {
-    if (!(BankAccountDTOParameter instanceof BankAccountDTO))
+    //parameter validation
+    if (!(bankAccountDTOParameter instanceof BankAccountDTO))
+      throw new InstanceofError('Param sent need to be an BankAccountDTO.');
+
+    //run validation. Returns exceptions if fails
+    await BankAccountValidation.updateBankAccountSchema.validate(bankAccountDTOParameter);
+
+    const BankAccountDTOResult = await BankAccountDAL.getOneById(bankAccountDTOParameter.id);
+    if (!BankAccountDTOResult.id) throw new BankAccountNotFoundError();
+
+    //check if request user is the owner of bank account
+    if (userRequestDTOParameter.user != userDTOParameter.id)
+      throw new UnauthorizedActionError('You can not edit this bank account.');
+
+    const bankAccountDTO = await BankAccountDAL.update(bankAccountDTOParameter);
+    return bankAccountDTO;
+  } catch (err) {
+    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
+    else throw err;
+  }
+};
+
+export const remove = async bankAccountDTOParameter => {
+  try {
+    if (!(bankAccountDTOParameter instanceof BankAccountDTO))
       throw new InstanceofError('Param sent need to be an BankAccountDTO.');
 
     //validate
-    await BankAccountValidation.updateEmployeeSchema.validate(BankAccountDTOParameter);
+    await BankAccountValidation.updateBankAccountSchema.validate(bankAccountDTOParameter);
 
-    let BankAccountDTOResult = await BankAccountDAL.getOneById(BankAccountDTOParameter.id);
-    if (!BankAccountDTOResult.id) throw new EmployeeNotFoundError();
+    let BankAccountDTOResult = await BankAccountDAL.getOneById(bankAccountDTOParameter.id);
+    if (!BankAccountDTOResult.id) throw new BankAccountNotFoundError();
 
     if (BankAccountDTOResult.role === Role.Admin)
       throw new UnauthorizedActionError('You can not remove this user.');
@@ -95,23 +92,17 @@ export const remove = async BankAccountDTOParameter => {
   }
 };
 
-export const getOne = async BankAccountDTOParameter => {
+export const getOne = async bankAccountDTOParameter => {
   try {
-    if (!(BankAccountDTOParameter instanceof BankAccountDTO))
+    if (!(bankAccountDTOParameter instanceof BankAccountDTO))
       throw new InstanceofError('Param sent need to be an BankAccountDTO.');
 
     //validate
-    await BankAccountValidation.getEmployeeSchema.validate(BankAccountDTOParameter);
+    await BankAccountValidation.getBankAccountSchema.validate(bankAccountDTOParameter);
 
-    //let BankAccountDTOResult;
-    //check if exists id and if not find by email
-    //if (BankAccountDTOParameter.id) {
-    const BankAccountDTOResult = await BankAccountDAL.getOneById(BankAccountDTOParameter.id);
-    //} else {
-    //BankAccountDTOResult = await BankAccountDAL.getOne({ slug: BankAccountDTOParameter.slug });
-    //}
+    const BankAccountDTOResult = await BankAccountDAL.getOneById(bankAccountDTOParameter.id);
 
-    if (!BankAccountDTOResult.id) throw new EmployeeNotFoundError();
+    if (!BankAccountDTOResult.id) throw new BankAccountNotFoundError();
 
     //returns DTO without password
     return BankAccountDTOResult;

@@ -140,8 +140,8 @@ export const getAll = async (req, res, next) => {
     const pageParameter = req.params.page;
     const limitParameter = req.params.limit;
 
-    const users = await ClientService.getAll(pageParameter, limitParameter);
-    res.status(200).json(users);
+    const clients = await ClientService.getAll(pageParameter, limitParameter);
+    res.status(200).json(clients);
   } catch (err) {
     return next(err);
   }

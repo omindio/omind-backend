@@ -15,6 +15,7 @@ import {
   ClientComponent,
   EmployeeComponent,
   ContactComponent,
+  BankAccountComponent,
 } from '@components';
 import { Swagger, ErrorHandler, Winston, RateLimiterMiddleware } from '@libraries';
 
@@ -44,9 +45,9 @@ export const initialize = () => {
   EmployeeComponent.initialize(app);
   AuthComponent.initialize(app);
   ContactComponent.initialize(app);
+  BankAccountComponent.initialize(app);
 
   Swagger.initialize(app);
-
   ErrorHandler.Middleware.initialize(app);
 
   /*

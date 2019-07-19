@@ -1,31 +1,4 @@
 paths:
-  /bank-accounts/{page}/{limit}:
-    get:
-      tags:
-        - bank-accounts
-      summary: Get all bank-accounts.
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BankAccount'
-        '403':
-          description: Access denied. Insufficient permission.
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: page
-          in: path
-          schema:
-            type: integer
-        - name: limit
-          in: path
-          schema:
-            type: integer
   /bank-accounts/{userId}:
     post:
       tags:
@@ -50,26 +23,6 @@ paths:
       security:
         - bearerAuth: []
   /bank-accounts/{id}:
-    delete:
-      tags:
-        - bank-accounts
-      summary: Delete bank-account.
-      parameters:
-        - name: id
-          in: path
-          schema:
-            type: string
-      responses:
-        '204':
-          description: BankAccount deleted successfully
-        '400':
-          description: Missing id parameter
-        '403':
-          description: Can not delete Admin BankAccount
-        '404':
-          description: Clint not found
-      security:
-        - bearerAuth: []
     get:
       tags:
         - bank-accounts

@@ -1,10 +1,9 @@
-import * as BankAccountService from './employee.service';
+import * as BankAccountService from './bankAccount.service';
 import BankAccountDTO from './bankAccount.dto';
 
 import { DTO as UserDTO } from '@components/user';
-import { roles as Role } from '@components/user/config';
 
-import { MissingParameterError, UnauthorizedActionError } from '@libraries/Error';
+import { MissingParameterError } from '@libraries/Error';
 
 export const create = async (req, res, next) => {
   const userIdParameter = req.params.userId;
@@ -21,10 +20,10 @@ export const create = async (req, res, next) => {
       routeNumber,
       bankName,
     });
-    const userDTO = new UserDTO({ id: userId });
+    const userDTO = new UserDTO({ id: userIdParameter });
 
-    const employee = await BankAccountService.create(userDTO, bankAccountDTO);
-    res.status(201).json(employee);
+    const bankAccount = await BankAccountService.create(userDTO, bankAccountDTO);
+    res.status(201).json(bankAccount);
   } catch (err) {
     return next(err);
   }
@@ -34,42 +33,24 @@ export const update = async (req, res, next) => {
   const idParameter = req.params.id;
   try {
     if (!idParameter) throw new MissingParameterError(['id']);
-    if (Role.Admin != req.user.role && idParameter != req.user.employeeId)
-      throw new UnauthorizedActionError('You can not update this employee.');
 
-    const {
-      dni,
-      lastName,
-      socialInstagram,
-      name,
-      socialLinkedin,
-      phone,
-      socialFacebook,
-      web,
-      workPosition,
-      fiscalAddress,
-      password,
-      email,
-      id,
-    } = Object.assign({}, req.body, {
+    const { id, vat, swift, iban, routeNumber, bankName } = Object.assign({}, req.body, {
       id: idParameter,
     });
 
     const bankAccountDTO = new BankAccountDTO({
-      dni,
-      fiscalAddress,
-      web,
-      socialFacebook,
-      workPosition,
-      phone,
-      socialLinkedin,
-      socialInstagram,
       id,
+      vat,
+      swift,
+      iban,
+      routeNumber,
+      bankName,
     });
-    const userDTO = new UserDTO({ name, lastName, email, password });
 
-    const employee = await BankAccountService.update(userDTO, bankAccountDTO);
-    res.status(200).json(employee);
+    const userRequestDTO = new UserDTO({ id: req.user.id });
+
+    const bankAccount = await BankAccountService.update(bankAccountDTO, userRequestDTO);
+    res.status(200).json(bankAccount);
   } catch (err) {
     return next(err);
   }
@@ -93,14 +74,9 @@ export const getOne = async (req, res, next) => {
   try {
     if (!idParameter) throw new MissingParameterError(['id']);
 
-    //Check Owner of employee.
-    //TODO: Por ahora comprobaremos la propiedad en el update.
-    // if (Role.Admin != req.user.role && id != req.user.employeeId)
-    // throw new UnauthorizedActionError('You can not get this employee.');
-
     const bankAccountDTO = new BankAccountDTO({ id: idParameter });
-    const employee = await BankAccountService.getOne(bankAccountDTO);
-    res.status(200).json(employee);
+    const bankAccount = await BankAccountService.getOne(bankAccountDTO);
+    res.status(200).json(bankAccount);
   } catch (err) {
     return next(err);
   }
@@ -111,8 +87,8 @@ export const getAll = async (req, res, next) => {
     const pageParameter = req.params.page;
     const limitParameter = req.params.limit;
 
-    const users = await BankAccountService.getAll(pageParameter, limitParameter);
-    res.status(200).json(users);
+    const bankAccounts = await BankAccountService.getAll(pageParameter, limitParameter);
+    res.status(200).json(bankAccounts);
   } catch (err) {
     return next(err);
   }

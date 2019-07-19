@@ -20,8 +20,9 @@ const bankNameSchema = Joi.string()
 
 const statusSchema = Joi.string();
 const userSchema = Joi.object();
+const createdDateSchema = Joi.date();
 
-export const createEmployeeSchema = Joi.object()
+export const createBankAccountSchema = Joi.object()
   .keys({
     id: idSchema.optional(),
     vat: vatchema.optional().allow(''),
@@ -30,11 +31,12 @@ export const createEmployeeSchema = Joi.object()
     routeNumber: routeNumberSchema.optional().allow(''),
     bankName: bankNameSchema.optional().allow(''),
     status: statusSchema.optional().allow(''),
+    createdDate: createdDateSchema.optional().allow(''),
     user: userSchema.optional().allow(''),
   })
   .options({ abortEarly: false });
 
-export const updateEmployeeSchema = Joi.object()
+export const updateBankAccountSchema = Joi.object()
   .keys({
     id: idSchema.required(),
     vat: vatchema.optional().allow(''),
@@ -43,11 +45,12 @@ export const updateEmployeeSchema = Joi.object()
     routeNumber: routeNumberSchema.optional().allow(''),
     bankName: bankNameSchema.optional().allow(''),
     status: statusSchema.optional().allow(''),
+    createdDate: createdDateSchema.optional().allow(''),
     user: userSchema.optional().allow(''),
   })
   .options({ abortEarly: false });
 
-export const getEmployeeSchema = Joi.object()
+export const getBankAccountSchema = Joi.object()
   .keys({
     id: idSchema.required(),
     vat: vatchema.optional().allow(''),
@@ -56,6 +59,7 @@ export const getEmployeeSchema = Joi.object()
     routeNumber: routeNumberSchema.optional().allow(''),
     bankName: bankNameSchema.optional().allow(''),
     status: statusSchema.optional().allow(''),
+    createdDate: createdDateSchema.optional().allow(''),
     user: userSchema.optional().allow(''),
   })
   .options({ abortEarly: false });

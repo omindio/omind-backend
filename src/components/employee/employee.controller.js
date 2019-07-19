@@ -123,8 +123,8 @@ export const getAll = async (req, res, next) => {
     const pageParameter = req.params.page;
     const limitParameter = req.params.limit;
 
-    const users = await EmployeeService.getAll(pageParameter, limitParameter);
-    res.status(200).json(users);
+    const employees = await EmployeeService.getAll(pageParameter, limitParameter);
+    res.status(200).json(employees);
   } catch (err) {
     return next(err);
   }

@@ -13,7 +13,7 @@ export const initialize = app => {
       description: '',
     },
     //TODO: Add https after SSL/TLS configured
-    schemes: ['http'],
+    schemes: ['http', 'https'],
     components: {
       securitySchemes: {
         bearerAuth: {

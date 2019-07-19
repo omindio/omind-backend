@@ -2,6 +2,8 @@ import * as UserService from './user.service';
 import UserDTO from './user.dto';
 import { roles as Role } from './config';
 
+import { Service as BankAccountService } from '@components/bankAccount';
+
 import { MissingParameterError, UnauthorizedActionError } from '@libraries/Error';
 
 export const create = async (req, res, next) => {
@@ -61,6 +63,22 @@ export const getOne = async (req, res, next) => {
 
     const user = await UserService.getOne(userDTO);
     res.status(200).json(user);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const getBankAccount = async (req, res, next) => {
+  const userIdParameter = req.params.userId;
+  try {
+    if (!userIdParameter) throw new MissingParameterError(['userId']);
+    if (Role.Admin != req.user.role && idParameter != req.user.id)
+      throw new UnauthorizedActionError('You can not get bank account of this User.');
+    const userDTO = new UserDTO({ id: userIdParameter });
+
+    const bankAccountDTO = await BankAccountService.getOneByUserId(userDTO);
+
+    res.status(200).json(bankAccountDTO);
   } catch (err) {
     return next(err);
   }

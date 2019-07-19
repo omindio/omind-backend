@@ -1,4 +1,4 @@
-import EmployeeNotFoundError from './EmployeeNotFoundError';
-import EmployeeAlreadyExistsError from './EmployeeAlreadyExistsError';
+import BankAccountNotFoundError from './BankAccountNotFoundError';
+import BankAccountAlreadyExistsError from './BankAccountAlreadyExistsError';
 
-export { EmployeeAlreadyExistsError, EmployeeNotFoundError };
+export { BankAccountAlreadyExistsError, BankAccountNotFoundError };
