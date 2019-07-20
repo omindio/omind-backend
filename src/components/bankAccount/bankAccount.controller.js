@@ -47,7 +47,7 @@ export const update = async (req, res, next) => {
       bankName,
     });
 
-    const userRequestDTO = new UserDTO({ id: req.user.id });
+    const userRequestDTO = new UserDTO({ id: req.user.id, role: req.user.role });
 
     const bankAccount = await BankAccountService.update(bankAccountDTO, userRequestDTO);
     res.status(200).json(bankAccount);

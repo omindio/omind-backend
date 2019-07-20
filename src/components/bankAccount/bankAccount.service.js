@@ -54,7 +54,10 @@ export const update = async (bankAccountDTOParameter, userRequestDTOParameter = 
     if (!BankAccountDTOResult.id) throw new BankAccountNotFoundError();
 
     //check if request user is the owner of bank account
-    if (userRequestDTOParameter.user != userDTOParameter.id)
+    if (
+      userRequestDTOParameter.role !== 'Admin' &&
+      BankAccountDTOResult.user != userRequestDTOParameter.id
+    )
       throw new UnauthorizedActionError('You can not edit this bank account.');
 
     const bankAccountDTO = await BankAccountDAL.update(bankAccountDTOParameter);
@@ -79,13 +82,24 @@ export const remove = async bankAccountDTOParameter => {
     if (BankAccountDTOResult.role === Role.Admin)
       throw new UnauthorizedActionError('You can not remove this user.');
 
-    return UserService.removeById(BankAccountDTOResult.user.id)
-      .then(async () => {
-        await BankAccountDAL.remove(BankAccountDTOResult);
-      })
-      .catch(err => {
-        throw err;
-      });
+    await BankAccountDAL.remove(BankAccountDTOResult);
+  } catch (err) {
+    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
+    else throw err;
+  }
+};
+
+export const removeByUser = async bankAccountDTOParameter => {
+  try {
+    if (!(bankAccountDTOParameter instanceof BankAccountDTO))
+      throw new InstanceofError('Param sent need to be an BankAccountDTO.');
+
+    //validate
+    await BankAccountValidation.removeByUserBankAccountSchema.validate(bankAccountDTOParameter);
+
+    const BankAccountDTOResult = await BankAccountDAL.getOneByUserId(bankAccountDTOParameter.id);
+    // if (!BankAccountDTOResult) throw new BankAccountNotFoundError();
+    if (BankAccountDTOResult) await BankAccountDAL.removeByUser(BankAccountDTOResult);
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;

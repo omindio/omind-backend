@@ -111,6 +111,17 @@ export const update = async bankAccountDTOParameter => {
   }
 };
 
+export const removeByUser = async BankAccountDTOParameter => {
+  if (!(BankAccountDTOParameter instanceof BankAccountDTO))
+    throw new InstanceofError('Param sent need to be an BankAccountDTO.');
+
+  try {
+    await BankAccountModel.findOneAndRemove({ user: BankAccountDTOParameter.user });
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const remove = async bankAccountDTOParameter => {
   if (!(bankAccountDTOParameter instanceof BankAccountDTO))
     throw new InstanceofError('Param sent need to be an BankAccountDTO.');

@@ -1,5 +1,5 @@
 //Data Transfer Object
-export default class ClientDTO {
+export default class BankAccountDTO {
   constructor(data) {
     if (typeof data !== 'object' || data === null || typeof data === 'undefined') data = {};
 

@@ -61,7 +61,7 @@ export const create = async userDTOParameter => {
 
     //create bank Account
     const bankAccountDTO = new BankAccountDTO({ id: user.id });
-    await BankAccountService.create(bankAccountDTO);
+    await BankAccountService.create(user, bankAccountDTO);
 
     return {
       user: Object.assign(Object.create(Object.getPrototypeOf(user)), user, {
@@ -142,21 +142,13 @@ export const remove = async (userDTOParameter, userAPI = false) => {
         `To delete ${userDTOResult.role} user use the correct API for the Role.`,
       );
 
+    const bankAccountDTO = new BankAccountDTO({ user: userDTOResult.id });
+    await BankAccountService.removeByUser(bankAccountDTO);
+
     await UserDAL.remove(userDTOResult);
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
-  }
-};
-
-//TODO: Check to add validations like default remove ^^
-export const removeById = async userId => {
-  try {
-    const userDTO = new UserDTO({ id: userId });
-
-    await remove(userDTO);
-  } catch (err) {
-    throw err;
   }
 };
 

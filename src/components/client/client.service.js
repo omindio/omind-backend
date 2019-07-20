@@ -9,7 +9,7 @@ import * as ClientValidation from './validation/client.validation';
 
 import { ImageResize } from '@libraries';
 import { config } from '@config';
-import { Service as UserService } from '@components/user';
+import { Service as UserService, DTO as UserDTO } from '@components/user';
 import { roles as Role } from '@components/user/config';
 
 import * as Pagination from '@libraries/pagination';
@@ -162,19 +162,17 @@ export const remove = async clientDTOParameter => {
     if (clientDTOResult.role === Role.Admin)
       throw new UnauthorizedActionError('You can not remove this user.');
 
-    return UserService.removeById(clientDTOResult.user.id)
-      .then(async () => {
-        await ClientDAL.remove(clientDTOResult);
-        //remove image if exists
-        if (clientDTOResult.logo) {
-          fs.unlink(`${imagePath}/${clientDTOResult.logo}`, err => {
-            if (err) throw err;
-          });
-        }
-      })
-      .catch(err => {
-        throw err;
+    const userDTO = new UserDTO({ id: clientDTOResult.user.id });
+
+    await ClientDAL.remove(clientDTOResult);
+    await UserService.remove(userDTO);
+
+    if (clientDTOResult.logo) {
+      fs.unlink(`${imagePath}/${clientDTOResult.logo}`, err => {
+        if (err) throw err;
       });
+    }
+
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;

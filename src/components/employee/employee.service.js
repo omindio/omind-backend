@@ -4,14 +4,14 @@ import EmployeeDTO from './employee.dto';
 import * as EmployeeDAL from './employee.dal';
 import * as EmployeeValidation from './validation/employee.validation';
 
-import { Service as UserService } from '@components/user';
+import { Service as UserService, DTO as UserDTO } from '@components/user';
 import { roles as Role } from '@components/user/config';
 
 import { config } from '@config';
 import * as Pagination from '@libraries/pagination';
 
 //Global errors
-import { UnauthorizedActionError, InstanceofError, ValidationSchemaError } from '@libraries/Error';
+import { InstanceofError, ValidationSchemaError } from '@libraries/Error';
 //User errors
 import { EmployeeNotFoundError } from './Error';
 
@@ -107,23 +107,20 @@ export const remove = async employeeDTOParameter => {
   try {
     if (!(employeeDTOParameter instanceof EmployeeDTO))
       throw new InstanceofError('Param sent need to be an EmployeeDTO.');
-
     //validate
     await EmployeeValidation.updateEmployeeSchema.validate(employeeDTOParameter);
 
     let employeeDTOResult = await EmployeeDAL.getOneById(employeeDTOParameter.id);
     if (!employeeDTOResult.id) throw new EmployeeNotFoundError();
 
-    if (employeeDTOResult.role === Role.Admin)
-      throw new UnauthorizedActionError('You can not remove this user.');
+    // if (employeeDTOResult.role === Role.Admin)
+    // throw new UnauthorizedActionError('You can not remove this user.');
 
-    return UserService.removeById(employeeDTOResult.user.id)
-      .then(async () => {
-        await EmployeeDAL.remove(employeeDTOResult);
-      })
-      .catch(err => {
-        throw err;
-      });
+    const userDTO = new UserDTO({ id: employeeDTOResult.user.id });
+
+    await EmployeeDAL.remove(employeeDTOResult);
+    await UserService.remove(userDTO);
+
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;

@@ -72,7 +72,7 @@ export const getBankAccount = async (req, res, next) => {
   const userIdParameter = req.params.userId;
   try {
     if (!userIdParameter) throw new MissingParameterError(['userId']);
-    if (Role.Admin != req.user.role && idParameter != req.user.id)
+    if (Role.Admin != req.user.role && userIdParameter != req.user.id)
       throw new UnauthorizedActionError('You can not get bank account of this User.');
     const userDTO = new UserDTO({ id: userIdParameter });
 
