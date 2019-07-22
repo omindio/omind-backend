@@ -21,7 +21,7 @@ import { ClientAlreadyExistsError, ClientNotFoundError } from './Error';
 
 const imagePath = `${appRoot}/uploads/images`;
 
-export const create = async (userDTOParameter, clientDTOParameter) => {
+export const create = async clientDTOParameter => {
   try {
     //parameter validation
     if (!(clientDTOParameter instanceof ClientDTO))
@@ -37,12 +37,12 @@ export const create = async (userDTOParameter, clientDTOParameter) => {
 
     //Check if exists some user with slug/company name received
     const clientDTOResult = await ClientDAL.getOne({ slug: newData.slug });
-    if (clientDTOResult.id) throw new ClientAlreadyExistsError();
+    if (clientDTOResult) throw new ClientAlreadyExistsError();
 
     //set client Role
     const userDTO = Object.assign(
-      Object.create(Object.getPrototypeOf(userDTOParameter)),
-      userDTOParameter,
+      Object.create(Object.getPrototypeOf(clientDTOParameter.user)),
+      clientDTOParameter.user,
       { role: Role.Client },
     );
 
@@ -86,7 +86,7 @@ export const create = async (userDTOParameter, clientDTOParameter) => {
   }
 };
 
-export const update = async (userDTOParameter, clientDTOParameter) => {
+export const update = async clientDTOParameter => {
   try {
     //parameter validation
     if (!(clientDTOParameter instanceof ClientDTO))
@@ -94,22 +94,21 @@ export const update = async (userDTOParameter, clientDTOParameter) => {
 
     //run validation. Returns exceptions if fails
     await ClientValidation.updateClientSchema.validate(clientDTOParameter);
-
     const clientDTOResult = await ClientDAL.getOneById(clientDTOParameter.id);
-    if (!clientDTOResult.id) throw new ClientNotFoundError();
+    if (!clientDTOResult) throw new ClientNotFoundError();
 
     const newData = {};
 
     if (clientDTOParameter.companyName.trim() != clientDTOResult.companyName.trim()) {
       newData.slug = urlSlug(clientDTOParameter.companyName);
       //Check if exists some user with slug/company name received
-      let clientDTOSlugResult = await ClientDAL.getOne({ slug: newData.slug });
-      if (clientDTOSlugResult.id) throw new ClientAlreadyExistsError();
+      const clientDTOSlugResult = await ClientDAL.getOne({ slug: newData.slug });
+      if (clientDTOSlugResult) throw new ClientAlreadyExistsError();
     }
 
     const userDTO = Object.assign(
-      Object.create(Object.getPrototypeOf(userDTOParameter)),
-      userDTOParameter,
+      Object.create(Object.getPrototypeOf(clientDTOParameter.user)),
+      clientDTOParameter.user,
       { id: clientDTOResult.user.id },
     );
 
@@ -126,8 +125,9 @@ export const update = async (userDTOParameter, clientDTOParameter) => {
           const filename = await fileUpload.save(clientDTOParameter.logoFile.buffer);
 
           newData.logo = filename;
-          //clientDTOParameter.logo = filename;
         }
+
+        newData.user = userDTO.id;
 
         const clientDTO = Object.assign(
           Object.create(Object.getPrototypeOf(clientDTOParameter)),
@@ -157,7 +157,7 @@ export const remove = async clientDTOParameter => {
     await ClientValidation.updateClientSchema.validate(clientDTOParameter);
 
     const clientDTOResult = await ClientDAL.getOneById(clientDTOParameter.id);
-    if (!clientDTOResult.id) throw new ClientNotFoundError();
+    if (!clientDTOResult) throw new ClientNotFoundError();
 
     if (clientDTOResult.role === Role.Admin)
       throw new UnauthorizedActionError('You can not remove this user.');
@@ -172,7 +172,6 @@ export const remove = async clientDTOParameter => {
         if (err) throw err;
       });
     }
-
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
@@ -195,7 +194,7 @@ export const getOne = async clientDTOParameter => {
       clientDTOResult = await ClientDAL.getOne({ slug: clientDTOParameter.slug });
     }
 
-    if (!clientDTOResult || !clientDTOResult.id) throw new ClientNotFoundError();
+    if (!clientDTOResult) throw new ClientNotFoundError();
 
     //returns DTO without password
     return clientDTOResult;

@@ -33,7 +33,7 @@ export const create = async userDTOParameter => {
 
     //Check if exists some user with Email received
     const userDTOResult = await UserDAL.getOneByEmail(userDTOParameter.email);
-    if (userDTOResult.id) throw new EmailAlreadyExistsError();
+    if (userDTOResult) throw new EmailAlreadyExistsError();
 
     //hash and save password
     const salt = await bcrypt.genSalt(passwordSalt);
@@ -85,12 +85,12 @@ export const update = async userDTOParameter => {
     await UserValidation.updateUserSchema.validate(userDTOParameter);
 
     const userDTOResult = await UserDAL.getOneById(userDTOParameter.id);
-    if (!userDTOResult.id) throw new UserNotFoundError();
+    if (!userDTOResult) throw new UserNotFoundError();
 
     //check if exists new email
     if (userDTOResult.email != userDTOParameter.email) {
       const checkUserDTOResult = await UserDAL.getOneByEmail(userDTOParameter.email);
-      if (checkUserDTOResult.id) throw new EmailAlreadyExistsError();
+      if (checkUserDTOResult) throw new EmailAlreadyExistsError();
     }
 
     const newData = {};
@@ -131,8 +131,8 @@ export const remove = async (userDTOParameter, userAPI = false) => {
     //validate
     await UserValidation.updateUserSchema.validate(userDTOParameter);
 
-    let userDTOResult = await UserDAL.getOneById(userDTOParameter.id);
-    if (!userDTOResult.id) throw new UserNotFoundError();
+    const userDTOResult = await UserDAL.getOneById(userDTOParameter.id);
+    if (!userDTOResult) throw new UserNotFoundError();
 
     if (userDTOResult.role === Role.Admin)
       throw new UnauthorizedActionError('You can not remove this user.');
@@ -160,6 +160,7 @@ export const getOne = async userDTOParameter => {
     //validate
     await UserValidation.getUserSchema.validate(userDTOParameter);
 
+    //TODO: Change
     let userDTOResult;
     //check if exists id and if not find by email
     if (userDTOParameter.id) {
@@ -168,7 +169,7 @@ export const getOne = async userDTOParameter => {
       userDTOResult = await UserDAL.getOneByEmail(userDTOParameter.email);
     }
 
-    if (!userDTOResult.id) throw new UserNotFoundError();
+    if (!userDTOResult) throw new UserNotFoundError();
 
     //returns DTO without password
     return Object.assign(Object.create(Object.getPrototypeOf(userDTOResult)), userDTOResult, {

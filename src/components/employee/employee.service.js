@@ -15,7 +15,7 @@ import { InstanceofError, ValidationSchemaError } from '@libraries/Error';
 //User errors
 import { EmployeeNotFoundError } from './Error';
 
-export const create = async (userDTOParameter, employeeDTOParameter) => {
+export const create = async employeeDTOParameter => {
   try {
     //parameter validation
     if (!(employeeDTOParameter instanceof EmployeeDTO))
@@ -27,8 +27,8 @@ export const create = async (userDTOParameter, employeeDTOParameter) => {
     const newData = {};
 
     const userDTO = Object.assign(
-      Object.create(Object.getPrototypeOf(userDTOParameter)),
-      userDTOParameter,
+      Object.create(Object.getPrototypeOf(employeeDTOParameter.user)),
+      employeeDTOParameter.user,
       { role: Role.Employee },
     );
 
@@ -68,7 +68,7 @@ export const create = async (userDTOParameter, employeeDTOParameter) => {
   }
 };
 
-export const update = async (userDTOParameter, employeeDTOParameter) => {
+export const update = async employeeDTOParameter => {
   try {
     //parameter validation
     if (!(employeeDTOParameter instanceof EmployeeDTO))
@@ -77,22 +77,30 @@ export const update = async (userDTOParameter, employeeDTOParameter) => {
     //run validation. Returns exceptions if fails
     await EmployeeValidation.updateEmployeeSchema.validate(employeeDTOParameter);
 
-    let employeeDTOResult = await EmployeeDAL.getOneById(employeeDTOParameter.id);
-    if (!employeeDTOResult.id) throw new EmployeeNotFoundError();
+    const employeeDTOResult = await EmployeeDAL.getOneById(employeeDTOParameter.id);
+    if (!employeeDTOResult) throw new EmployeeNotFoundError();
 
-    // const newData = {};
+    const newData = {};
 
     const userDTO = Object.assign(
-      Object.create(Object.getPrototypeOf(userDTOParameter)),
-      userDTOParameter,
+      Object.create(Object.getPrototypeOf(employeeDTOParameter.user)),
+      employeeDTOParameter.user,
       { id: employeeDTOResult.user.id },
     );
 
     return UserService.update(userDTO)
       .then(async () => {
-        const employeeDTO = await EmployeeDAL.update(employeeDTOParameter);
+        newData.user = userDTO.id;
 
-        return employeeDTO;
+        const employeeDTO = Object.assign(
+          Object.create(Object.getPrototypeOf(employeeDTOParameter)),
+          employeeDTOParameter,
+          newData,
+        );
+
+        const employee = await EmployeeDAL.update(employeeDTO);
+
+        return employee;
       })
       .catch(err => {
         throw err;
@@ -110,8 +118,8 @@ export const remove = async employeeDTOParameter => {
     //validate
     await EmployeeValidation.updateEmployeeSchema.validate(employeeDTOParameter);
 
-    let employeeDTOResult = await EmployeeDAL.getOneById(employeeDTOParameter.id);
-    if (!employeeDTOResult.id) throw new EmployeeNotFoundError();
+    const employeeDTOResult = await EmployeeDAL.getOneById(employeeDTOParameter.id);
+    if (!employeeDTOResult) throw new EmployeeNotFoundError();
 
     // if (employeeDTOResult.role === Role.Admin)
     // throw new UnauthorizedActionError('You can not remove this user.');
@@ -120,7 +128,6 @@ export const remove = async employeeDTOParameter => {
 
     await EmployeeDAL.remove(employeeDTOResult);
     await UserService.remove(userDTO);
-
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
@@ -138,7 +145,7 @@ export const getOne = async employeeDTOParameter => {
     //check if exists id and if not find by email
     const employeeDTOResult = await EmployeeDAL.getOneById(employeeDTOParameter.id);
 
-    if (!employeeDTOResult || !employeeDTOResult.id) throw new EmployeeNotFoundError();
+    if (!employeeDTOResult) throw new EmployeeNotFoundError();
 
     //returns DTO without password
     return employeeDTOResult;

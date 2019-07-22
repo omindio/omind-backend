@@ -28,6 +28,8 @@ export const create = async (req, res, next) => {
     let logoFile = req.file;
     if (logoFile === undefined) logoFile = null;
 
+    const userDTO = new UserDTO({ name, lastName, email, password });
+
     const clientDTO = new ClientDTO({
       companyName,
       cif,
@@ -40,10 +42,10 @@ export const create = async (req, res, next) => {
       socialLinkedin,
       socialInstagram,
       logoFile,
+      user: userDTO,
     });
-    const userDTO = new UserDTO({ name, lastName, email, password });
 
-    const client = await ClientService.create(userDTO, clientDTO);
+    const client = await ClientService.create(clientDTO);
     res.status(201).json(client);
   } catch (err) {
     return next(err);
@@ -56,7 +58,7 @@ export const update = async (req, res, next) => {
     if (!idParameter) throw new MissingParameterError(['id']);
     if (Role.Admin != req.user.role && idParameter != req.user.clientId)
       throw new UnauthorizedActionError('You can not update this client.');
-
+    
     const {
       cif,
       lastName,
@@ -80,6 +82,8 @@ export const update = async (req, res, next) => {
     let logoFile = req.file;
     if (logoFile === undefined) logoFile = null;
 
+    const userDTO = new UserDTO({ name, lastName, email, password });
+
     const clientDTO = new ClientDTO({
       companyName,
       cif,
@@ -93,10 +97,10 @@ export const update = async (req, res, next) => {
       socialInstagram,
       logoFile,
       id,
+      user: userDTO,
     });
-    const userDTO = new UserDTO({ name, lastName, email, password });
 
-    const client = await ClientService.update(userDTO, clientDTO);
+    const client = await ClientService.update(clientDTO);
     res.status(200).json(client);
   } catch (err) {
     return next(err);
@@ -128,6 +132,7 @@ export const getOne = async (req, res, next) => {
     // throw new UnauthorizedActionError('You can not get this client.');
 
     const clientDTO = new ClientDTO({ id: idParameter, slug: slugParameter });
+
     const client = await ClientService.getOne(clientDTO);
     res.status(200).json(client);
   } catch (err) {

@@ -22,13 +22,4 @@ routes.patch(
   BankAccountController.update,
 );
 
-// routes.delete('/:id', middleware.authorize([Role.Admin]), BankAccountController.remove);
-/*
-routes.get(
-  '/:page?/:limit?',
-  middleware.authorize([Role.Admin, Role.Employee]),
-  BankAccountController.getAll,
-);
-*/
-
 export default routes;

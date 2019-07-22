@@ -20,7 +20,7 @@ export const getOne = async params => {
       );
       return employee;
     } else {
-      return {};
+      return null;
     }
   } catch (err) {
     throw err;
@@ -41,7 +41,7 @@ export const getOneById = async idParameter => {
       );
       return employee;
     } else {
-      return {};
+      return null;
     }
   } catch (err) {
     throw err;
@@ -87,10 +87,7 @@ export const create = async employeeDTOParameter => {
     throw err;
   }
 };
-/*
-let user = await User.create({ ... })
-user = await user.populate('company').execPopulate()
-*/
+
 export const update = async employeeDTOParameter => {
   try {
     if (!(employeeDTOParameter instanceof EmployeeDTO))

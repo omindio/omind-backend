@@ -33,7 +33,7 @@ export const createEmployeeSchema = Joi.object()
     socialInstagram: socialInstagramSchema.optional().allow(''),
     web: webSchema.optional().allow(''),
     createdDate: createdDateSchema.optional().allow(''),
-    user: userSchema.optional().allow(''),
+    user: userSchema.required(),
   })
   .options({ abortEarly: false });
 
@@ -49,7 +49,7 @@ export const updateEmployeeSchema = Joi.object()
     socialInstagram: socialInstagramSchema.optional().allow(''),
     web: webSchema.optional().allow(''),
     createdDate: createdDateSchema.optional().allow(''),
-    user: userSchema.optional().allow(''),
+    user: userSchema.required(),
   })
   .options({ abortEarly: false });
 

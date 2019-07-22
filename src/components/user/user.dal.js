@@ -8,7 +8,11 @@ import { InstanceofError } from '@libraries/Error';
 export const getOneByEmail = async emailParameter => {
   try {
     const user = await UserModel.findOne({ email: emailParameter });
-    return new UserDTO(user);
+    if (user) {
+      return new UserDTO(user);
+    } else {
+      return null;
+    }
   } catch (err) {
     throw err;
   }
@@ -17,7 +21,11 @@ export const getOneByEmail = async emailParameter => {
 export const getOneById = async idParameter => {
   try {
     const user = await UserModel.findById(idParameter);
-    return new UserDTO(user);
+    if (user) {
+      return new UserDTO(user);
+    } else {
+      return null;
+    }
   } catch (err) {
     throw err;
   }

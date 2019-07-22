@@ -16,7 +16,7 @@ export const getOne = async params => {
       });
       return client;
     } else {
-      return {};
+      return null;
     }
   } catch (err) {
     throw err;
@@ -33,7 +33,7 @@ export const getOneById = async idParameter => {
       });
       return client;
     } else {
-      return {};
+      return null;
     }
   } catch (err) {
     throw err;
@@ -52,7 +52,6 @@ export const getAll = async (projection = {}, pagination) => {
     clients.forEach(client => {
       const clientDTO = new ClientDTO(client);
       projection.user = _getUserDTO(client.user);
-      //clientsDTOArray.push(Object.assign({}, clientDTO, projection));
       clientsDTOArray.push(
         Object.assign(Object.create(Object.getPrototypeOf(clientDTO)), clientDTO, projection),
       );

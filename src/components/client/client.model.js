@@ -7,6 +7,7 @@ const ClientSchema = new Schema({
   companyName: {
     type: String,
     required: true,
+    index: true,
   },
   slug: {
     type: String,
@@ -34,10 +35,6 @@ const ClientSchema = new Schema({
     type: String,
     required: false,
   },
-  /*bankAccount: {
-    type: String,
-    required: false,
-  },*/
   published: {
     type: Boolean,
     default: false,
@@ -68,6 +65,6 @@ const ClientSchema = new Schema({
   },
 });
 
-let Client = mongoose.model('Client', ClientSchema);
+const Client = mongoose.model('Client', ClientSchema);
 
 export default Client;

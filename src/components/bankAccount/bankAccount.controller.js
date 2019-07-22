@@ -56,19 +56,6 @@ export const update = async (req, res, next) => {
   }
 };
 
-export const remove = async (req, res, next) => {
-  const idParameter = req.params.id;
-
-  try {
-    if (!idParameter) throw new MissingParameterError(['id']);
-    const bankAccountDTO = new BankAccountDTO({ id: idParameter });
-    await BankAccountService.remove(bankAccountDTO);
-    res.status(204).send();
-  } catch (err) {
-    return next(err);
-  }
-};
-
 export const getOne = async (req, res, next) => {
   const idParameter = req.params.id;
   try {
@@ -77,18 +64,6 @@ export const getOne = async (req, res, next) => {
     const bankAccountDTO = new BankAccountDTO({ id: idParameter });
     const bankAccount = await BankAccountService.getOne(bankAccountDTO);
     res.status(200).json(bankAccount);
-  } catch (err) {
-    return next(err);
-  }
-};
-
-export const getAll = async (req, res, next) => {
-  try {
-    const pageParameter = req.params.page;
-    const limitParameter = req.params.limit;
-
-    const bankAccounts = await BankAccountService.getAll(pageParameter, limitParameter);
-    res.status(200).json(bankAccounts);
   } catch (err) {
     return next(err);
   }

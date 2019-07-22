@@ -38,6 +38,6 @@ const BankAccountSchema = new Schema({
   },
 });
 
-let BankAccount = mongoose.model('BankAccount', BankAccountSchema);
+const BankAccount = mongoose.model('BankAccount', BankAccountSchema);
 
 export default BankAccount;

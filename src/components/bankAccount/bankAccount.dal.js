@@ -49,33 +49,6 @@ export const getOneByUserId = async userIdParameter => {
   }
 };
 
-export const getAll = async (projection = {}, pagination) => {
-  try {
-    const bankAccounts = await BankAccountModel.find({})
-      .sort({ createdDate: 'desc' })
-      .skip(pagination.skip)
-      .limit(pagination.limit);
-    const count = await BankAccountModel.countDocuments();
-    const bankAccountsDTOArray = [];
-    bankAccounts.forEach(bankAccount => {
-      const bankAccountDTO = new BankAccountDTO(bankAccount);
-      bankAccountsDTOArray.push(
-        Object.assign(
-          Object.create(Object.getPrototypeOf(bankAccountDTO)),
-          bankAccountDTO,
-          projection,
-        ),
-      );
-    });
-    return {
-      bankAccounts: bankAccountsDTOArray,
-      count: count,
-    };
-  } catch (err) {
-    throw err;
-  }
-};
-
 export const create = async bankAccountDTOParameter => {
   try {
     if (!(bankAccountDTOParameter instanceof BankAccountDTO))

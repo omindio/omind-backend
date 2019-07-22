@@ -1,0 +1,181 @@
+paths:
+  /projects/{page}/{limit}:
+    get:
+      tags:
+        - projects
+      summary: Get all projects.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+        '403':
+          description: Access denied. Insufficient permission.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: path
+          schema:
+            type: integer
+        - name: limit
+          in: path
+          schema:
+            type: integer
+  /projects:
+    post:
+      tags:
+        - projects
+      summary: Create project.
+      requestBody:
+        $ref: '#/components/requestBodies/Project'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          description: Email already exists
+      security:
+        - bearerAuth: []
+  /projects/{id}:
+    delete:
+      tags:
+        - projects
+      summary: Delete project.
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Project deleted successfully
+        '400':
+          description: Missing id parameter
+        '403':
+          description: Can not delete Admin Project
+        '404':
+          description: Clint not found
+      security:
+        - bearerAuth: []
+    get:
+      tags:
+        - projects
+      summary: Get one project by id.
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: Project not found
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - projects
+      summary: Update one project
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Project'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: Project not found
+      security:
+        - bearerAuth: []
+components:
+  schemas:
+    Project:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        metaDescription:
+          type: string
+        startedDate:
+          type: string
+        finishedDate:
+          type: string
+        published:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        client:
+          type: object
+        #pmo:
+        # type: object
+        #employee:
+        # type: object
+  requestBodies:
+    Project:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              metaDescription:
+                type: string
+              startedDate:
+                type: string
+                format: date
+              finishedDate:
+                type: string
+                format: date
+              published:
+                type: boolean
+                default: false
+              status:
+                type: string
+              #employee:
+              #type: string
+              #pmo:
+              # type: string
+              client:
+                type: string
+              tags:
+                type: array
+                items:
+                  type: string

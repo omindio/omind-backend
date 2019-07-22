@@ -76,7 +76,7 @@ export const remove = async bankAccountDTOParameter => {
     //validate
     await BankAccountValidation.updateBankAccountSchema.validate(bankAccountDTOParameter);
 
-    let BankAccountDTOResult = await BankAccountDAL.getOneById(bankAccountDTOParameter.id);
+    const BankAccountDTOResult = await BankAccountDAL.getOneById(bankAccountDTOParameter.id);
     if (!BankAccountDTOResult.id) throw new BankAccountNotFoundError();
 
     if (BankAccountDTOResult.role === Role.Admin)
@@ -137,23 +137,6 @@ export const getOneByUserId = async userDTOParameter => {
 
     //returns DTO without password
     return BankAccountDTOResult;
-  } catch (err) {
-    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
-    else throw err;
-  }
-};
-
-export const getAll = async (page, limit) => {
-  try {
-    //validate pagination params and return values
-    const pagination = await Pagination.initialize(page, limit);
-    const result = await BankAccountDAL.getAll({ password: undefined }, pagination);
-
-    return {
-      pages: Math.ceil(result.count / pagination.limit),
-      current: pagination.page,
-      bankAccounts: result.bankAccounts,
-    };
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;

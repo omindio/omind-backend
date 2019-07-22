@@ -11,7 +11,9 @@ const idSchema = Joi.string()
 const companyNameSchema = Joi.string()
   .min(2)
   .max(50);
-const descriptionSchema = Joi.string();
+const descriptionSchema = Joi.string()
+  .min(10)
+  .max(1000);
 const logoSchema = Joi.string();
 const slugSchema = Joi.string();
 const cifSchema = Joi.string()
@@ -41,14 +43,13 @@ export const createClientSchema = Joi.object()
     cif: cifSchema.optional().allow(''),
     fiscalAddress: fiscalAddressSchema.optional().allow(''),
     phone: phoneSchema.optional().allow(''),
-    //bankAccount: createdAtSchema.optional(),
     published: publishedSchema.optional().allow(''),
     socialLinkedin: socialLinkedinSchema.optional().allow(''),
     socialFacebook: socialFacebookSchema.optional().allow(''),
     socialInstagram: socialInstagramSchema.optional().allow(''),
     web: webSchema.optional().allow(''),
     createdDate: createdDateSchema.optional().allow(''),
-    user: userSchema.optional().allow(''),
+    user: userSchema.required(),
   })
   .options({ abortEarly: false });
 
@@ -63,14 +64,13 @@ export const updateClientSchema = Joi.object()
     cif: cifSchema.optional().allow(''),
     fiscalAddress: fiscalAddressSchema.optional().allow(''),
     phone: phoneSchema.optional().allow(''),
-    //bankAccount: createdAtSchema.optional(),
     published: publishedSchema.optional().allow(''),
     socialLinkedin: socialLinkedinSchema.optional().allow(''),
     socialFacebook: socialFacebookSchema.optional().allow(''),
     socialInstagram: socialInstagramSchema.optional().allow(''),
     web: webSchema.optional().allow(''),
     createdDate: createdDateSchema.optional().allow(''),
-    user: userSchema.optional().allow(''),
+    user: userSchema.required(),
   })
   .options({ abortEarly: false });
 
@@ -85,7 +85,6 @@ export const getClientSchema = Joi.object()
     cif: cifSchema.optional(),
     fiscalAddress: fiscalAddressSchema.optional(),
     phone: phoneSchema.optional(),
-    //bankAccount: createdAtSchema.optional(),
     published: publishedSchema.optional(),
     socialLinkedin: socialLinkedinSchema.optional(),
     socialFacebook: socialFacebookSchema.optional(),

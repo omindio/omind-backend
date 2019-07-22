@@ -1,5 +1,7 @@
-import * as EmployeeService from './employee.service';
-import EmployeeDTO from './employee.dto';
+import * as ProjectService from './project.service';
+import ProjectDTO from './project.dto';
+
+import { DTO as ClientDTO } from '@components/client';
 
 import { DTO as UserDTO } from '@components/user';
 import { roles as Role } from '@components/user/config';
@@ -9,36 +11,41 @@ import { MissingParameterError, UnauthorizedActionError } from '@libraries/Error
 export const create = async (req, res, next) => {
   try {
     const {
-      dni,
-      lastName,
-      socialInstagram,
       name,
-      socialLinkedin,
-      phone,
-      socialFacebook,
-      web,
-      workPosition,
-      fiscalAddress,
-      password,
-      email,
+      description,
+      metaDescription,
+      startedDate,
+      finishedDate,
+      published,
+      status,
+      tags,
+      employee,
+      pmo,
+      client,
     } = req.body;
 
-    const userDTO = new UserDTO({ name, lastName, email, password });
+    const tagsArray = tags.split(',');
 
-    const employeeDTO = new EmployeeDTO({
-      dni,
-      fiscalAddress,
-      web,
-      socialFacebook,
-      workPosition,
-      phone,
-      socialLinkedin,
-      socialInstagram,
-      user: userDTO,
+    const clientDTO = new ClientDTO({
+      id: client,
     });
 
-    const employee = await EmployeeService.create(employeeDTO);
-    res.status(201).json(employee);
+    const projectDTO = new ProjectDTO({
+      name,
+      description,
+      metaDescription,
+      startedDate,
+      finishedDate,
+      published,
+      status,
+      tags: tagsArray,
+      employee,
+      pmo,
+      client: clientDTO,
+    });
+
+    const employeeResult = await ProjectService.create(projectDTO);
+    res.status(201).json(employeeResult);
   } catch (err) {
     return next(err);
   }
@@ -71,7 +78,7 @@ export const update = async (req, res, next) => {
 
     const userDTO = new UserDTO({ name, lastName, email, password });
 
-    const employeeDTO = new EmployeeDTO({
+    const projectDTO = new ProjectDTO({
       dni,
       fiscalAddress,
       web,
@@ -84,7 +91,7 @@ export const update = async (req, res, next) => {
       user: userDTO,
     });
 
-    const employee = await EmployeeService.update(employeeDTO);
+    const employee = await ProjectService.update(projectDTO);
     res.status(200).json(employee);
   } catch (err) {
     return next(err);
@@ -96,8 +103,8 @@ export const remove = async (req, res, next) => {
 
   try {
     if (!idParameter) throw new MissingParameterError(['id']);
-    const employeeDTO = new EmployeeDTO({ id: idParameter });
-    await EmployeeService.remove(employeeDTO);
+    const projectDTO = new ProjectDTO({ id: idParameter });
+    await ProjectService.remove(projectDTO);
     res.status(204).send();
   } catch (err) {
     return next(err);
@@ -114,9 +121,9 @@ export const getOne = async (req, res, next) => {
     // if (Role.Admin != req.user.role && id != req.user.employeeId)
     // throw new UnauthorizedActionError('You can not get this employee.');
 
-    const employeeDTO = new EmployeeDTO({ id: idParameter });
-    const employee = await EmployeeService.getOne(employeeDTO);
-    res.status(200).json(employee);
+    const projectDTO = new ProjectDTO({ id: idParameter });
+    const project = await ProjectService.getOne(projectDTO);
+    res.status(200).json(project);
   } catch (err) {
     return next(err);
   }
@@ -127,8 +134,8 @@ export const getAll = async (req, res, next) => {
     const pageParameter = req.params.page;
     const limitParameter = req.params.limit;
 
-    const employees = await EmployeeService.getAll(pageParameter, limitParameter);
-    res.status(200).json(employees);
+    const projects = await ProjectService.getAll(pageParameter, limitParameter);
+    res.status(200).json(projects);
   } catch (err) {
     return next(err);
   }

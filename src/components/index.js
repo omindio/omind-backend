@@ -4,6 +4,7 @@ import * as AuthComponent from './auth';
 import * as EmployeeComponent from './employee';
 import * as ContactComponent from './contact';
 import * as BankAccountComponent from './bankAccount';
+import * as ProjectComponent from './project';
 
 export {
   UserComponent,
@@ -12,4 +13,5 @@ export {
   EmployeeComponent,
   ContactComponent,
   BankAccountComponent,
+  ProjectComponent,
 };
