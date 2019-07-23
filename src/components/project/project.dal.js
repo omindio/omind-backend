@@ -35,7 +35,7 @@ export const getOneById = async idParameter => {
       });
       return project;
     } else {
-      return {};
+      return null;
     }
   } catch (err) {
     throw err;

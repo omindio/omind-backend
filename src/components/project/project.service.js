@@ -11,7 +11,7 @@ import * as Pagination from '@libraries/pagination';
 //Global errors
 import { InstanceofError, ValidationSchemaError } from '@libraries/Error';
 //User errors
-import { ProjectNotFoundError, ProjectAlreadyExistsError } from './Error';
+import { ProjectNotFoundError, ProjectAlreadyExistsError, ProjectIsPublishedError } from './Error';
 
 export const create = async projectDTOParameter => {
   try {
@@ -108,7 +108,9 @@ export const remove = async projectDTOParameter => {
     await ProjectValidation.updateProjectSchema.validate(projectDTOParameter);
 
     const employeeDTOResult = await ProjectDAL.getOneById(projectDTOParameter.id);
-    if (!employeeDTOResult.id) throw new ProjectNotFoundError();
+    if (!employeeDTOResult) throw new ProjectNotFoundError();
+
+    if (employeeDTOResult.published) throw new ProjectIsPublishedError();
 
     await ProjectDAL.remove(employeeDTOResult);
   } catch (err) {
