@@ -16,8 +16,8 @@ const descriptionSchema = Joi.string()
 const metaDescriptionSchema = Joi.string()
   .min(2)
   .max(250);
-const startedDateSchema = Joi.date().format('DD-MM-YYY');
-const finishedDateSchema = Joi.date().format('DD-MM-YYY');
+const startedDateSchema = Joi.date();
+const finishedDateSchema = Joi.date();
 const publishedSchema = Joi.boolean();
 const statusSchema = Joi.string()
   .min(1)
