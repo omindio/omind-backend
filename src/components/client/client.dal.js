@@ -84,7 +84,10 @@ export const update = async clientDTOParameter => {
     if (!(clientDTOParameter instanceof ClientDTO))
       throw new InstanceofError('Param sent need to be an ClientDTO.');
 
-    const clientDTOClean = _pickBy(clientDTOParameter, v => v !== null && v !== undefined);
+    const clientDTOClean = _pickBy(
+      clientDTOParameter,
+      v => v !== null && v !== undefined && v !== '',
+    );
     const clientResult = await ClientModel.findOneAndUpdate(
       { _id: clientDTOClean.id },
       clientDTOClean,

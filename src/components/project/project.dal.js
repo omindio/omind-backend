@@ -88,9 +88,10 @@ export const update = async projectDTOParameter => {
     if (!(projectDTOParameter instanceof ProjectDTO))
       throw new InstanceofError('Param sent need to be an ProjectDTO.');
 
-    const projectDTOClean = _pickBy(projectDTOParameter, v => v !== null && v !== undefined);
-    console.log(projectDTOParameter);
-    console.log(projectDTOClean);
+    const projectDTOClean = _pickBy(
+      projectDTOParameter,
+      v => v !== null && v !== undefined && v !== '',
+    );
     const projectResult = await ProjectModel.findOneAndUpdate(
       { _id: projectDTOClean.id },
       projectDTOClean,

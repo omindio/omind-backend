@@ -70,7 +70,7 @@ export const update = async bankAccountDTOParameter => {
 
     const bankAccountDTOClean = _pickBy(
       bankAccountDTOParameter,
-      v => v !== null && v !== undefined,
+      v => v !== null && v !== undefined && v !== '',
     );
     const bankAccountResult = await BankAccountModel.findOneAndUpdate(
       { _id: bankAccountDTOClean.id },

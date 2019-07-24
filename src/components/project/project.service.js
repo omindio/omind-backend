@@ -91,7 +91,6 @@ export const update = async projectDTOParameter => {
 
     const project = await ProjectDAL.update(projectDTO);
 
-    // console.log(project);
     return project;
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);

@@ -93,7 +93,10 @@ export const update = async employeeDTOParameter => {
     if (!(employeeDTOParameter instanceof EmployeeDTO))
       throw new InstanceofError('Param sent need to be an EmployeeDTO.');
 
-    const employeeDTOClean = _pickBy(employeeDTOParameter, v => v !== null && v !== undefined);
+    const employeeDTOClean = _pickBy(
+      employeeDTOParameter,
+      v => v !== null && v !== undefined && v !== '',
+    );
     const employeeResult = await EmployeeModel.findOneAndUpdate(
       { _id: employeeDTOClean.id },
       employeeDTOClean,

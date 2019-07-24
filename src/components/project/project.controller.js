@@ -95,12 +95,9 @@ export const update = async (req, res, next) => {
       client: clientDTO,
     });
 
-    // console.log(projectDTO);
-
     const project = await ProjectService.update(projectDTO);
     res.status(200).json(project);
   } catch (err) {
-    console.log(err);
     return next(err);
   }
 };
