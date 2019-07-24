@@ -3,7 +3,6 @@ import ProjectDTO from './project.dto';
 
 import { DTO as ClientDTO } from '@components/client';
 
-import { DTO as UserDTO } from '@components/user';
 import { roles as Role } from '@components/user/config';
 
 import { MissingParameterError, UnauthorizedActionError } from '@libraries/Error';
@@ -24,7 +23,7 @@ export const create = async (req, res, next) => {
       client,
     } = req.body;
 
-    const tagsArray = tags.split(',');
+    const tagsArray = tags ? tags.split(',') : [];
 
     const clientDTO = new ClientDTO({
       id: client,
@@ -55,45 +54,53 @@ export const update = async (req, res, next) => {
   const idParameter = req.params.id;
   try {
     if (!idParameter) throw new MissingParameterError(['id']);
-    if (Role.Admin != req.user.role && idParameter != req.user.employeeId)
-      throw new UnauthorizedActionError('You can not update this employee.');
+    if (Role.Admin != req.user.role)
+      throw new UnauthorizedActionError('You can not update this project.');
 
     const {
-      dni,
-      lastName,
-      socialInstagram,
       name,
-      socialLinkedin,
-      phone,
-      socialFacebook,
-      web,
-      workPosition,
-      fiscalAddress,
-      password,
-      email,
+      description,
+      metaDescription,
+      startedDate,
+      finishedDate,
+      published,
+      status,
+      tags,
+      employee,
+      pmo,
+      client,
       id,
     } = Object.assign({}, req.body, {
       id: idParameter,
     });
 
-    const userDTO = new UserDTO({ name, lastName, email, password });
+    const tagsArray = tags ? tags.split(',') : [];
 
-    const projectDTO = new ProjectDTO({
-      dni,
-      fiscalAddress,
-      web,
-      socialFacebook,
-      workPosition,
-      phone,
-      socialLinkedin,
-      socialInstagram,
-      id,
-      user: userDTO,
+    const clientDTO = new ClientDTO({
+      id: client,
     });
 
-    const employee = await ProjectService.update(projectDTO);
-    res.status(200).json(employee);
+    const projectDTO = new ProjectDTO({
+      id,
+      name,
+      description,
+      metaDescription,
+      startedDate,
+      finishedDate,
+      published,
+      status,
+      tags: tagsArray,
+      employee,
+      pmo,
+      client: clientDTO,
+    });
+
+    // console.log(projectDTO);
+
+    const project = await ProjectService.update(projectDTO);
+    res.status(200).json(project);
   } catch (err) {
+    console.log(err);
     return next(err);
   }
 };

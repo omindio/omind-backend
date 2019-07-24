@@ -41,7 +41,7 @@ export const update = async tokenDTOParameter => {
     if (!(tokenDTOParameter instanceof TokenDTO))
       throw new InstanceofError('Param sent need to be an TokenDTO.');
 
-    const tokenDTO = _pickBy(tokenDTOParameter);
+    const tokenDTO = _pickBy(tokenDTOParameter, v => v !== null && v !== undefined);
     const token = await TokenModel.findOneAndUpdate({ _id: tokenDTO.id }, tokenDTO, { new: true });
     return new TokenDTO(token);
   } catch (err) {

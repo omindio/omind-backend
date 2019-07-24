@@ -75,7 +75,7 @@ export const update = async userDTOParameter => {
     if (!(userDTOParameter instanceof UserDTO))
       throw new InstanceofError('Param sent need to be an UserDTO.');
 
-    const userDTO = _pickBy(userDTOParameter);
+    const userDTO = _pickBy(userDTOParameter, v => v !== null && v !== undefined);
     const user = await UserModel.findOneAndUpdate({ _id: userDTO.id }, userDTO, {
       new: true,
     });

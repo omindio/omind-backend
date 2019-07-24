@@ -68,7 +68,10 @@ export const update = async bankAccountDTOParameter => {
     if (!(bankAccountDTOParameter instanceof BankAccountDTO))
       throw new InstanceofError('Param sent need to be an BankAccountDTO.');
 
-    const bankAccountDTOClean = _pickBy(bankAccountDTOParameter);
+    const bankAccountDTOClean = _pickBy(
+      bankAccountDTOParameter,
+      v => v !== null && v !== undefined,
+    );
     const bankAccountResult = await BankAccountModel.findOneAndUpdate(
       { _id: bankAccountDTOClean.id },
       bankAccountDTOClean,

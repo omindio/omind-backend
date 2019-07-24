@@ -63,7 +63,7 @@ export const update = async projectDTOParameter => {
     await ProjectValidation.updateProjectSchema.validate(projectDTOParameter);
 
     const projectDTOResult = await ProjectDAL.getOneById(projectDTOParameter.id);
-    if (!projectDTOResult.id) throw new ProjectNotFoundError();
+    if (!projectDTOResult) throw new ProjectNotFoundError();
 
     const newData = {
       client: projectDTOParameter.client.id,
@@ -77,13 +77,10 @@ export const update = async projectDTOParameter => {
       if (projectDTOSlugResult) throw new ProjectAlreadyExistsError();
     }
 
-    //TODO: Returns DTO CLIENT
     //check client
-    if (projectDTOParameter.client.id != projectDTOResult.client) {
-      const projectDTOClientResult = await ProjectDAL.getOne({
-        client: projectDTOParameter.client.id,
-      });
-      newData.client = projectDTOClientResult.id;
+    if (projectDTOParameter.client.id != projectDTOResult.client.id) {
+      const clientDTOResult = await ClientService.getOne(projectDTOParameter.client);
+      newData.client = clientDTOResult.id;
     }
 
     const projectDTO = Object.assign(
@@ -93,6 +90,8 @@ export const update = async projectDTOParameter => {
     );
 
     const project = await ProjectDAL.update(projectDTO);
+
+    // console.log(project);
     return project;
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);

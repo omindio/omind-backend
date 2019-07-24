@@ -78,16 +78,13 @@ export const create = async clientDTOParameter => {
     throw err;
   }
 };
-/*
-let user = await User.create({ ... })
-user = await user.populate('company').execPopulate()
-*/
+
 export const update = async clientDTOParameter => {
   try {
     if (!(clientDTOParameter instanceof ClientDTO))
       throw new InstanceofError('Param sent need to be an ClientDTO.');
 
-    const clientDTOClean = _pickBy(clientDTOParameter);
+    const clientDTOClean = _pickBy(clientDTOParameter, v => v !== null && v !== undefined);
     const clientResult = await ClientModel.findOneAndUpdate(
       { _id: clientDTOClean.id },
       clientDTOClean,

@@ -12,6 +12,7 @@ export const getOne = async params => {
 
     if (projectResult) {
       const projectDTO = new ProjectDTO(projectResult);
+
       const project = Object.assign(Object.create(Object.getPrototypeOf(projectDTO)), projectDTO, {
         client: _getClientDTO(projectResult.client),
       });
@@ -30,6 +31,7 @@ export const getOneById = async idParameter => {
     const projectResult = await ProjectModel.findById(idParameter).populate('client');
     if (projectResult) {
       const projectDTO = new ProjectDTO(projectResult);
+
       const project = Object.assign(Object.create(Object.getPrototypeOf(projectDTO)), projectDTO, {
         client: _getClientDTO(projectResult.client),
       });
@@ -86,7 +88,9 @@ export const update = async projectDTOParameter => {
     if (!(projectDTOParameter instanceof ProjectDTO))
       throw new InstanceofError('Param sent need to be an ProjectDTO.');
 
-    const projectDTOClean = _pickBy(projectDTOParameter);
+    const projectDTOClean = _pickBy(projectDTOParameter, v => v !== null && v !== undefined);
+    console.log(projectDTOParameter);
+    console.log(projectDTOClean);
     const projectResult = await ProjectModel.findOneAndUpdate(
       { _id: projectDTOClean.id },
       projectDTOClean,

@@ -1,6 +1,6 @@
 import { AppError } from '@libraries/Error';
 
-export default class ClientNotFound extends AppError {
+export default class ClientNotFoundError extends AppError {
   constructor(message) {
     super(message || 'Client not found.', 404);
   }

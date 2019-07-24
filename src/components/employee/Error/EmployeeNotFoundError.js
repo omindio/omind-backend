@@ -1,6 +1,6 @@
 import { AppError } from '@libraries/Error';
 
-export default class EmployeeNotFound extends AppError {
+export default class EmployeeNotFoundError extends AppError {
   constructor(message) {
     super(message || 'Employee not found.', 404);
   }
