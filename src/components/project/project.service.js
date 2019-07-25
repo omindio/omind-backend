@@ -3,6 +3,11 @@ import urlSlug from 'url-slug';
 import ProjectDTO from './project.dto';
 import * as ProjectDAL from './project.dal';
 import * as ProjectValidation from './validation/project.validation';
+import {
+  DTO as ProjectImageDTO,
+  Validation as ProjectImageValidation,
+  Service as ProjectImageService,
+} from './components/projectImage';
 
 import { Service as ClientService } from '@components/client';
 
@@ -25,7 +30,6 @@ export const create = async projectDTOParameter => {
     //Call to getOne Client
     await ClientService.getOne(projectDTOParameter.client);
 
-    //TODO: generate slug and check if exists.
     const newData = {
       slug: urlSlug(projectDTOParameter.name),
       client: projectDTOParameter.client.id,
@@ -149,6 +153,125 @@ export const getAll = async (page, limit) => {
       current: pagination.page,
       projects: result.projects,
     };
+  } catch (err) {
+    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
+    else throw err;
+  }
+};
+
+export const addImage = async (projectDTOParameter, projectImageDTOParameter) => {
+  try {
+    if (!(projectDTOParameter instanceof ProjectDTO))
+      throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+    if (!(projectImageDTOParameter instanceof ProjectImageDTO))
+      throw new InstanceofError('Param sent need to be an ProjectImageDTO.');
+
+    await ProjectImageValidation.createProjectImageSchema.validate(projectImageDTOParameter);
+
+    const projectDTOResult = await getOne(projectDTOParameter);
+
+    if (projectImageDTOParameter.main) await ProjectImageService.hasMainImage(projectDTOResult);
+    if (projectImageDTOParameter.coverPage)
+      await ProjectImageService.hasCoverPageImage(projectDTOResult);
+
+    const projectImageDTO = await ProjectImageService.saveFile(projectImageDTOParameter);
+
+    const projectDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(projectDTOResult)),
+      projectDTOResult,
+      {
+        images: projectDTOResult.images.concat([projectImageDTO]),
+      },
+    );
+
+    const project = await update(projectDTO);
+
+    return project;
+  } catch (err) {
+    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
+    else throw err;
+  }
+};
+
+//TODO: Check another way to update. Current are changing IDs after update.
+export const updateImage = async (projectDTOParameter, projectImageDTOParameter) => {
+  try {
+    if (!(projectDTOParameter instanceof ProjectDTO))
+      throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+    if (!(projectImageDTOParameter instanceof ProjectImageDTO))
+      throw new InstanceofError('Param sent need to be an ProjectImageDTO.');
+
+    await ProjectImageValidation.updateProjectImageSchema.validate(projectImageDTOParameter);
+
+    const projectDTOResult = await getOne(projectDTOParameter);
+
+    const newData = {};
+
+    const indexImageDTOResult = await ProjectImageService.getOneById(
+      projectDTOResult,
+      projectImageDTOParameter,
+    );
+
+    if (projectImageDTOParameter.main) await ProjectImageService.hasMainImage(projectDTOResult);
+    if (projectImageDTOParameter.coverPage)
+      await ProjectImageService.hasCoverPageImage(projectDTOResult);
+
+    if (projectImageDTOParameter.imageFile) {
+      //remove file
+      await ProjectImageService.removeFile(projectDTOResult.images[indexImageDTOResult]);
+      //save file
+      const projectImageDTOSaved = await ProjectImageService.saveFile(projectImageDTOParameter);
+      newData.path = projectImageDTOSaved.path;
+    }
+
+    const projectImageDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(projectDTOResult.images[indexImageDTOResult])),
+      projectDTOResult.images[indexImageDTOResult],
+      projectImageDTOParameter,
+      newData,
+    );
+
+    projectDTOResult.images[indexImageDTOResult] = projectImageDTO;
+
+    const project = await update(projectDTOResult);
+    return project;
+  } catch (err) {
+    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
+    else throw err;
+  }
+};
+
+//TODO: Check another way to remove. Current are changing IDs after update.
+export const removeImage = async (projectDTOParameter, projectImageDTOParameter) => {
+  try {
+    if (!(projectDTOParameter instanceof ProjectDTO))
+      throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+    if (!(projectImageDTOParameter instanceof ProjectImageDTO))
+      throw new InstanceofError('Param sent need to be an ProjectImageDTO.');
+
+    await ProjectImageValidation.updateProjectImageSchema.validate(projectImageDTOParameter);
+
+    const projectDTOResult = await getOne(projectDTOParameter);
+    const { projectImageDTORemoved, projectImagesDTOArray } = await ProjectImageService.removeById(
+      projectDTOResult,
+      projectImageDTOParameter,
+    );
+
+    const projectDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(projectDTOResult)),
+      projectDTOResult,
+      {
+        images: projectImagesDTOArray,
+      },
+    );
+
+    const project = await update(projectDTO);
+    await ProjectImageService.removeFile(projectImageDTORemoved);
+
+    return project;
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;

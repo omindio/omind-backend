@@ -75,7 +75,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         vat:
           type: string
         swift:

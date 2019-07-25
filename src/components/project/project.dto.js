@@ -13,6 +13,7 @@ export default class ProjectDTO {
     this.published = data.published;
     this.status = data.status;
     this.tags = data.tags;
+    this.images = data.images;
     this.client = data.client;
     // this.pmo = data.pmo;
     // this.employee = data.employee;

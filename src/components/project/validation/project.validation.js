@@ -24,6 +24,7 @@ const statusSchema = Joi.string()
   .max(2);
 const clientSchema = Joi.object();
 const tagsSchema = Joi.array();
+const imagesSchema = Joi.array();
 const createdDateSchema = Joi.date();
 
 export const createProjectSchema = Joi.object()
@@ -39,6 +40,7 @@ export const createProjectSchema = Joi.object()
     status: statusSchema.required(),
     client: clientSchema.required(),
     tags: tagsSchema.optional().allow(''),
+    images: imagesSchema.optional().allow(''),
     createdDate: createdDateSchema.optional().allow(''),
   })
   .options({ abortEarly: false });
@@ -59,6 +61,7 @@ export const updateProjectSchema = Joi.object()
     status: statusSchema.optional().allow(''),
     client: clientSchema.optional().allow(''),
     tags: tagsSchema.optional().allow(''),
+    images: imagesSchema.optional().allow(''),
     createdDate: createdDateSchema.optional().allow(''),
   })
   .options({ abortEarly: false });
@@ -76,6 +79,7 @@ export const getProjectSchema = Joi.object()
     status: statusSchema.optional(),
     client: clientSchema.optional(),
     tags: tagsSchema.optional(),
+    images: imagesSchema.optional(),
     createdDate: createdDateSchema.optional(),
   })
   .options({ abortEarly: false });

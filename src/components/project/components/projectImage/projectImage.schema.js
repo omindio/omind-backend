@@ -20,7 +20,7 @@ const ProjectImageSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  url: {
+  path: {
     type: String,
     required: true,
   },
@@ -30,6 +30,4 @@ const ProjectImageSchema = new Schema({
   },
 });
 
-const Image = mongoose.model('ProjectImage', ProjectImageSchema);
-
-export default Image;
+export default ProjectImageSchema;

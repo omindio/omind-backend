@@ -1,8 +1,9 @@
 import * as ProjectService from './project.service';
 import ProjectDTO from './project.dto';
 
-import { DTO as ClientDTO } from '@components/client';
+import { DTO as ProjectImageDTO } from './components/projectImage';
 
+import { DTO as ClientDTO } from '@components/client';
 import { roles as Role } from '@components/user/config';
 
 import { MissingParameterError, UnauthorizedActionError } from '@libraries/Error';
@@ -43,8 +44,8 @@ export const create = async (req, res, next) => {
       client: clientDTO,
     });
 
-    const employeeResult = await ProjectService.create(projectDTO);
-    res.status(201).json(employeeResult);
+    const project = await ProjectService.create(projectDTO);
+    res.status(201).json(project);
   } catch (err) {
     return next(err);
   }
@@ -140,6 +141,82 @@ export const getAll = async (req, res, next) => {
 
     const projects = await ProjectService.getAll(pageParameter, limitParameter);
     res.status(200).json(projects);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const addImage = async (req, res, next) => {
+  const projectIdParameter = req.params.projectId;
+  try {
+    if (!projectIdParameter) throw new MissingParameterError(['projectId']);
+
+    const { title, main, coverPage, published } = req.body;
+
+    let imageFile = req.file;
+    if (imageFile === undefined) imageFile = null;
+
+    const projectImageDTO = new ProjectImageDTO({
+      title,
+      main: typeof main === 'string' ? main === 'true' : main,
+      coverPage: typeof coverPage === 'string' ? coverPage === 'true' : coverPage,
+      published: typeof published === 'string' ? published === 'true' : published,
+      imageFile,
+    });
+
+    const projectDTO = new ProjectDTO({ id: projectIdParameter });
+
+    const projectImage = await ProjectService.addImage(projectDTO, projectImageDTO);
+
+    res.status(201).json(projectImage);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const updateImage = async (req, res, next) => {
+  const projectIdParameter = req.params.projectId;
+  const imageIdParameter = req.params.imageId;
+  try {
+    if (!projectIdParameter) throw new MissingParameterError(['projectId']);
+    if (!imageIdParameter) throw new MissingParameterError(['imageId']);
+
+    const { title, main, coverPage, published } = req.body;
+
+    let imageFile = req.file;
+    if (imageFile === undefined) imageFile = null;
+
+    const projectImageDTO = new ProjectImageDTO({
+      id: imageIdParameter,
+      title,
+      main: typeof main === 'string' ? main === 'true' : main,
+      coverPage: typeof coverPage === 'string' ? coverPage === 'true' : coverPage,
+      published: typeof published === 'string' ? published === 'true' : published,
+      imageFile,
+    });
+
+    const projectDTO = new ProjectDTO({ id: projectIdParameter });
+
+    const projectImage = await ProjectService.updateImage(projectDTO, projectImageDTO);
+
+    res.status(201).json(projectImage);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const removeImage = async (req, res, next) => {
+  const projectIdParameter = req.params.projectId;
+  const imageIdParameter = req.params.imageId;
+  try {
+    if (!projectIdParameter) throw new MissingParameterError(['projectId']);
+    if (!imageIdParameter) throw new MissingParameterError(['imageId']);
+
+    const projectImageDTO = new ProjectImageDTO({ id: imageIdParameter });
+    const projectDTO = new ProjectDTO({ id: projectIdParameter });
+
+    await ProjectService.removeImage(projectDTO, projectImageDTO);
+    res.status(204).send();
   } catch (err) {
     return next(err);
   }

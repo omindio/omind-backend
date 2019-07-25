@@ -140,7 +140,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         companyName:
           type: string
         slug:

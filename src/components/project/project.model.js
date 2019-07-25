@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-// import { projectImage, projectVideo } from './components';
+import { projectImage } from './components';
 
 const Schema = mongoose.Schema;
 
@@ -57,10 +57,8 @@ const ProjectSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Employee',
   },
-
-  images: [projectImage.Model],
-  videos: [projectVideo.Model],
-   */
+  */
+  images: [projectImage.Schema],
   createdDate: {
     type: Date,
     default: Date.now,

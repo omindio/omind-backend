@@ -1,4 +1,74 @@
 paths:
+  /projects/{projectId}/images:
+    post:
+      parameters:
+        - name: projectId
+          in: path
+          schema:
+            type: string
+      tags:
+        - projects
+      summary: Add image.
+      requestBody:
+        $ref: '#/components/requestBodies/ProjectImage'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectImage'
+      security:
+        - bearerAuth: []
+  /projects/{projectId}/images/{imageId}:
+    delete:
+      tags:
+        - projects
+      summary: Delete image.
+      parameters:
+        - name: projectId
+          in: path
+          schema:
+            type: string
+        - name: imageId
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Image deleted successfully
+        '400':
+          description: Missing id parameter
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - projects
+      summary: Update image
+      parameters:
+        - name: projectId
+          in: path
+          schema:
+            type: string
+        - name: imageId
+          in: path
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/ProjectImage'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectImage'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: Image not found
+      security:
+        - bearerAuth: []
   /projects/{page}/{limit}:
     get:
       tags:
@@ -113,11 +183,27 @@ paths:
         - bearerAuth: []
 components:
   schemas:
+    ProjectImage:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        main:
+          type: boolean
+        coverPage:
+          type: boolean
+        published:
+          type: boolean
+        path:
+          type: string
+
     Project:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         name:
           type: string
         slug:
@@ -140,11 +226,29 @@ components:
             type: string
         client:
           type: object
-        #pmo:
-        # type: object
+        images:
+          type: array
         #employee:
         # type: object
   requestBodies:
+    ProjectImage:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              main:
+                type: boolean
+              coverPage:
+                type: boolean
+              published:
+                type: boolean
+              imageFile:
+                type: string
+                format: binary
     Project:
       required: true
       content:

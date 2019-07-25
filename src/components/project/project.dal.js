@@ -5,6 +5,7 @@ import ProjectDTO from './project.dto';
 
 import { InstanceofError } from '@libraries/Error';
 import { DTO as ClientDTO } from '@components/client';
+import { DTO as ProjectImageDTO } from './components/projectImage';
 
 export const getOne = async params => {
   try {
@@ -15,6 +16,7 @@ export const getOne = async params => {
 
       const project = Object.assign(Object.create(Object.getPrototypeOf(projectDTO)), projectDTO, {
         client: _getClientDTO(projectResult.client),
+        images: _getProjectImagesDTOArray(projectResult.images),
       });
 
       return project;
@@ -34,6 +36,7 @@ export const getOneById = async idParameter => {
 
       const project = Object.assign(Object.create(Object.getPrototypeOf(projectDTO)), projectDTO, {
         client: _getClientDTO(projectResult.client),
+        images: _getProjectImagesDTOArray(projectResult.images),
       });
       return project;
     } else {
@@ -56,6 +59,7 @@ export const getAll = async (projection = {}, pagination) => {
     projects.forEach(project => {
       const projectDTO = new ProjectDTO(project);
       projection.client = _getClientDTO(project.client);
+      projection.images = _getProjectImagesDTOArray(project.images);
       projectsDTOArray.push(
         Object.assign(Object.create(Object.getPrototypeOf(projectDTO)), projectDTO, projection),
       );
@@ -102,6 +106,7 @@ export const update = async projectDTOParameter => {
     const projectDTO = new ProjectDTO(projectResult);
     const project = Object.assign(Object.create(Object.getPrototypeOf(projectDTO)), projectDTO, {
       client: _getClientDTO(projectResult.client),
+      images: _getProjectImagesDTOArray(projectResult.images),
     });
     return project;
   } catch (err) {
@@ -123,4 +128,22 @@ export const remove = async projectDTOParameter => {
 const _getClientDTO = client => {
   const clientDTO = new ClientDTO(client);
   return Object.assign(Object.create(Object.getPrototypeOf(clientDTO)), clientDTO, {});
+};
+
+const _getProjectImagesDTOArray = projectImagesArray => {
+  const projectImagesDTOArray = [];
+
+  projectImagesArray.forEach(projectImage => {
+    const projectImageDTO = _getProjectImageDTO(projectImage);
+    projectImagesDTOArray.push(
+      Object.assign(Object.create(Object.getPrototypeOf(projectImageDTO)), projectImageDTO, {}),
+    );
+  });
+
+  return projectImagesDTOArray;
+};
+
+const _getProjectImageDTO = projectImage => {
+  const projectImageDTO = new ProjectImageDTO(projectImage);
+  return Object.assign(Object.create(Object.getPrototypeOf(projectImageDTO)), projectImageDTO, {});
 };

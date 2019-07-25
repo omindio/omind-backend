@@ -5,8 +5,8 @@ import sharp from 'sharp';
 export default class ImageResize {
   constructor(folder, width, height) {
     this.folder = folder;
-    this.width = width || 300;
-    this.height = height || 300;
+    this.width = width || 960;
+    this.height = height || 748;
   }
   async save(buffer) {
     const filename = ImageResize.filename();
