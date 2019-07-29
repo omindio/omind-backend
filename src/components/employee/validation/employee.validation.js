@@ -53,6 +53,22 @@ export const updateEmployeeSchema = Joi.object()
   })
   .options({ abortEarly: false });
 
+export const removeEmployeeSchema = Joi.object()
+  .keys({
+    id: idSchema.required(),
+    workPosition: workPositionSchema.optional().allow(''),
+    dni: dniSchema.optional().allow(''),
+    fiscalAddress: fiscalAddressSchema.optional().allow(''),
+    phone: phoneSchema.optional().allow(''),
+    socialLinkedin: socialLinkedinSchema.optional().allow(''),
+    socialFacebook: socialFacebookSchema.optional().allow(''),
+    socialInstagram: socialInstagramSchema.optional().allow(''),
+    web: webSchema.optional().allow(''),
+    createdDate: createdDateSchema.optional().allow(''),
+    user: userSchema.optional().allow(''),
+  })
+  .options({ abortEarly: false });
+
 export const getEmployeeSchema = Joi.object()
   .keys({
     id: idSchema.required(),

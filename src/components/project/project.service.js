@@ -16,7 +16,13 @@ import * as Pagination from '@libraries/pagination';
 //Global errors
 import { InstanceofError, ValidationSchemaError } from '@libraries/Error';
 //User errors
-import { ProjectNotFoundError, ProjectAlreadyExistsError, ProjectIsPublishedError } from './Error';
+import {
+  ProjectNotFoundError,
+  ProjectAlreadyExistsError,
+  ProjectIsPublishedError,
+  MainImageAlreadyExistsError,
+  CoverPageImageAlreadyExistsError,
+} from './Error';
 
 export const create = async projectDTOParameter => {
   try {
@@ -39,7 +45,7 @@ export const create = async projectDTOParameter => {
     const projectDTOResult = await ProjectDAL.getOne({ slug: newData.slug });
     if (projectDTOResult) throw new ProjectAlreadyExistsError();
 
-    //Check if date start is minor than date end --> DID IN VALIDATION
+    //Check if date start is minor than date end --> DO IN VALIDATION
     // if (projectDTOParameter.startedDate > projectDTOParameter.finishedDate)
     // throw new ProjectInvalidDateError('Start date can not be greater than Finish.');
 
@@ -92,6 +98,20 @@ export const update = async projectDTOParameter => {
       projectDTOParameter,
       newData,
     );
+
+    //If publish = true check if has main & cover page images.
+    if (projectDTO.published) {
+      const hasMainImage = await ProjectImageService.hasMainImage(projectDTOResult, false);
+      if (!hasMainImage)
+        throw new MainImageAlreadyExistsError(
+          'Can not publish project if does not exists main image.',
+        );
+      const hasCoverPage = await ProjectImageService.hasCoverPageImage(projectDTOResult, false);
+      if (!hasCoverPage)
+        throw new CoverPageImageAlreadyExistsError(
+          'Can not publish project if does not exists cover page image.',
+        );
+    }
 
     const project = await ProjectDAL.update(projectDTO);
 

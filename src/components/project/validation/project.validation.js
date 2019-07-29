@@ -36,7 +36,7 @@ export const createProjectSchema = Joi.object()
     metaDescription: metaDescriptionSchema.optional().allow(''),
     startedDate: startedDateSchema.required(),
     finishedDate: finishedDateSchema.greater(Joi.ref('startedDate')).required(),
-    published: publishedSchema.required(),
+    published: publishedSchema.optional().allow(''),
     status: statusSchema.required(),
     client: clientSchema.required(),
     tags: tagsSchema.optional().allow(''),

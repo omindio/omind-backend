@@ -116,7 +116,7 @@ export const remove = async employeeDTOParameter => {
     if (!(employeeDTOParameter instanceof EmployeeDTO))
       throw new InstanceofError('Param sent need to be an EmployeeDTO.');
     //validate
-    await EmployeeValidation.updateEmployeeSchema.validate(employeeDTOParameter);
+    await EmployeeValidation.removeEmployeeSchema.validate(employeeDTOParameter);
 
     const employeeDTOResult = await EmployeeDAL.getOneById(employeeDTOParameter.id);
     if (!employeeDTOResult) throw new EmployeeNotFoundError();

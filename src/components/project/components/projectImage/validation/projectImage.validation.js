@@ -1,7 +1,4 @@
-import BaseJoi from '@hapi/joi';
-import JoiDate from '@hapi/joi-date';
-
-const Joi = BaseJoi.extend(JoiDate);
+import Joi from '@hapi/joi';
 
 const idSchema = Joi.string()
   .alphanum()

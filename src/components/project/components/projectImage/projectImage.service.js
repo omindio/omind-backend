@@ -4,6 +4,11 @@ import appRoot from 'app-root-path';
 import { ImageResize } from '@libraries';
 import { InstanceofError, MissingParameterError } from '@libraries/Error';
 
+import {
+  MainImageAlreadyExistsError,
+  ImageNotFoundError,
+  CoverPageImageAlreadyExistsError,
+} from '../../Error';
 import ProjectDTO from '../../project.dto';
 import ProjectImageDTO from './projectImage.dto';
 
@@ -22,7 +27,7 @@ export const getOneById = async (ProjectDTOParameter, projectImageDTOParameter) 
     });
 
     if ((projectImageDTO != 0 && !projectImageDTO) || projectImageDTO === -1)
-      throw new Error('Image does not exists.');
+      throw new ImageNotFoundError('Image does not exists.');
 
     return projectImageDTO;
   } catch (err) {
@@ -65,13 +70,20 @@ export const removeById = async (projectDTOParameter, projectImageDTOParameter) 
 };
 
 //will return main image index or null
-export const hasMainImage = async projectDTOParameter => {
+export const hasMainImage = async (projectDTOParameter, throwException = true) => {
   try {
     if (!(projectDTOParameter instanceof ProjectDTO))
       throw new InstanceofError('Param sent need to be an ProjectDTO.');
 
     projectDTOParameter.images.map(image => {
-      if (image.main) throw new Error('Can not add this image as main because another exists.');
+      if (image.main)
+        if (throwException) {
+          throw new MainImageAlreadyExistsError(
+            'Can not add this image as main because another exists.',
+          );
+        } else {
+          return true;
+        }
     });
   } catch (err) {
     throw err;
@@ -79,14 +91,20 @@ export const hasMainImage = async projectDTOParameter => {
 };
 
 //will return coverPageImage index or null
-export const hasCoverPageImage = async projectDTOParameter => {
+export const hasCoverPageImage = async (projectDTOParameter, throwException = true) => {
   try {
     if (!(projectDTOParameter instanceof ProjectDTO))
       throw new InstanceofError('Param sent need to be an ProjectDTO.');
 
     projectDTOParameter.images.map(image => {
       if (image.coverPage)
-        throw new Error('Can not add this image as cover page because another exists.');
+        if (throwException) {
+          throw new CoverPageImageAlreadyExistsError(
+            'Can not add this image as cover page because another exists.',
+          );
+        } else {
+          return true;
+        }
     });
   } catch (err) {
     throw err;

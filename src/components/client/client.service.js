@@ -154,7 +154,7 @@ export const remove = async clientDTOParameter => {
       throw new InstanceofError('Param sent need to be an ClientDTO.');
 
     //validate
-    await ClientValidation.updateClientSchema.validate(clientDTOParameter);
+    await ClientValidation.removeClientSchema.validate(clientDTOParameter);
 
     const clientDTOResult = await ClientDAL.getOneById(clientDTOParameter.id);
     if (!clientDTOResult) throw new ClientNotFoundError();
