@@ -234,8 +234,12 @@ export const updateImage = async (projectDTOParameter, projectImageDTOParameter)
       projectImageDTOParameter,
     );
 
-    if (projectImageDTOParameter.main) await ProjectImageService.hasMainImage(projectDTOResult);
-    if (projectImageDTOParameter.coverPage)
+    if (!projectDTOResult.images[indexImageDTOResult].main && projectImageDTOParameter.main)
+      await ProjectImageService.hasMainImage(projectDTOResult);
+    if (
+      !projectDTOResult.images[indexImageDTOResult].coverPage &&
+      projectImageDTOParameter.coverPage
+    )
       await ProjectImageService.hasCoverPageImage(projectDTOResult);
 
     if (projectImageDTOParameter.imageFile) {
