@@ -31,7 +31,7 @@ export const getOneById = async idParameter => {
   }
 };
 
-export const getAll = async (projection = {}, pagination) => {
+export const getAll = async (excludeFields = {}, pagination) => {
   try {
     const users = await UserModel.find({})
       .sort({ createdDate: 'desc' })
@@ -41,10 +41,9 @@ export const getAll = async (projection = {}, pagination) => {
     const usersDTOArray = [];
 
     users.forEach(user => {
-      let userDTO = new UserDTO(user);
-      //usersDTOArray.push(Object.assign({}, userDTO, projection));
+      const userDTO = new UserDTO(user);
       usersDTOArray.push(
-        Object.assign(Object.create(Object.getPrototypeOf(userDTO)), userDTO, projection),
+        Object.assign(Object.create(Object.getPrototypeOf(userDTO)), userDTO, excludeFields),
       );
     });
     return {

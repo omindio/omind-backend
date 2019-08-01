@@ -2,22 +2,31 @@
 import _pickBy from 'lodash.pickby';
 import ProjectModel from './project.model';
 import ProjectDTO from './project.dto';
+import { DTO as ProjectImageDTO } from './components/projectImage';
 
 import { InstanceofError } from '@libraries/Error';
 import { DTO as ClientDTO } from '@components/client';
-import { DTO as ProjectImageDTO } from './components/projectImage';
 
-export const getOne = async params => {
+export const getOne = async (params, excludeFields = {}) => {
   try {
-    const projectResult = await ProjectModel.findOne(params).populate('client');
+    const projectResult = await ProjectModel.findOne(params).populate({
+      path: 'client',
+      select:
+        '_id companyName slug description logo socialLinkedin socialFacebook socialInstagram web',
+    });
 
     if (projectResult) {
       const projectDTO = new ProjectDTO(projectResult);
 
-      const project = Object.assign(Object.create(Object.getPrototypeOf(projectDTO)), projectDTO, {
-        client: _getClientDTO(projectResult.client),
-        images: _getProjectImagesDTOArray(projectResult.images),
-      });
+      const project = Object.assign(
+        Object.create(Object.getPrototypeOf(projectDTO)),
+        projectDTO,
+        {
+          client: _getClientDTO(projectResult.client),
+          images: _getProjectImagesDTOArray(projectResult.images),
+        },
+        excludeFields,
+      );
 
       return project;
     } else {
@@ -30,7 +39,11 @@ export const getOne = async params => {
 
 export const getOneById = async idParameter => {
   try {
-    const projectResult = await ProjectModel.findById(idParameter).populate('client');
+    const projectResult = await ProjectModel.findById(idParameter).populate({
+      path: 'client',
+      select:
+        '_id companyName slug description logo socialLinkedin socialFacebook socialInstagram web',
+    });
     if (projectResult) {
       const projectDTO = new ProjectDTO(projectResult);
 
@@ -47,21 +60,33 @@ export const getOneById = async idParameter => {
   }
 };
 
-export const getAll = async (projection = {}, pagination) => {
+export const getAll = async (excludeFields = {}, pagination, filter = {}) => {
   try {
-    const projects = await ProjectModel.find({})
-      .populate('client')
+    const projects = await ProjectModel.find(filter)
+      .populate({
+        path: 'client',
+        select:
+          '_id companyName slug description logo socialLinkedin socialFacebook socialInstagram web',
+      })
       .sort({ createdDate: 'desc' })
       .skip(pagination.skip)
       .limit(pagination.limit);
+
     const count = await ProjectModel.countDocuments();
     const projectsDTOArray = [];
+
     projects.forEach(project => {
       const projectDTO = new ProjectDTO(project);
-      projection.client = _getClientDTO(project.client);
-      projection.images = _getProjectImagesDTOArray(project.images);
+      const client = _getClientDTO(project.client);
+      const images = _getProjectImagesDTOArray(project.images);
+
       projectsDTOArray.push(
-        Object.assign(Object.create(Object.getPrototypeOf(projectDTO)), projectDTO, projection),
+        Object.assign(
+          Object.create(Object.getPrototypeOf(projectDTO)),
+          projectDTO,
+          { client, images },
+          excludeFields,
+        ),
       );
     });
     return {
@@ -102,7 +127,11 @@ export const update = async projectDTOParameter => {
       {
         new: true,
       },
-    ).populate('client');
+    ).populate({
+      path: 'client',
+      select:
+        '_id companyName slug description logo socialLinkedin socialFacebook socialInstagram web',
+    });
     const projectDTO = new ProjectDTO(projectResult);
     const project = Object.assign(Object.create(Object.getPrototypeOf(projectDTO)), projectDTO, {
       client: _getClientDTO(projectResult.client),
@@ -120,6 +149,94 @@ export const remove = async projectDTOParameter => {
 
   try {
     await ProjectModel.findOneAndRemove({ _id: projectDTOParameter.id });
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const addImage = async (projectDTOParameter, projectImageDTOParameter) => {
+  if (!(projectDTOParameter instanceof ProjectDTO))
+    throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+  if (!(projectImageDTOParameter instanceof ProjectImageDTO))
+    throw new InstanceofError('Param sent need to be an ProjectImageDTO.');
+
+  try {
+    const projectModel = await ProjectModel.findById(projectDTOParameter.id);
+
+    if (projectModel) {
+      projectModel.images.push(projectImageDTOParameter);
+      const project = await projectModel.save();
+
+      const projectDTO = Object.assign(
+        Object.create(Object.getPrototypeOf(projectDTOParameter)),
+        projectDTOParameter,
+        project.toJSON(),
+      );
+      return projectDTO;
+    }
+    return null;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const updateImage = async (projectDTOParameter, projectImageDTOParameter) => {
+  if (!(projectDTOParameter instanceof ProjectDTO))
+    throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+  if (!(projectImageDTOParameter instanceof ProjectImageDTO))
+    throw new InstanceofError('Param sent need to be an ProjectImageDTO.');
+
+  try {
+    const projectModel = await ProjectModel.findById(projectDTOParameter.id);
+
+    if (projectModel) {
+      const image = projectModel.images.id(projectImageDTOParameter.id);
+      if (!image) return null;
+
+      image.set(projectImageDTOParameter);
+
+      const project = await projectModel.save();
+
+      const projectDTO = Object.assign(
+        Object.create(Object.getPrototypeOf(projectDTOParameter)),
+        projectDTOParameter,
+        project.toJSON(),
+      );
+
+      return { projectDTO, projectImageDTO: _getProjectImageDTO(image) };
+    }
+    return null;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const removeImage = async (projectDTOParameter, projectImageDTOParameter) => {
+  if (!(projectDTOParameter instanceof ProjectDTO))
+    throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+  if (!(projectImageDTOParameter instanceof ProjectImageDTO))
+    throw new InstanceofError('Param sent need to be an ProjectImageDTO.');
+
+  try {
+    const projectModel = await ProjectModel.findById(projectDTOParameter.id);
+
+    if (projectModel) {
+      const image = projectModel.images.id(projectImageDTOParameter.id);
+      if (!image) return null;
+
+      projectModel.images.pull(projectImageDTOParameter.id);
+      const project = await projectModel.save();
+      const projectDTO = Object.assign(
+        Object.create(Object.getPrototypeOf(projectDTOParameter)),
+        projectDTOParameter,
+        project.toJSON(),
+      );
+      return { projectDTO, projectImageDTORemoved: _getProjectImageDTO(image) };
+    }
+    return null;
   } catch (err) {
     throw err;
   }

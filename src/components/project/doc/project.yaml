@@ -1,4 +1,44 @@
 paths:
+  /public/projects/{page}/{limit}:
+    get:
+      tags:
+        - projects
+      summary: Get all public projects.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+      parameters:
+        - name: page
+          in: path
+          schema:
+            type: integer
+        - name: limit
+          in: path
+          schema:
+            type: integer
+  /public/projects/{slug}:
+    get:
+      tags:
+        - projects
+      summary: Get one public project by slug.
+      parameters:
+        - name: slug
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
   /projects/{projectId}/images:
     post:
       parameters:

@@ -9,6 +9,7 @@ import {
   ImageNotFoundError,
   CoverPageImageAlreadyExistsError,
 } from '../../Error';
+
 import ProjectDTO from '../../project.dto';
 import ProjectImageDTO from './projectImage.dto';
 
@@ -36,6 +37,7 @@ export const getOneById = async (ProjectDTOParameter, projectImageDTOParameter) 
 };
 
 //will return object of array of imagesDTO result and imageDTORemoved or exception
+/*
 export const removeById = async (projectDTOParameter, projectImageDTOParameter) => {
   try {
     if (!(projectDTOParameter instanceof ProjectDTO))
@@ -64,10 +66,12 @@ export const removeById = async (projectDTOParameter, projectImageDTOParameter) 
       projectImageDTORemoved: imageDTOResult,
       projectImagesDTOArray: imagesDTOArrayFiltered,
     };
+
   } catch (err) {
     throw err;
   }
 };
+ */
 
 //will return main image index or null
 export const hasMainImage = async (projectDTOParameter, throwException = true) => {
@@ -85,6 +89,7 @@ export const hasMainImage = async (projectDTOParameter, throwException = true) =
           return true;
         }
     });
+    return false;
   } catch (err) {
     throw err;
   }
@@ -106,6 +111,7 @@ export const hasCoverPageImage = async (projectDTOParameter, throwException = tr
           return true;
         }
     });
+    return false;
   } catch (err) {
     throw err;
   }

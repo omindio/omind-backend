@@ -119,11 +119,6 @@ export const getOne = async (req, res, next) => {
   try {
     if (!idParameter) throw new MissingParameterError(['id']);
 
-    //Check Owner of employee.
-    //TODO: Por ahora comprobaremos la propiedad en el update.
-    // if (Role.Admin != req.user.role && id != req.user.employeeId)
-    // throw new UnauthorizedActionError('You can not get this employee.');
-
     const projectDTO = new ProjectDTO({ id: idParameter });
     const project = await ProjectService.getOne(projectDTO);
     res.status(200).json(project);
@@ -215,6 +210,31 @@ export const removeImage = async (req, res, next) => {
 
     await ProjectService.removeImage(projectDTO, projectImageDTO);
     res.status(204).send();
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const publicGetAll = async (req, res, next) => {
+  try {
+    const pageParameter = req.params.page;
+    const limitParameter = req.params.limit;
+
+    const projects = await ProjectService.publicGetAll(pageParameter, limitParameter);
+    res.status(200).json(projects);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const publicGetOne = async (req, res, next) => {
+  const slugParameter = req.params.slug;
+  try {
+    if (!slugParameter) throw new MissingParameterError(['slug']);
+
+    const projectDTO = new ProjectDTO({ slug: slugParameter });
+    const project = await ProjectService.publicGetOne(projectDTO);
+    res.status(200).json(project);
   } catch (err) {
     return next(err);
   }

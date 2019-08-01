@@ -1,5 +1,5 @@
 paths:
-  /contact/send:
+  /public/contact/send:
     post:
       tags:
         - contact

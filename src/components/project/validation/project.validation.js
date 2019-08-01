@@ -83,3 +83,21 @@ export const getProjectSchema = Joi.object()
     createdDate: createdDateSchema.optional(),
   })
   .options({ abortEarly: false });
+
+export const getPublicProjectSchema = Joi.object()
+  .keys({
+    id: idSchema.optional(),
+    name: nameSchema.optional(),
+    description: descriptionSchema.optional(),
+    slug: slugSchema.required(),
+    metaDescription: metaDescriptionSchema.optional(),
+    startedDate: startedDateSchema.optional(),
+    finishedDate: finishedDateSchema.optional(),
+    published: publishedSchema.optional(),
+    status: statusSchema.optional(),
+    client: clientSchema.optional(),
+    tags: tagsSchema.optional(),
+    images: imagesSchema.optional(),
+    createdDate: createdDateSchema.optional(),
+  })
+  .options({ abortEarly: false });

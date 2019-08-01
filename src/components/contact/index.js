@@ -1,7 +1,7 @@
 import routes from './contact.routes';
 
 const initialize = async app => {
-  app.use('/contact', routes);
+  app.use('/public/contact', routes);
 };
 
 export { initialize };

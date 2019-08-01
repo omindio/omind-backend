@@ -102,12 +102,12 @@ export const update = async projectDTOParameter => {
     //If publish = true check if has main & cover page images.
     if (projectDTO.published) {
       const hasMainImage = await ProjectImageService.hasMainImage(projectDTOResult, false);
-      if (!hasMainImage)
+      if (hasMainImage)
         throw new MainImageAlreadyExistsError(
           'Can not publish project if does not exists main image.',
         );
       const hasCoverPage = await ProjectImageService.hasCoverPageImage(projectDTOResult, false);
-      if (!hasCoverPage)
+      if (hasCoverPage)
         throw new CoverPageImageAlreadyExistsError(
           'Can not publish project if does not exists cover page image.',
         );
@@ -129,12 +129,12 @@ export const remove = async projectDTOParameter => {
     //validate
     await ProjectValidation.updateProjectSchema.validate(projectDTOParameter);
 
-    const employeeDTOResult = await ProjectDAL.getOneById(projectDTOParameter.id);
-    if (!employeeDTOResult) throw new ProjectNotFoundError();
+    const projectDTOResult = await ProjectDAL.getOneById(projectDTOParameter.id);
+    if (!projectDTOResult) throw new ProjectNotFoundError();
 
-    if (employeeDTOResult.published) throw new ProjectIsPublishedError();
+    if (projectDTOResult.published) throw new ProjectIsPublishedError();
 
-    await ProjectDAL.remove(employeeDTOResult);
+    await ProjectDAL.remove(projectDTOResult);
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
@@ -150,12 +150,12 @@ export const getOne = async projectDTOParameter => {
     await ProjectValidation.getProjectSchema.validate(projectDTOParameter);
 
     //check if exists id and if not find by email
-    const employeeDTOResult = await ProjectDAL.getOneById(projectDTOParameter.id);
+    const projectDTOResult = await ProjectDAL.getOneById(projectDTOParameter.id);
 
-    if (!employeeDTOResult || !employeeDTOResult.id) throw new ProjectNotFoundError();
+    if (!projectDTOResult) throw new ProjectNotFoundError();
 
     //returns DTO without password
-    return employeeDTOResult;
+    return projectDTOResult;
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
@@ -189,25 +189,13 @@ export const addImage = async (projectDTOParameter, projectImageDTOParameter) =>
 
     await ProjectImageValidation.createProjectImageSchema.validate(projectImageDTOParameter);
 
-    const projectDTOResult = await getOne(projectDTOParameter);
-
-    if (projectImageDTOParameter.main) await ProjectImageService.hasMainImage(projectDTOResult);
-    if (projectImageDTOParameter.coverPage)
-      await ProjectImageService.hasCoverPageImage(projectDTOResult);
-
     const projectImageDTO = await ProjectImageService.saveFile(projectImageDTOParameter);
 
-    const projectDTO = Object.assign(
-      Object.create(Object.getPrototypeOf(projectDTOResult)),
-      projectDTOResult,
-      {
-        images: projectDTOResult.images.concat([projectImageDTO]),
-      },
-    );
+    const projectDTO = await ProjectDAL.addImage(projectDTOParameter, projectImageDTO);
 
-    const project = await update(projectDTO);
+    if (!projectDTO) throw new ProjectNotFoundError('Project or Image does not exists.');
 
-    return project;
+    return projectDTO;
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
@@ -225,10 +213,9 @@ export const updateImage = async (projectDTOParameter, projectImageDTOParameter)
 
     await ProjectImageValidation.updateProjectImageSchema.validate(projectImageDTOParameter);
 
-    const projectDTOResult = await getOne(projectDTOParameter);
-
     const newData = {};
 
+    const projectDTOResult = await getOne(projectDTOParameter);
     const indexImageDTOResult = await ProjectImageService.getOneById(
       projectDTOResult,
       projectImageDTOParameter,
@@ -236,6 +223,7 @@ export const updateImage = async (projectDTOParameter, projectImageDTOParameter)
 
     if (!projectDTOResult.images[indexImageDTOResult].main && projectImageDTOParameter.main)
       await ProjectImageService.hasMainImage(projectDTOResult);
+
     if (
       !projectDTOResult.images[indexImageDTOResult].coverPage &&
       projectImageDTOParameter.coverPage
@@ -249,25 +237,29 @@ export const updateImage = async (projectDTOParameter, projectImageDTOParameter)
       const projectImageDTOSaved = await ProjectImageService.saveFile(projectImageDTOParameter);
       newData.path = projectImageDTOSaved.path;
     }
+    newData.title = projectImageDTOParameter.title;
+    newData.imageFile = projectImageDTOParameter.imageFile;
+    newData.main = projectImageDTOParameter.main;
+    newData.coverPage = projectImageDTOParameter.coverPage;
+    newData.published = projectImageDTOParameter.published;
 
     const projectImageDTO = Object.assign(
       Object.create(Object.getPrototypeOf(projectDTOResult.images[indexImageDTOResult])),
       projectDTOResult.images[indexImageDTOResult],
-      projectImageDTOParameter,
       newData,
     );
 
-    projectDTOResult.images[indexImageDTOResult] = projectImageDTO;
+    const { projectDTO } = await ProjectDAL.updateImage(projectDTOParameter, projectImageDTO);
 
-    const project = await update(projectDTOResult);
-    return project;
+    if (!projectDTO) throw new ProjectNotFoundError('Project or Image does not exists.');
+
+    return { projectDTO, projectImageDTO };
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
   }
 };
 
-//TODO: Check another way to remove. Current are changing IDs after update.
 export const removeImage = async (projectDTOParameter, projectImageDTOParameter) => {
   try {
     if (!(projectDTOParameter instanceof ProjectDTO))
@@ -278,24 +270,78 @@ export const removeImage = async (projectDTOParameter, projectImageDTOParameter)
 
     await ProjectImageValidation.updateProjectImageSchema.validate(projectImageDTOParameter);
 
-    const projectDTOResult = await getOne(projectDTOParameter);
-    const { projectImageDTORemoved, projectImagesDTOArray } = await ProjectImageService.removeById(
-      projectDTOResult,
+    const removeImageResult = await ProjectDAL.removeImage(
+      projectDTOParameter,
       projectImageDTOParameter,
     );
 
-    const projectDTO = Object.assign(
-      Object.create(Object.getPrototypeOf(projectDTOResult)),
-      projectDTOResult,
+    if (!removeImageResult) throw new ProjectNotFoundError('Project or Image does not exists.');
+
+    const { projectDTO, projectImageDTORemoved } = removeImageResult;
+    //Remove File by PATH.
+    await ProjectImageService.removeFile(projectImageDTORemoved);
+
+    return projectDTO;
+  } catch (err) {
+    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
+    else throw err;
+  }
+};
+
+export const publicGetOne = async projectDTOParameter => {
+  try {
+    if (!(projectDTOParameter instanceof ProjectDTO))
+      throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+    //validate
+    await ProjectValidation.getPublicProjectSchema.validate(projectDTOParameter);
+
+    //check if exists id and if not find by email
+    const projectDTOResult = await ProjectDAL.getOne(
       {
-        images: projectImagesDTOArray,
+        slug: projectDTOParameter.slug,
+        published: true,
+      },
+      {
+        createdDate: undefined,
+        startedDate: undefined,
+        finishedDate: undefined,
+        status: undefined,
       },
     );
 
-    const project = await update(projectDTO);
-    await ProjectImageService.removeFile(projectImageDTORemoved);
+    if (!projectDTOResult) throw new ProjectNotFoundError();
 
-    return project;
+    //returns DTO without password
+    return projectDTOResult;
+  } catch (err) {
+    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
+    else throw err;
+  }
+};
+
+export const publicGetAll = async (page, limit) => {
+  try {
+    //validate pagination params and return values
+    const pagination = await Pagination.initialize(page, limit);
+    const result = await ProjectDAL.getAll(
+      {
+        createdDate: undefined,
+        startedDate: undefined,
+        finishedDate: undefined,
+        status: undefined,
+      },
+      pagination,
+      {
+        published: true,
+      },
+    );
+
+    return {
+      pages: Math.ceil(result.count / pagination.limit),
+      current: pagination.page,
+      projects: result.projects,
+    };
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;

@@ -40,7 +40,7 @@ export const getOneById = async idParameter => {
   }
 };
 
-export const getAll = async (projection = {}, pagination) => {
+export const getAll = async (excludeFields = {}, pagination) => {
   try {
     const clients = await ClientModel.find({})
       .sort({ createdDate: 'desc' })
@@ -51,9 +51,15 @@ export const getAll = async (projection = {}, pagination) => {
     const clientsDTOArray = [];
     clients.forEach(client => {
       const clientDTO = new ClientDTO(client);
-      projection.user = _getUserDTO(client.user);
+      const user = _getUserDTO(client.user);
+
       clientsDTOArray.push(
-        Object.assign(Object.create(Object.getPrototypeOf(clientDTO)), clientDTO, projection),
+        Object.assign(
+          Object.create(Object.getPrototypeOf(clientDTO)),
+          clientDTO,
+          { user },
+          excludeFields,
+        ),
       );
     });
     return {

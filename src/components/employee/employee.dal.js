@@ -48,7 +48,7 @@ export const getOneById = async idParameter => {
   }
 };
 
-export const getAll = async (projection = {}, pagination) => {
+export const getAll = async (excludeFields = {}, pagination) => {
   try {
     const employees = await EmployeeModel.find({})
       .populate('user')
@@ -59,10 +59,15 @@ export const getAll = async (projection = {}, pagination) => {
     const employeesDTOArray = [];
     employees.forEach(employee => {
       const employeeDTO = new EmployeeDTO(employee);
-      projection.user = _getUserDTO(employee.user);
-      //employeesDTOArray.push(Object.assign({}, employeeDTO, projection));
+      const user = _getUserDTO(employee.user);
+
       employeesDTOArray.push(
-        Object.assign(Object.create(Object.getPrototypeOf(employeeDTO)), employeeDTO, projection),
+        Object.assign(
+          Object.create(Object.getPrototypeOf(employeeDTO)),
+          employeeDTO,
+          { user },
+          excludeFields,
+        ),
       );
     });
     return {
