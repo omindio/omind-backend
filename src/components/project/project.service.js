@@ -8,6 +8,10 @@ import {
   Validation as ProjectImageValidation,
   Service as ProjectImageService,
 } from './components/projectImage';
+import {
+  DTO as ProjectVideoDTO,
+  Validation as ProjectVideoValidation,
+} from './components/projectVideo';
 
 import { Service as ClientService } from '@components/client';
 
@@ -249,9 +253,11 @@ export const updateImage = async (projectDTOParameter, projectImageDTOParameter)
       newData,
     );
 
-    const { projectDTO } = await ProjectDAL.updateImage(projectDTOParameter, projectImageDTO);
+    const updateImageResult = await ProjectDAL.updateImage(projectDTOParameter, projectImageDTO);
 
-    if (!projectDTO) throw new ProjectNotFoundError('Project or Image does not exists.');
+    if (!updateImageResult) throw new ProjectNotFoundError('Project or Image does not exists.');
+
+    const { projectDTO } = updateImageResult;
 
     return { projectDTO, projectImageDTO };
   } catch (err) {
@@ -280,6 +286,79 @@ export const removeImage = async (projectDTOParameter, projectImageDTOParameter)
     const { projectDTO, projectImageDTORemoved } = removeImageResult;
     //Remove File by PATH.
     await ProjectImageService.removeFile(projectImageDTORemoved);
+
+    return projectDTO;
+  } catch (err) {
+    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
+    else throw err;
+  }
+};
+
+export const addVideo = async (projectDTOParameter, projectVideoDTOParameter) => {
+  try {
+    if (!(projectDTOParameter instanceof ProjectDTO))
+      throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+    if (!(projectVideoDTOParameter instanceof ProjectVideoDTO))
+      throw new InstanceofError('Param sent need to be an ProjectVideoDTO.');
+
+    await ProjectVideoValidation.createProjectVideoSchema.validate(projectVideoDTOParameter);
+
+    const projectDTO = await ProjectDAL.addVideo(projectDTOParameter, projectVideoDTOParameter);
+
+    if (!projectDTO) throw new ProjectNotFoundError('Project or Video does not exists.');
+
+    return projectDTO;
+  } catch (err) {
+    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
+    else throw err;
+  }
+};
+
+export const updateVideo = async (projectDTOParameter, projectVideoDTOParameter) => {
+  try {
+    if (!(projectDTOParameter instanceof ProjectDTO))
+      throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+    if (!(projectVideoDTOParameter instanceof ProjectVideoDTO))
+      throw new InstanceofError('Param sent need to be an ProjectVideoDTO.');
+
+    await ProjectVideoValidation.updateProjectVideoSchema.validate(projectVideoDTOParameter);
+
+    const removeVideoResult = await ProjectDAL.updateVideo(
+      projectDTOParameter,
+      projectVideoDTOParameter,
+    );
+
+    if (!removeVideoResult) throw new ProjectNotFoundError('Project or Video does not exists.');
+
+    const { projectDTO, projectVideoDTO } = removeVideoResult;
+
+    return { projectDTO, projectVideoDTO };
+  } catch (err) {
+    if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
+    else throw err;
+  }
+};
+
+export const removeVideo = async (projectDTOParameter, projectVideoDTOParameter) => {
+  try {
+    if (!(projectDTOParameter instanceof ProjectDTO))
+      throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+    if (!(projectVideoDTOParameter instanceof ProjectVideoDTO))
+      throw new InstanceofError('Param sent need to be an ProjectVideoDTO.');
+
+    await ProjectVideoValidation.updateProjectVideoSchema.validate(projectVideoDTOParameter);
+
+    const removeVideoResult = await ProjectDAL.removeVideo(
+      projectDTOParameter,
+      projectVideoDTOParameter,
+    );
+
+    if (!removeVideoResult) throw new ProjectNotFoundError('Project or Video does not exists.');
+
+    const { projectDTO } = removeVideoResult;
 
     return projectDTO;
   } catch (err) {

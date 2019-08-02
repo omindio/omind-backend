@@ -2,6 +2,7 @@ import * as ProjectService from './project.service';
 import ProjectDTO from './project.dto';
 
 import { DTO as ProjectImageDTO } from './components/projectImage';
+import { DTO as ProjectVideoDTO } from './components/projectVideo';
 
 import { DTO as ClientDTO } from '@components/client';
 import { roles as Role } from '@components/user/config';
@@ -134,6 +135,75 @@ export const getAll = async (req, res, next) => {
 
     const projects = await ProjectService.getAll(pageParameter, limitParameter);
     res.status(200).json(projects);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const addVideo = async (req, res, next) => {
+  const projectIdParameter = req.params.projectId;
+  try {
+    if (!projectIdParameter) throw new MissingParameterError(['projectId']);
+
+    const { title, source, url, published } = req.body;
+
+    const projectVideoDTO = new ProjectVideoDTO({
+      title,
+      source,
+      url,
+      published: typeof published === 'string' ? published === 'true' : published,
+    });
+    const projectDTO = new ProjectDTO({ id: projectIdParameter });
+
+    const projectVideo = await ProjectService.addVideo(projectDTO, projectVideoDTO);
+
+    res.status(201).json(projectVideo);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const updateVideo = async (req, res, next) => {
+  const projectIdParameter = req.params.projectId;
+  const videoIdParameter = req.params.videoId;
+  try {
+    if (!projectIdParameter) throw new MissingParameterError(['projectId']);
+    if (!videoIdParameter) throw new MissingParameterError(['videoId']);
+
+    const { title, source, url, published } = req.body;
+
+    const projectVideoDTO = new ProjectVideoDTO({
+      id: videoIdParameter,
+      title,
+      source,
+      url,
+      published: typeof published === 'string' ? published === 'true' : published,
+    });
+
+    const projectDTO = new ProjectDTO({ id: projectIdParameter });
+
+    const projectVideo = await ProjectService.updateVideo(projectDTO, projectVideoDTO);
+
+    res.status(201).json(projectVideo);
+  } catch (err) {
+    console.log(err);
+
+    return next(err);
+  }
+};
+
+export const removeVideo = async (req, res, next) => {
+  const projectIdParameter = req.params.projectId;
+  const videoIdParameter = req.params.videoId;
+  try {
+    if (!projectIdParameter) throw new MissingParameterError(['projectId']);
+    if (!videoIdParameter) throw new MissingParameterError(['videoId']);
+
+    const projectVideoDTO = new ProjectVideoDTO({ id: videoIdParameter });
+    const projectDTO = new ProjectDTO({ id: projectIdParameter });
+
+    await ProjectService.removeVideo(projectDTO, projectVideoDTO);
+    res.status(204).send();
   } catch (err) {
     return next(err);
   }

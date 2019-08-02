@@ -8,6 +8,8 @@ const defaultConfig = {
     'http://192.168.1.101:4000',
     'https://omindbrand.com',
     'https://www.omindbrand.com',
+    'https://omind.io',
+    'https://www.omind.io',
     'https://omind-frontend-production.herokuapp.com',
     'https://omind-frontend-staging.herokuapp.com',
     'http://omind-frontend-staging.herokuapp.com',

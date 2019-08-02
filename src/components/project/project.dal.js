@@ -3,6 +3,7 @@ import _pickBy from 'lodash.pickby';
 import ProjectModel from './project.model';
 import ProjectDTO from './project.dto';
 import { DTO as ProjectImageDTO } from './components/projectImage';
+import { DTO as ProjectVideoDTO } from './components/projectVideo';
 
 import { InstanceofError } from '@libraries/Error';
 import { DTO as ClientDTO } from '@components/client';
@@ -24,6 +25,7 @@ export const getOne = async (params, excludeFields = {}) => {
         {
           client: _getClientDTO(projectResult.client),
           images: _getProjectImagesDTOArray(projectResult.images),
+          videos: _getProjectVideosDTOArray(projectResult.videos),
         },
         excludeFields,
       );
@@ -50,6 +52,7 @@ export const getOneById = async idParameter => {
       const project = Object.assign(Object.create(Object.getPrototypeOf(projectDTO)), projectDTO, {
         client: _getClientDTO(projectResult.client),
         images: _getProjectImagesDTOArray(projectResult.images),
+        videos: _getProjectVideosDTOArray(projectResult.videos),
       });
       return project;
     } else {
@@ -68,7 +71,7 @@ export const getAll = async (excludeFields = {}, pagination, filter = {}) => {
         select:
           '_id companyName slug description logo socialLinkedin socialFacebook socialInstagram web',
       })
-      .sort({ createdDate: 'desc' })
+      .sort({ finishedDate: 'desc' })
       .skip(pagination.skip)
       .limit(pagination.limit);
 
@@ -79,12 +82,13 @@ export const getAll = async (excludeFields = {}, pagination, filter = {}) => {
       const projectDTO = new ProjectDTO(project);
       const client = _getClientDTO(project.client);
       const images = _getProjectImagesDTOArray(project.images);
+      const videos = _getProjectVideosDTOArray(project.videos);
 
       projectsDTOArray.push(
         Object.assign(
           Object.create(Object.getPrototypeOf(projectDTO)),
           projectDTO,
-          { client, images },
+          { client, images, videos },
           excludeFields,
         ),
       );
@@ -136,6 +140,7 @@ export const update = async projectDTOParameter => {
     const project = Object.assign(Object.create(Object.getPrototypeOf(projectDTO)), projectDTO, {
       client: _getClientDTO(projectResult.client),
       images: _getProjectImagesDTOArray(projectResult.images),
+      videos: _getProjectVideosDTOArray(projectResult.videos),
     });
     return project;
   } catch (err) {
@@ -242,6 +247,94 @@ export const removeImage = async (projectDTOParameter, projectImageDTOParameter)
   }
 };
 
+export const addVideo = async (projectDTOParameter, projectVideoDTOParameter) => {
+  if (!(projectDTOParameter instanceof ProjectDTO))
+    throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+  if (!(projectVideoDTOParameter instanceof ProjectVideoDTO))
+    throw new InstanceofError('Param sent need to be an ProjectVideoDTO.');
+
+  try {
+    const projectModel = await ProjectModel.findById(projectDTOParameter.id);
+
+    if (projectModel) {
+      projectModel.videos.push(projectVideoDTOParameter);
+      const project = await projectModel.save();
+
+      const projectDTO = Object.assign(
+        Object.create(Object.getPrototypeOf(projectDTOParameter)),
+        projectDTOParameter,
+        project.toJSON(),
+      );
+      return projectDTO;
+    }
+    return null;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const updateVideo = async (projectDTOParameter, projectVideoDTOParameter) => {
+  if (!(projectDTOParameter instanceof ProjectDTO))
+    throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+  if (!(projectVideoDTOParameter instanceof ProjectVideoDTO))
+    throw new InstanceofError('Param sent need to be an ProjectVideoDTO.');
+
+  try {
+    const projectModel = await ProjectModel.findById(projectDTOParameter.id);
+
+    if (projectModel) {
+      const video = projectModel.videos.id(projectVideoDTOParameter.id);
+      if (!video) return null;
+
+      video.set(projectVideoDTOParameter);
+
+      const project = await projectModel.save();
+
+      const projectDTO = Object.assign(
+        Object.create(Object.getPrototypeOf(projectDTOParameter)),
+        projectDTOParameter,
+        project.toJSON(),
+      );
+
+      return { projectDTO, projectVideoDTO: _getProjectVideoDTO(video) };
+    }
+    return null;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const removeVideo = async (projectDTOParameter, projectVideoDTOParameter) => {
+  if (!(projectDTOParameter instanceof ProjectDTO))
+    throw new InstanceofError('Param sent need to be an ProjectDTO.');
+
+  if (!(projectVideoDTOParameter instanceof ProjectVideoDTO))
+    throw new InstanceofError('Param sent need to be an ProjectVideoDTO.');
+
+  try {
+    const projectModel = await ProjectModel.findById(projectDTOParameter.id);
+
+    if (projectModel) {
+      const video = projectModel.videos.id(projectVideoDTOParameter.id);
+      if (!video) return null;
+
+      projectModel.videos.pull(projectVideoDTOParameter.id);
+      const project = await projectModel.save();
+      const projectDTO = Object.assign(
+        Object.create(Object.getPrototypeOf(projectDTOParameter)),
+        projectDTOParameter,
+        project.toJSON(),
+      );
+      return { projectDTO, projectVideoDTORemoved: _getProjectVideoDTO(video) };
+    }
+    return null;
+  } catch (err) {
+    throw err;
+  }
+};
+
 const _getClientDTO = client => {
   const clientDTO = new ClientDTO(client);
   return Object.assign(Object.create(Object.getPrototypeOf(clientDTO)), clientDTO, {});
@@ -263,4 +356,22 @@ const _getProjectImagesDTOArray = projectImagesArray => {
 const _getProjectImageDTO = projectImage => {
   const projectImageDTO = new ProjectImageDTO(projectImage);
   return Object.assign(Object.create(Object.getPrototypeOf(projectImageDTO)), projectImageDTO, {});
+};
+
+const _getProjectVideosDTOArray = projectVideosArray => {
+  const projectVideosDTOArray = [];
+
+  projectVideosArray.forEach(projectVideo => {
+    const projectVideoDTO = _getProjectImageDTO(projectVideo);
+    projectVideosDTOArray.push(
+      Object.assign(Object.create(Object.getPrototypeOf(projectVideoDTO)), projectVideoDTO, {}),
+    );
+  });
+
+  return projectVideosDTOArray;
+};
+
+const _getProjectVideoDTO = projectVideo => {
+  const projectVideoDTO = new ProjectVideoDTO(projectVideo);
+  return Object.assign(Object.create(Object.getPrototypeOf(projectVideoDTO)), projectVideoDTO, {});
 };

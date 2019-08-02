@@ -8,6 +8,18 @@ import { UploadMidleware } from '@libraries';
 
 export const protectedRoutes = () => {
   const routes = Router();
+  //videos
+  routes.post('/:projectId/videos', middleware.authorize([Role.Admin]), ProjectController.addVideo);
+  routes.patch(
+    '/:projectId/videos/:videoId',
+    middleware.authorize([Role.Admin]),
+    ProjectController.updateVideo,
+  );
+  routes.delete(
+    '/:projectId/videos/:videoId',
+    middleware.authorize([Role.Admin]),
+    ProjectController.removeVideo,
+  );
 
   //images
   routes.post(

@@ -39,7 +39,7 @@ export const createClientSchema = Joi.object()
     slug: slugSchema.optional().allow(''),
     logo: logoSchema.optional().allow(''),
     logoFile: logoFileSchema.optional().allow(null),
-    description: descriptionSchema.optional().allow(''),
+    description: descriptionSchema.required(),
     cif: cifSchema.optional().allow(''),
     fiscalAddress: fiscalAddressSchema.optional().allow(''),
     phone: phoneSchema.optional().allow(''),

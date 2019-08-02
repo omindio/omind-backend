@@ -1,3 +1,5 @@
-import Model from './projectVideo.model';
+import Schema from './projectVideo.schema';
+import DTO from './projectVideo.dto';
+import * as Validation from './validation/projectVideo.validation';
 
-export { Model };
+export { Schema, DTO, Validation };

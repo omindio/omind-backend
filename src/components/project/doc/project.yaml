@@ -39,6 +39,76 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Project'
+  /projects/{projectId}/videos:
+    post:
+      parameters:
+        - name: projectId
+          in: path
+          schema:
+            type: string
+      tags:
+        - projects
+      summary: Add video.
+      requestBody:
+        $ref: '#/components/requestBodies/ProjectVideo'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectVideo'
+      security:
+        - bearerAuth: []
+  /projects/{projectId}/videos/{videoId}:
+    delete:
+      tags:
+        - projects
+      summary: Delete video.
+      parameters:
+        - name: projectId
+          in: path
+          schema:
+            type: string
+        - name: videoId
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Video deleted successfully
+        '400':
+          description: Missing id parameter
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - projects
+      summary: Update video
+      parameters:
+        - name: projectId
+          in: path
+          schema:
+            type: string
+        - name: videoId
+          in: path
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/ProjectVideo'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectVideo'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: Video not found
+      security:
+        - bearerAuth: []
   /projects/{projectId}/images:
     post:
       parameters:
@@ -238,7 +308,19 @@ components:
           type: boolean
         path:
           type: string
-
+    ProjectVideo:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        source:
+          type: string
+        url:
+          type: string
+        published:
+          type: boolean
     Project:
       type: object
       properties:
@@ -289,6 +371,21 @@ components:
               imageFile:
                 type: string
                 format: binary
+    ProjectVideo:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              url:
+                type: string
+              source:
+                type: string
+              published:
+                type: boolean
     Project:
       required: true
       content:
