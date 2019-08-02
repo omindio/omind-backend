@@ -18,7 +18,6 @@ const ProjectVideoSchema = new Schema({
   },
   source: {
     type: String,
-    required: true,
   },
   createdDate: {
     type: Date,
