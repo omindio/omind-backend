@@ -362,7 +362,7 @@ const _getProjectVideosDTOArray = projectVideosArray => {
   const projectVideosDTOArray = [];
 
   projectVideosArray.forEach(projectVideo => {
-    const projectVideoDTO = _getProjectImageDTO(projectVideo);
+    const projectVideoDTO = _getProjectVideoDTO(projectVideo);
     projectVideosDTOArray.push(
       Object.assign(Object.create(Object.getPrototypeOf(projectVideoDTO)), projectVideoDTO, {}),
     );
