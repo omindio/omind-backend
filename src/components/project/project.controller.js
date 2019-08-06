@@ -233,6 +233,7 @@ export const addImage = async (req, res, next) => {
 
     res.status(201).json(projectImage);
   } catch (err) {
+    console.log(err);
     return next(err);
   }
 };
