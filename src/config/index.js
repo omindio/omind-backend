@@ -32,6 +32,12 @@ const defaultConfig = {
     tokenTime: process.env.TOKEN_TIME,
     secret: process.env.SECRET_TOKEN,
   },
+  backblaze: {
+    bucketId: process.env.BACKBLAZE_BUCKET_ID,
+    keyId: process.env.BACKBLAZE_KEY_ID,
+    keyName: process.env.BACKBLAZE_KEY_NAME,
+    applicationKey: process.env.BACKBLAZE_APPLICATION_KEY,
+  },
   rateLimiter: {
     tableName: process.env.RATE_LIMITER_TABLE_NAME,
     points: process.env.RATE_LIMITER_POINTS,

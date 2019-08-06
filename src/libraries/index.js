@@ -8,6 +8,7 @@ import RateLimiterMiddleware from './rate-limiter-middleware';
 import UploadMidleware from './upload-image-middleware';
 import ImageResize from './image-resize';
 import MillisToMinutes from './millis-to-minutes';
+import Backblaze from './backblaze-b2';
 
 export {
   Swagger,
@@ -20,4 +21,5 @@ export {
   ImageResize,
   RateLimiterMiddleware,
   MillisToMinutes,
+  Backblaze,
 };

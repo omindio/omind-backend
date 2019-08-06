@@ -193,8 +193,17 @@ export const addImage = async (projectDTOParameter, projectImageDTOParameter) =>
 
     await ProjectImageValidation.createProjectImageSchema.validate(projectImageDTOParameter);
 
-    const projectImageDTO = await ProjectImageService.saveFile(projectImageDTOParameter);
+    //check get projectDTO and check if ...
+    const projectDTOResult = await getOne(projectDTOParameter);
 
+    //check if exist another main image - returns exception
+    if (projectImageDTOParameter.main) await ProjectImageService.hasMainImage(projectDTOResult);
+
+    //check if exist cover page - returns exception
+    if (projectImageDTOParameter.coverPage)
+      await ProjectImageService.hasCoverPageImage(projectDTOResult);
+
+    const projectImageDTO = await ProjectImageService.saveFile(projectImageDTOParameter);
     const projectDTO = await ProjectDAL.addImage(projectDTOParameter, projectImageDTO);
 
     if (!projectDTO) throw new ProjectNotFoundError('Project or Image does not exists.');
@@ -234,12 +243,14 @@ export const updateImage = async (projectDTOParameter, projectImageDTOParameter)
     )
       await ProjectImageService.hasCoverPageImage(projectDTOResult);
 
+    //TODO: NO LLAMAR AUTENTICAR 2 VECES EN EL CDN.
     if (projectImageDTOParameter.imageFile) {
       //remove file
-      await ProjectImageService.removeFile(projectDTOResult.images[indexImageDTOResult]);
-      //save file
-      const projectImageDTOSaved = await ProjectImageService.saveFile(projectImageDTOParameter);
-      newData.path = projectImageDTOSaved.path;
+      const newProjectImageDTO = await ProjectImageService.updateFile(
+        projectDTOResult.images[indexImageDTOResult],
+        projectImageDTOParameter,
+      );
+      newData.path = newProjectImageDTO.path;
     }
     newData.title = projectImageDTOParameter.title;
     newData.imageFile = projectImageDTOParameter.imageFile;

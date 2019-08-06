@@ -1,7 +1,4 @@
-import fs from 'fs';
-import appRoot from 'app-root-path';
-
-import { ImageResize } from '@libraries';
+import { ImageResize, Backblaze } from '@libraries';
 import { InstanceofError, MissingParameterError } from '@libraries/Error';
 
 import {
@@ -12,8 +9,6 @@ import {
 
 import ProjectDTO from '../../project.dto';
 import ProjectImageDTO from './projectImage.dto';
-
-const imagePath = `${appRoot}/uploads/images`;
 
 //will return index of imageDTO or exception
 export const getOneById = async (ProjectDTOParameter, projectImageDTOParameter) => {
@@ -36,43 +31,6 @@ export const getOneById = async (ProjectDTOParameter, projectImageDTOParameter) 
   }
 };
 
-//will return object of array of imagesDTO result and imageDTORemoved or exception
-/*
-export const removeById = async (projectDTOParameter, projectImageDTOParameter) => {
-  try {
-    if (!(projectDTOParameter instanceof ProjectDTO))
-      throw new InstanceofError('Param sent need to be an ProjectDTO.');
-
-    if (!(projectImageDTOParameter instanceof ProjectImageDTO))
-      throw new InstanceofError('Param sent need to be an ProjectImageDTO.');
-
-    if (!projectImageDTOParameter.id) throw new MissingParameterError(['id']);
-
-    const imageDTOIndex = await getOneById(projectDTOParameter, projectImageDTOParameter);
-
-    const imageDTOResult = Object.assign(
-      Object.create(Object.getPrototypeOf(projectDTOParameter.images[imageDTOIndex])),
-      projectDTOParameter.images[imageDTOIndex],
-    );
-
-    //TODO: Change for filter
-    projectDTOParameter.images.splice(imageDTOIndex);
-
-    const imagesDTOArrayFiltered = projectDTOParameter.images.filter(function(image, index) {
-      return projectDTOParameter.images[index].id != projectImageDTOParameter.id;
-    });
-
-    return {
-      projectImageDTORemoved: imageDTOResult,
-      projectImagesDTOArray: imagesDTOArrayFiltered,
-    };
-
-  } catch (err) {
-    throw err;
-  }
-};
- */
-
 //will return main image index or null
 export const hasMainImage = async (projectDTOParameter, throwException = true) => {
   try {
@@ -80,7 +38,7 @@ export const hasMainImage = async (projectDTOParameter, throwException = true) =
       throw new InstanceofError('Param sent need to be an ProjectDTO.');
 
     projectDTOParameter.images.map(image => {
-      if (image.main)
+      if (image.main) {
         if (throwException) {
           throw new MainImageAlreadyExistsError(
             'Can not add this image as main because another exists.',
@@ -88,6 +46,7 @@ export const hasMainImage = async (projectDTOParameter, throwException = true) =
         } else {
           return true;
         }
+      }
     });
     return false;
   } catch (err) {
@@ -123,14 +82,56 @@ export const saveFile = async projectImageDTOParameter => {
     if (!(projectImageDTOParameter instanceof ProjectImageDTO))
       throw new InstanceofError('Param sent need to be an ProjectImageDTO.');
 
-    const fileUpload = new ImageResize(imagePath, 960, 748);
-    const filename = await fileUpload.save(projectImageDTOParameter.imageFile.buffer);
+    const imageResize = new ImageResize();
+    const { filePath, fileName } = await imageResize.resize(
+      projectImageDTOParameter.imageFile.buffer,
+    );
+
+    const b2 = new Backblaze();
+    await b2.authorize();
+    await b2.uploadFile(filePath, fileName);
 
     const projectImageDTO = Object.assign(
       Object.create(Object.getPrototypeOf(projectImageDTOParameter)),
       projectImageDTOParameter,
       {
-        path: filename,
+        path: fileName,
+      },
+    );
+
+    return projectImageDTO;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const updateFile = async (
+  removeProjectImageDTOParameter,
+  createProjectImageDTOParameter,
+) => {
+  try {
+    if (
+      !(removeProjectImageDTOParameter instanceof ProjectImageDTO) ||
+      !(createProjectImageDTOParameter instanceof ProjectImageDTO)
+    )
+      throw new InstanceofError('Param sent need to be an ProjectImageDTO.');
+
+    const b2 = new Backblaze();
+    await b2.authorize();
+    await b2.removeFile(removeProjectImageDTOParameter.path);
+
+    const imageResize = new ImageResize();
+    const { filePath, fileName } = await imageResize.resize(
+      createProjectImageDTOParameter.imageFile.buffer,
+    );
+
+    await b2.uploadFile(filePath, fileName);
+
+    const projectImageDTO = Object.assign(
+      Object.create(Object.getPrototypeOf(createProjectImageDTOParameter)),
+      createProjectImageDTOParameter,
+      {
+        path: fileName,
       },
     );
 
@@ -145,10 +146,13 @@ export const removeFile = async projectImageDTOParameter => {
     if (!(projectImageDTOParameter instanceof ProjectImageDTO))
       throw new InstanceofError('Param sent need to be an ProjectImageDTO.');
 
-    if (projectImageDTOParameter.path)
-      fs.unlink(`${imagePath}/${projectImageDTOParameter.path}`, err => {
-        if (err) throw err;
-      });
+    const { path } = projectImageDTOParameter;
+
+    if (path) {
+      const b2 = new Backblaze();
+      await b2.authorize();
+      await b2.removeFile(path);
+    }
   } catch (err) {
     throw err;
   }
