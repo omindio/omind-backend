@@ -1,0 +1,412 @@
+paths:
+  /public/products/{page}/{limit}:
+    get:
+      tags:
+        - products
+      summary: Get all public products.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+      parameters:
+        - name: page
+          in: path
+          schema:
+            type: integer
+        - name: limit
+          in: path
+          schema:
+            type: integer
+  /public/products/{slug}:
+    get:
+      tags:
+        - products
+      summary: Get one public product by slug.
+      parameters:
+        - name: slug
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+  /products/{productId}/videos:
+    post:
+      parameters:
+        - name: productId
+          in: path
+          schema:
+            type: string
+      tags:
+        - products
+      summary: Add video.
+      requestBody:
+        $ref: '#/components/requestBodies/ProductVideo'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductVideo'
+      security:
+        - bearerAuth: []
+  /products/{productId}/videos/{videoId}:
+    delete:
+      tags:
+        - products
+      summary: Delete video.
+      parameters:
+        - name: productId
+          in: path
+          schema:
+            type: string
+        - name: videoId
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Video deleted successfully
+        '400':
+          description: Missing id parameter
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - products
+      summary: Update video
+      parameters:
+        - name: productId
+          in: path
+          schema:
+            type: string
+        - name: videoId
+          in: path
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/ProductVideo'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductVideo'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: Video not found
+      security:
+        - bearerAuth: []
+  /products/{productId}/images:
+    post:
+      parameters:
+        - name: productId
+          in: path
+          schema:
+            type: string
+      tags:
+        - products
+      summary: Add image.
+      requestBody:
+        $ref: '#/components/requestBodies/ProductImage'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductImage'
+      security:
+        - bearerAuth: []
+  /products/{productId}/images/{imageId}:
+    delete:
+      tags:
+        - products
+      summary: Delete image.
+      parameters:
+        - name: productId
+          in: path
+          schema:
+            type: string
+        - name: imageId
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Image deleted successfully
+        '400':
+          description: Missing id parameter
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - products
+      summary: Update image
+      parameters:
+        - name: productId
+          in: path
+          schema:
+            type: string
+        - name: imageId
+          in: path
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/ProductImage'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductImage'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: Image not found
+      security:
+        - bearerAuth: []
+  /products/{page}/{limit}:
+    get:
+      tags:
+        - products
+      summary: Get all products.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '403':
+          description: Access denied. Insufficient permission.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: path
+          schema:
+            type: integer
+        - name: limit
+          in: path
+          schema:
+            type: integer
+  /products:
+    post:
+      tags:
+        - products
+      summary: Create product.
+      requestBody:
+        $ref: '#/components/requestBodies/Product'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Email already exists
+      security:
+        - bearerAuth: []
+  /products/{id}:
+    delete:
+      tags:
+        - products
+      summary: Delete product.
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Product deleted successfully
+        '400':
+          description: Missing id parameter
+        '403':
+          description: Can not delete Admin Product
+        '404':
+          description: Clint not found
+      security:
+        - bearerAuth: []
+    get:
+      tags:
+        - products
+      summary: Get one product by id.
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: Product not found
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - products
+      summary: Update one product
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Product'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Missing id parameter
+        '404':
+          description: Product not found
+      security:
+        - bearerAuth: []
+components:
+  schemas:
+    ProductImage:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        main:
+          type: boolean
+        coverPage:
+          type: boolean
+        published:
+          type: boolean
+        path:
+          type: string
+    ProductVideo:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        source:
+          type: string
+        url:
+          type: string
+        published:
+          type: boolean
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        metaDescription:
+          type: string
+        startedDate:
+          type: string
+        finishedDate:
+          type: string
+        published:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        images:
+          type: array
+  requestBodies:
+    ProductImage:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              main:
+                type: boolean
+              coverPage:
+                type: boolean
+              published:
+                type: boolean
+              imageFile:
+                type: string
+                format: binary
+    ProductVideo:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              url:
+                type: string
+              source:
+                type: string
+              published:
+                type: boolean
+    Product:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              metaDescription:
+                type: string
+              startedDate:
+                type: string
+                format: date
+              finishedDate:
+                type: string
+                format: date
+              published:
+                type: boolean
+                default: false
+              status:
+                type: string
+              tags:
+                type: array
+                items:
+                  type: string

@@ -17,6 +17,7 @@ import {
   ContactComponent,
   BankAccountComponent,
   ProjectComponent,
+  ProductComponent,
 } from '@components';
 import { Swagger, ErrorHandler, Winston, RateLimiterMiddleware } from '@libraries';
 
@@ -48,6 +49,7 @@ export const initialize = () => {
   ContactComponent.initialize(app);
   BankAccountComponent.initialize(app);
   ProjectComponent.initialize(app);
+  ProductComponent.initialize(app);
 
   Swagger.initialize(app);
   ErrorHandler.Middleware.initialize(app);

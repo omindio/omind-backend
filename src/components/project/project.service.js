@@ -59,9 +59,9 @@ export const create = async projectDTOParameter => {
       newData,
     );
 
-    const employee = await ProjectDAL.create(projectDTO);
+    const project = await ProjectDAL.create(projectDTO);
 
-    return employee;
+    return project;
   } catch (err) {
     if (err.hasOwnProperty('details')) throw new ValidationSchemaError(err);
     else throw err;
