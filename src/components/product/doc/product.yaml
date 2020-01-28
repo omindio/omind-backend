@@ -340,6 +340,14 @@ components:
           type: string
         published:
           type: string
+        webUrl:
+          type: string
+        linkedinUrl:
+          type: string
+        instagramUrl:
+          type: string
+        facebookUrl:
+          type: string
         status:
           type: string
         tags:
@@ -405,6 +413,14 @@ components:
                 type: boolean
                 default: false
               status:
+                type: string
+              webUrl:
+                type: string
+              linkedinUrl:
+                type: string
+              instagramUrl:
+                type: string
+              facebookUrl:
                 type: string
               tags:
                 type: array

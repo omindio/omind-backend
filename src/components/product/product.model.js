@@ -25,6 +25,22 @@ const ProductSchema = new Schema({
     type: String,
     required: false,
   },
+  facebookUrl: {
+    type: String,
+    required: false,
+  },
+  instagramUrl: {
+    type: String,
+    required: false,
+  },
+  webUrl: {
+    type: String,
+    required: false,
+  },
+  linkedinUrl: {
+    type: String,
+    required: false,
+  },
   startedDate: {
     type: Date,
     default: Date.now,

@@ -14,6 +14,10 @@ export default class ProductDTO {
     this.status = data.status;
     this.tags = data.tags;
     this.images = data.images;
+    this.facebookUrl = data.facebookUrl;
+    this.instagramUrl = data.instagramUrl;
+    this.webUrl = data.webUrl;
+    this.linkedinUrl = data.linkedinUrl;
     this.createdDate = data.createdDate;
 
     Object.freeze(this);

@@ -10,6 +10,11 @@ const nameSchema = Joi.string()
   .min(2)
   .max(50);
 const slugSchema = Joi.string();
+const facebookUrlSchema = Joi.string().uri();
+const instagramUrlSchema = Joi.string().uri();
+const linkedinUrlSchema = Joi.string().uri();
+const webUrlSchema = Joi.string().uri();
+
 const descriptionSchema = Joi.string()
   .min(10)
   .max(1000);
@@ -40,6 +45,10 @@ export const createProductSchema = Joi.object()
     tags: tagsSchema.optional().allow(''),
     images: imagesSchema.optional().allow(''),
     createdDate: createdDateSchema.optional().allow(''),
+    facebookUrl: facebookUrlSchema.optional().allow(''),
+    instagramUrl: instagramUrlSchema.optional().allow(''),
+    linkedinUrl: linkedinUrlSchema.optional().allow(''),
+    webUrl: webUrlSchema.optional().allow(''),
   })
   .options({ abortEarly: false });
 
@@ -60,6 +69,10 @@ export const updateProductSchema = Joi.object()
     tags: tagsSchema.optional().allow(''),
     images: imagesSchema.optional().allow(''),
     createdDate: createdDateSchema.optional().allow(''),
+    facebookUrl: facebookUrlSchema.optional().allow(''),
+    instagramUrl: instagramUrlSchema.optional().allow(''),
+    linkedinUrl: linkedinUrlSchema.optional().allow(''),
+    webUrl: webUrlSchema.optional().allow(''),
   })
   .options({ abortEarly: false });
 
@@ -77,6 +90,10 @@ export const getProductSchema = Joi.object()
     tags: tagsSchema.optional(),
     images: imagesSchema.optional(),
     createdDate: createdDateSchema.optional(),
+    facebookUrl: facebookUrlSchema.optional(),
+    instagramUrl: instagramUrlSchema.optional(),
+    linkedinUrl: linkedinUrlSchema.optional(),
+    webUrl: webUrlSchema.optional(),
   })
   .options({ abortEarly: false });
 
@@ -94,5 +111,9 @@ export const getPublicProductSchema = Joi.object()
     tags: tagsSchema.optional(),
     images: imagesSchema.optional(),
     createdDate: createdDateSchema.optional(),
+    facebookUrl: facebookUrlSchema.optional(),
+    instagramUrl: instagramUrlSchema.optional(),
+    linkedinUrl: linkedinUrlSchema.optional(),
+    webUrl: webUrlSchema.optional(),
   })
   .options({ abortEarly: false });

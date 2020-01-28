@@ -19,6 +19,10 @@ export const create = async (req, res, next) => {
       status,
       tags,
       employee,
+      facebookUrl,
+      instagramUrl,
+      webUrl,
+      linkedinUrl,
       pmo,
     } = req.body;
 
@@ -34,6 +38,10 @@ export const create = async (req, res, next) => {
       tags: tagsArray,
       employee,
       pmo,
+      facebookUrl,
+      instagramUrl,
+      webUrl,
+      linkedinUrl,
     });
 
     const product = await ProductService.create(productDTO);
@@ -62,6 +70,10 @@ export const update = async (req, res, next) => {
       employee,
       pmo,
       id,
+      facebookUrl,
+      instagramUrl,
+      webUrl,
+      linkedinUrl,
     } = Object.assign({}, req.body, {
       id: idParameter,
     });
@@ -79,6 +91,10 @@ export const update = async (req, res, next) => {
       tags: tagsArray,
       employee,
       pmo,
+      facebookUrl,
+      instagramUrl,
+      webUrl,
+      linkedinUrl,
     });
 
     const product = await ProductService.update(productDTO);
