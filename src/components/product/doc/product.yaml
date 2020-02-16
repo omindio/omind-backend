@@ -346,6 +346,10 @@ components:
           type: string
         instagramUrl:
           type: string
+        youtubeUrl:
+          type: string
+        soundcloudUrl:
+          type: string
         facebookUrl:
           type: string
         status:
@@ -419,6 +423,10 @@ components:
               linkedinUrl:
                 type: string
               instagramUrl:
+                type: string
+              youtubeUrl:
+                type: string
+              soundcloudUrl:
                 type: string
               facebookUrl:
                 type: string

@@ -29,6 +29,14 @@ const ProductSchema = new Schema({
     type: String,
     required: false,
   },
+  youtubeUrl: {
+    type: String,
+    required: false,
+  },
+  soundcloudUrl: {
+    type: String,
+    required: false,
+  },
   instagramUrl: {
     type: String,
     required: false,

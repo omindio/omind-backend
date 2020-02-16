@@ -14,7 +14,8 @@ const facebookUrlSchema = Joi.string().uri();
 const instagramUrlSchema = Joi.string().uri();
 const linkedinUrlSchema = Joi.string().uri();
 const webUrlSchema = Joi.string().uri();
-
+const youtubeUrlSchema = Joi.string().uri();
+const soundcloudUrlSchema = Joi.string().uri();
 const descriptionSchema = Joi.string()
   .min(10)
   .max(1000);
@@ -48,6 +49,8 @@ export const createProductSchema = Joi.object()
     facebookUrl: facebookUrlSchema.optional().allow(''),
     instagramUrl: instagramUrlSchema.optional().allow(''),
     linkedinUrl: linkedinUrlSchema.optional().allow(''),
+    youtubeUrl: youtubeUrlSchema.optional().allow(''),
+    soundcloudUrl: soundcloudUrlSchema.optional().allow(''),
     webUrl: webUrlSchema.optional().allow(''),
   })
   .options({ abortEarly: false });
@@ -72,6 +75,8 @@ export const updateProductSchema = Joi.object()
     facebookUrl: facebookUrlSchema.optional().allow(''),
     instagramUrl: instagramUrlSchema.optional().allow(''),
     linkedinUrl: linkedinUrlSchema.optional().allow(''),
+    youtubeUrl: youtubeUrlSchema.optional().allow(''),
+    soundcloudUrl: soundcloudUrlSchema.optional().allow(''),
     webUrl: webUrlSchema.optional().allow(''),
   })
   .options({ abortEarly: false });
@@ -92,6 +97,8 @@ export const getProductSchema = Joi.object()
     createdDate: createdDateSchema.optional(),
     facebookUrl: facebookUrlSchema.optional(),
     instagramUrl: instagramUrlSchema.optional(),
+    youtubeUrl: youtubeUrlSchema.optional(),
+    soundcloudUrl: soundcloudUrlSchema.optional(),
     linkedinUrl: linkedinUrlSchema.optional(),
     webUrl: webUrlSchema.optional(),
   })
@@ -114,6 +121,8 @@ export const getPublicProductSchema = Joi.object()
     facebookUrl: facebookUrlSchema.optional(),
     instagramUrl: instagramUrlSchema.optional(),
     linkedinUrl: linkedinUrlSchema.optional(),
+    youtubeUrl: youtubeUrlSchema.optional(),
+    soundcloudUrl: soundcloudUrlSchema.optional(),
     webUrl: webUrlSchema.optional(),
   })
   .options({ abortEarly: false });

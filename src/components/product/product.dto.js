@@ -17,6 +17,8 @@ export default class ProductDTO {
     this.facebookUrl = data.facebookUrl;
     this.instagramUrl = data.instagramUrl;
     this.webUrl = data.webUrl;
+    this.youtubeUrl = data.youtubeUrl;
+    this.soundcloudUrl = data.soundcloudUrl;
     this.linkedinUrl = data.linkedinUrl;
     this.createdDate = data.createdDate;
 

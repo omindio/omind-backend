@@ -22,6 +22,8 @@ export const create = async (req, res, next) => {
       facebookUrl,
       instagramUrl,
       webUrl,
+      youtubeUrl,
+      soundcloudUrl,
       linkedinUrl,
       pmo,
     } = req.body;
@@ -40,6 +42,8 @@ export const create = async (req, res, next) => {
       pmo,
       facebookUrl,
       instagramUrl,
+      youtubeUrl,
+      soundcloudUrl,
       webUrl,
       linkedinUrl,
     });
@@ -72,6 +76,8 @@ export const update = async (req, res, next) => {
       id,
       facebookUrl,
       instagramUrl,
+      youtubeUrl,
+      soundcloudUrl,
       webUrl,
       linkedinUrl,
     } = Object.assign({}, req.body, {
@@ -93,6 +99,8 @@ export const update = async (req, res, next) => {
       pmo,
       facebookUrl,
       instagramUrl,
+      youtubeUrl,
+      soundcloudUrl,
       webUrl,
       linkedinUrl,
     });
