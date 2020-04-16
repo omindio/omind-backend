@@ -31,3 +31,52 @@ paths:
                     type: string
         '401':
           description: Wrong email or password.
+  /auth/browser:
+    post:
+      tags:
+        - authentication
+      summary: Secure Authentication for browser httponly cookie
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  default: omindbrand@gmail.com
+                password:
+                  type: string
+                  format: password
+                  default: 12345678
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Wrong email or password.
+  /auth/browser/logout:
+    post:
+      tags:
+        - authentication
+      summary: Remove cookie token
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Wrong email or password.

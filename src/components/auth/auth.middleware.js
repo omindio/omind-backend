@@ -14,6 +14,13 @@ export const authorize = (roles = []) => {
     // authenticate JWT token and attach user to request object (req.user)
     expressJwt({
       secret: config.auth.secret,
+      getToken: (req) => {
+        if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+          return req.headers.authorization.split(' ')[1];
+        } else if (req.cookies && req.cookies.token) {
+          return req.cookies.token;
+        }
+      },
     }),
     // authorize based on user role
     (req, res, next) => {

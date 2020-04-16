@@ -3,7 +3,7 @@ import { config } from '@config';
 //TODO: FIX
 let db;
 export const connect = () => {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     if (db) return db;
     mongoose.Promise = global.Promise;
     mongoose
@@ -16,7 +16,7 @@ export const connect = () => {
       .then(() => {
         resolve(db);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log('Error creating db connection: ' + err);
         reject(db);
       });

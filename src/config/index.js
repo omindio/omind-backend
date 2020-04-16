@@ -4,6 +4,7 @@ dotenv.config();
 const defaultConfig = {
   cors: [
     'http://0.0.0.0:4000',
+    'http://localhost:8000',
     'http://localhost:4000',
     'http://192.168.1.101:4000',
     'https://omindbrand.com',
@@ -15,12 +16,13 @@ const defaultConfig = {
     'http://omind-frontend-staging.herokuapp.com',
   ],
   mongoOpts: {
-    reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
-    reconnectInterval: 100, // Reconnect every 100ms
+    //reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
+    //reconnectInterval: 100, // Reconnect every 100ms
     useCreateIndex: true,
     useNewUrlParser: true,
     autoIndex: false,
     useFindAndModify: false,
+    useUnifiedTopology: true,
   },
   dbName: process.env.DB_NAME,
   dbUri: process.env.DB_URI,

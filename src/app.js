@@ -6,6 +6,7 @@ import correlator from 'express-correlation-id';
 import morgan from 'morgan';
 import compression from 'compression';
 import appRoot from 'app-root-path';
+import cookieParser from 'cookie-parser';
 
 import { config } from './config';
 
@@ -30,7 +31,8 @@ export const initialize = () => {
   app.use(correlator());
 
   app.use(helmet());
-  app.use(cors({ origin: config.cors }));
+  app.use(cors({ origin: config.cors, credentials: true }));
+  app.use(cookieParser());
 
   //extended=false is a configuration option that tells the parser to use the classic encoding. When using it, values can be only strings or arrays.
   app.use(bodyParser.urlencoded({ extended: false }));
